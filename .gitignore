@@ -5,4 +5,4 @@
 *.mo
 *.sqlite3
 *.pid
-*.ini
+.cache/

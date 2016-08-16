@@ -3,6 +3,8 @@ from mongoengine import *
 
 from django.conf import settings
 
+from mongoextensions.fields import DateStringField, TimeStringField
+
 connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
 
 
@@ -81,4 +83,7 @@ class Event(HappBaseDocument):
     email = EmailField()
     web_site = URLField()
     votes = IntField(default=0)
-
+    start_date = DateStringField()
+    start_time = TimeStringField()
+    end_date = DateStringField()
+    end_time = TimeStringField()
