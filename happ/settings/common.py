@@ -118,3 +118,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MONGODB_PORT = 27017
+MONGODB_HOST_NAME = os.getenv('MONGO_PORT_27017_TCP_ADDR', '127.0.0.1')
+MONGODB_HOST = 'mongodb://{host}:{port}'.format(host=MONGODB_HOST_NAME, port=MONGODB_PORT)
+MONGODB_NAME = 'happ1'

@@ -1,6 +1,8 @@
 from mongoengine import *
 
-connect('happ1')
+from django.conf import settings
+
+connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
 
 
 class Country(Document):
