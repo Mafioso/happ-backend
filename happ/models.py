@@ -1,3 +1,4 @@
+from datetime import datetime
 from mongoengine import *
 
 from django.conf import settings
@@ -5,17 +6,27 @@ from django.conf import settings
 connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
 
 
-class Country(Document):
-    date_creatd = DateTimeField()
+class HappBaseDocument(Document):
+    date_created = DateTimeField()
+    date_edited = DateTimeField(default=datetime.now)
+
+    def save(self, *args, **kwargs):
+        if not self.date_created:
+            self.date_created = datetime.now()
+        self.date_edited = datetime.now()
+        return super(HappBaseDocument, self).save(*args, **kwargs)
+
+
+class Country(HappBaseDocument):
     name = StringField(required=True)
 
 
-class City(Document):
+class City(HappBaseDocument):
     name = StringField(required=True)
     country = ReferenceField(Country, reverse_delete_rule=CASCADE)
 
 
-class Currency(Document):
+class Currency(HappBaseDocument):
     name = StringField(required=True)
 
 
@@ -25,7 +36,7 @@ class UserSettings(EmbeddedDocument):
     notifications = DictField()
 
 
-class User(Document):
+class User(HappBaseDocument):
     GENDERS = (MALE, FEMALE) = range(2)
 
     username = StringField(required=True)
@@ -40,14 +51,14 @@ class User(Document):
     settings = EmbeddedDocumentField(UserSettings)
 
 
-class Interest(Document):
+class Interest(HappBaseDocument):
     title = StringField()
     is_global = BooleanField(default=True)
     local_cities = ListField(ReferenceField(City))
     parent = ReferenceField('self')
 
 
-class Event(Document):
+class Event(HappBaseDocument):
     TYPES = (NORMAL, FEATURED, ADS) = range(3)
     STATUSES = (MODERATION, APPROVED, REJECTED) = range(3)
 
