@@ -63,7 +63,7 @@ class TimeStringField(StringField):
         if value is None:
             return value
         if isinstance(value, datetime.time) or isinstance(value, datetime.datetime):
-            return datetime.datetime.strftime(datetime.datetime(value.hour, value.minute, value.second), self.format)
+            return datetime.datetime.strftime(datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second), self.format)
         if callable(value):
             return value()
 

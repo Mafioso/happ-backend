@@ -42,3 +42,20 @@ class EventTests(TestCase):
         self.assertEqual(Event.objects.filter(start_date__gte=datetime.datetime(2016, 10, 2)).count(), 4)
         self.assertEqual(Event.objects.filter(start_date__lt=datetime.datetime(2016, 10, 2)).count(), 1)
         self.assertEqual(Event.objects.filter(start_date__lte=datetime.datetime(2016, 10, 2)).count(), 2)
+
+    def test_event_time_field(self):
+        """
+            ensure that we store time properly
+            and we can make queries
+        """
+
+        for x in range(5):
+            event = EventFactory(start_time=datetime.datetime(2016, 10, 1, 10, (x+1), 30))
+            event.save()
+
+        self.assertIsInstance(Event.objects.first().start_time, datetime.time)
+        self.assertEqual(Event.objects.filter(start_time=datetime.datetime(2016, 10, 1, 10, 2, 30)).count(), 1)
+        self.assertEqual(Event.objects.filter(start_time__gt=datetime.datetime(2016, 10, 1, 10, 2, 30)).count(), 3)
+        self.assertEqual(Event.objects.filter(start_time__gte=datetime.datetime(2016, 10, 1, 10, 2, 30)).count(), 4)
+        self.assertEqual(Event.objects.filter(start_time__lt=datetime.datetime(2016, 10, 1, 10, 2, 30)).count(), 1)
+        self.assertEqual(Event.objects.filter(start_time__lte=datetime.datetime(2016, 10, 1, 10, 2, 30)).count(), 2)
