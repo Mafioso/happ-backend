@@ -7,6 +7,10 @@ connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
 
 
 class HappBaseDocument(Document):
+    meta = {
+        'abstract': True
+    }
+
     date_created = DateTimeField()
     date_edited = DateTimeField(default=datetime.now)
 
