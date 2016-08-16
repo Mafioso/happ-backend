@@ -1,0 +1,8 @@
+*.pyc
+*.pth
+*.save
+*.DS_store
+*.mo
+*.sqlite3
+*.pid
+*.ini
