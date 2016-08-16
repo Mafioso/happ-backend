@@ -1,5 +1,5 @@
 import pytest
-from datetime import datetime
+import datetime
 
 from django.test import TestCase
 from django.conf import settings
@@ -33,12 +33,12 @@ class EventTests(TestCase):
     	"""
 
         for x in range(5):
-            event = EventFactory(start_date=datetime(2016, 10, (x+1)))
+            event = EventFactory(start_date=datetime.datetime(2016, 10, (x+1)))
             event.save()
-        print Event.objects.count()
 
-        self.assertEqual(Event.objects.filter(start_date=datetime(2016, 10, 2)).count(), 1)
-        self.assertEqual(Event.objects.filter(start_date__gt=datetime(2016, 10, 2)).count(), 3)
-        self.assertEqual(Event.objects.filter(start_date__gte=datetime(2016, 10, 2)).count(), 4)
-        self.assertEqual(Event.objects.filter(start_date__lt=datetime(2016, 10, 2)).count(), 1)
-        self.assertEqual(Event.objects.filter(start_date__lte=datetime(2016, 10, 2)).count(), 2)
+        self.assertIsInstance(Event.objects.first().start_date, datetime.date)
+        self.assertEqual(Event.objects.filter(start_date=datetime.datetime(2016, 10, 2)).count(), 1)
+        self.assertEqual(Event.objects.filter(start_date__gt=datetime.datetime(2016, 10, 2)).count(), 3)
+        self.assertEqual(Event.objects.filter(start_date__gte=datetime.datetime(2016, 10, 2)).count(), 4)
+        self.assertEqual(Event.objects.filter(start_date__lt=datetime.datetime(2016, 10, 2)).count(), 1)
+        self.assertEqual(Event.objects.filter(start_date__lte=datetime.datetime(2016, 10, 2)).count(), 2)
