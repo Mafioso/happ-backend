@@ -14,6 +14,28 @@ ALL_CITIES = City.objects
 ALL_CURRENCIES = Currency.objects
 
 
+class UserSettingsFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = UserSettings
+
+    city = factory.LazyAttribute(lambda x: random.choice(ALL_CITIES))
+    currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES))
+
+
+class UserFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = User
+
+    username = factory.Faker('word')
+    email = factory.Faker('email')
+    settings = factory.SubFactory(UserSettingsFactory)
+
+    @factory.lazy_attribute
+    def interests(self):
+        interests = Interest.objects()
+        return random.sample(interests, random.randint(1,3))
+
+
 class InterestFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = Interest
