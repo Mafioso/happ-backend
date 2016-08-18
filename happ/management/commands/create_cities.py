@@ -8,7 +8,7 @@ from happ.models import Country, City
 
 
 class Command(BaseCommand):
-    help = 'Creates currencies from currencies.json fixtures'
+    help = 'Creates cities from cities.json fixtures'
 
     def handle(self, *args, **options):
         with open(os.path.join(settings.BASE_DIR, 'happ/fixtures/cities.json'), 'r') as f:

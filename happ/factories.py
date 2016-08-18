@@ -14,6 +14,22 @@ ALL_CITIES = City.objects
 ALL_CURRENCIES = Currency.objects
 
 
+class InterestFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = Interest
+
+    title = factory.Faker('word')
+    is_global = factory.LazyAttribute(lambda x: random.choice((True, False,)))
+    local_cities = factory.LazyAttribute(lambda x: random.sample(ALL_CITIES, random.randint(0, 5)) if not x.is_global else [])
+
+    @factory.lazy_attribute
+    def parent(self):
+        if not self.is_global:
+            global_interests = Interest.objects(is_global=True)
+            return random.choice(global_interests) if len(global_interests) > 0 else None
+        return None
+
+
 class EventFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = Event
