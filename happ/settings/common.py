@@ -48,7 +48,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     # 'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    # 'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -125,3 +125,11 @@ MONGODB_PORT = 27017
 MONGODB_HOST_NAME = os.getenv('MONGO_PORT_27017_TCP_ADDR', '127.0.0.1')
 MONGODB_HOST = 'mongodb://{host}:{port}'.format(host=MONGODB_HOST_NAME, port=MONGODB_PORT)
 MONGODB_NAME = 'happ1'
+
+REST_FRAMEWORK = {
+    'UNAUTHENTICATED_USER': None, # temp
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'PAGE_SIZE': 10,
+}
