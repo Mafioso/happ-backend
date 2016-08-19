@@ -1,30 +1,13 @@
-import pytest
 import datetime
 
-from django.test import TestCase
-from django.conf import settings
+from django.test import SimpleTestCase
 
 from ..models import Event
 from ..factories import EventFactory
+from . import *
 
 
-@pytest.fixture(scope="function", autouse=True)
-def setup_databases(**kwargs):
-    from mongoengine.connection import connect, disconnect
-    disconnect()
-    connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
-    print 'Creating mongo test database ' + settings.MONGODB_NAME
-
-@pytest.fixture(scope="function", autouse=True)
-def teardown_databases(**kwargs):
-    from mongoengine.connection import get_connection, disconnect
-    connection = get_connection()
-    connection.drop_database(settings.MONGODB_NAME)
-    print 'Dropping mongo test database: ' + settings.MONGODB_NAME
-    disconnect()
-
-
-class EventTests(TestCase):
+class EventTests(SimpleTestCase):
     
     def test_event_date_field(self):
     	"""
