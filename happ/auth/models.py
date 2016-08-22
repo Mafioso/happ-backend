@@ -72,6 +72,7 @@ class AbstractUser(object):
         if self._password is not None:
             password_validation.password_changed(self._password, self)
             self._password = None
+        return self
 
     def natural_key(self):
         return (self.get_username(),)
