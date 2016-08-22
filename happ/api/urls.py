@@ -11,5 +11,5 @@ router.register(r'cities', cities.CityViewSet, 'cities')
 router.register(r'currencies', currencies.CurrencyViewSet, 'currencies')
 
 urlpatterns = [
-    url(r'auth/', obtain_jwt_token),
+    url(r'auth/login/$', obtain_jwt_token, name='login'),
 ]

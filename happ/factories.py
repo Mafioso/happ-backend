@@ -18,8 +18,8 @@ class UserSettingsFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = UserSettings
 
-    city = factory.LazyAttribute(lambda x: random.choice(ALL_CITIES))
-    currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES))
+    city = factory.LazyAttribute(lambda x: random.choice(ALL_CITIES) if ALL_CITIES.count() > 5 else None)
+    currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES) if ALL_CURRENCIES.count() > 5 else None)
 
 
 class UserFactory(factory.mongoengine.MongoEngineFactory):
@@ -33,7 +33,7 @@ class UserFactory(factory.mongoengine.MongoEngineFactory):
     @factory.lazy_attribute
     def interests(self):
         interests = Interest.objects()
-        return random.sample(interests, random.randint(1,3))
+        return random.sample(interests, random.randint(1,3)) if interests.count() > 3 else []
 
 
 class InterestFactory(factory.mongoengine.MongoEngineFactory):
@@ -42,7 +42,7 @@ class InterestFactory(factory.mongoengine.MongoEngineFactory):
 
     title = factory.Faker('word')
     is_global = factory.LazyAttribute(lambda x: random.choice((True, False,)))
-    local_cities = factory.LazyAttribute(lambda x: random.sample(ALL_CITIES, random.randint(0, 5)) if not x.is_global else [])
+    local_cities = factory.LazyAttribute(lambda x: random.sample(ALL_CITIES, random.randint(0, 5)) if not x.is_global and ALL_CITIES.count() > 5 else [])
 
     @factory.lazy_attribute
     def parent(self):

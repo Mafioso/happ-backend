@@ -63,7 +63,6 @@ class User(AbstractUser, HappBaseDocument):
     is_active = BooleanField(default=True)
 
 
-
 class Interest(HappBaseDocument):
     title = StringField()
     is_global = BooleanField(default=True)

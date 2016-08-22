@@ -18,6 +18,6 @@ from django.conf.urls import include, url
 from .api.urls import router, urlpatterns as api_urlpatterns
 
 urlpatterns = [
-	url(r'^api/v1/', include(api_urlpatterns, namespace='api')),
-    url(r'^api/v1/', include(router.urls, namespace='api')),
+    url(r'^api/v1/', include(api_urlpatterns)),
+    url(r'^api/v1/', include(router.urls)),
 ]
