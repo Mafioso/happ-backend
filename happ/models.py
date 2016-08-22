@@ -4,6 +4,8 @@ from mongoengine import *
 from django.conf import settings
 
 from mongoextensions.fields import DateStringField, TimeStringField
+from happ.auth.models import AbstractUser, UserQuerySet
+
 
 connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
 
@@ -42,7 +44,10 @@ class UserSettings(EmbeddedDocument):
     notifications = DictField()
 
 
-class User(HappBaseDocument):
+class User(AbstractUser, HappBaseDocument):
+    meta = {
+        'queryset_class': UserQuerySet
+    }
     GENDERS = (MALE, FEMALE) = range(2)
 
     username = StringField(required=True)
@@ -55,6 +60,8 @@ class User(HappBaseDocument):
     interests = ListField(ReferenceField('Interest'))
     favorites = ListField(ReferenceField('Event'))
     settings = EmbeddedDocumentField(UserSettings)
+    is_active = BooleanField(default=True)
+
 
 
 class Interest(HappBaseDocument):

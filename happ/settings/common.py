@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     # 'django.contrib.auth',
     # 'django.contrib.contenttypes',
     # 'django.contrib.sessions',
-    'django.contrib.messages',
+    # 'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_mongoengine',
@@ -128,8 +128,20 @@ MONGODB_NAME = 'happ1'
 
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None, # temp
+    'PAGE_SIZE': 10,
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'PAGE_SIZE': 10,
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
 }
+
+JWT_AUTH = {
+    'JWT_PAYLOAD_HANDLER': 'happ.utils.jwt_payload_handler',
+}
+
+AUTHENTICATION_BACKENDS = ('happ.auth.backends.HappAuthBackend', )

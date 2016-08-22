@@ -1,6 +1,6 @@
 from rest_framework_mongoengine import serializers
 
-from .models import City, Currency
+from .models import City, Currency, User
 
 
 class CitySerializer(serializers.DocumentSerializer):
@@ -16,4 +16,14 @@ class CurrencySerializer(serializers.DocumentSerializer):
         exclude = (
             'date_created',
             'date_edited',
+        )
+
+
+class UserPayloadSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = User
+        include = (
+            'id',
+            'username',
         )
