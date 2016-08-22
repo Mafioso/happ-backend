@@ -23,7 +23,7 @@ class UserPayloadSerializer(serializers.DocumentSerializer):
 
     class Meta:
         model = User
-        include = (
+        fields = (
             'id',
             'username',
         )
