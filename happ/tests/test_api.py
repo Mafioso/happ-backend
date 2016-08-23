@@ -90,7 +90,7 @@ class AuthTests(APISimpleTestCase):
         user = User.objects.get(username='username')
         self.assertEqual(User.objects.count(), n+1)
         self.assertNotEqual(user.settings, None)
-        self.assertNotEqual(response.data['token'], None)
+        self.assertIn('token', response.data)
 
     def test_user_registration_no_username(self):
         """
@@ -133,3 +133,29 @@ class AuthTests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(User.objects.count(), n)
+
+    def test_authentication(self):
+        """
+        Ensures that user can authenticate with his username and password
+        it returns JWT
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = reverse('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data['token'], None)
+
+        data = {
+            'username': u.username,
+            'password': '1234'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertNotIn('token', response.data)
