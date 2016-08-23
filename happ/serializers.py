@@ -1,6 +1,6 @@
 from rest_framework_mongoengine import serializers
 
-from .models import City, Currency, User
+from .models import City, Currency, User, UserSettings
 
 
 class CitySerializer(serializers.DocumentSerializer):
@@ -33,10 +33,9 @@ class UserSerializer(serializers.DocumentSerializer):
 
     class Meta:
         model = User
-        write_only_fields = ('password',)
-        exclude = (
-            'password',
-        )
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -44,6 +43,7 @@ class UserSerializer(serializers.DocumentSerializer):
             email=validated_data['email'],
         )
         user.set_password(validated_data['password'])
+        user.settings = UserSettings()
         user.save()
 
         return user
