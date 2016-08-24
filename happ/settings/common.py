@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_mongoengine',
+    'anymail',
     'happ',
 ]
 
@@ -147,3 +148,16 @@ JWT_AUTH = {
 }
 
 AUTHENTICATION_BACKENDS = ('happ.auth.backends.HappAuthBackend', )
+
+DEFAULT_FROM_EMAIL = 'askhat.omarov91@gmail.com'
+
+ADMINS = [
+    ('Askhat', 'askhat.omarov91@gmail.com'),
+]
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": "key-a966a5efd94d4ee543331d9109e69d95",
+    "MAILGUN_SENDER_DOMAIN": 'sandbox7d7d8f136a6c447084ee631344625956.mailgun.org',
+}
+
+EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"

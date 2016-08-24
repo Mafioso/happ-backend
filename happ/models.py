@@ -61,6 +61,7 @@ class User(AbstractUser, HappBaseDocument):
     favorites = ListField(ReferenceField('Event'))
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
+    last_login = DateTimeField(blank=True, null=True)
 
 
 class Interest(HappBaseDocument):
