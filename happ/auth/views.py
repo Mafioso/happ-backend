@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
+from django.utils.translation import ugettext, ugettext_lazy as _
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
@@ -25,8 +26,21 @@ class UserRegister(CreateAPIView):
         """
         Once user created this endpoint returns JSON Web Token in response
         """
-        if 'email' not in request.data or 'password' not in request.data:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if 'username' not in request.data:
+            return Response(
+                {'error_message': _('No username provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if 'email' not in request.data:
+            return Response(
+                {'error_message': _('No email provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if 'password' not in request.data:
+            return Response(
+                {'error_message': _('No password provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -52,9 +66,12 @@ class PasswordReset(APIView):
                 'request': request,
             }
             form.save(**opts)
-            return Response({'status': True}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
 
-        return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+                {'error_message': _('Invalid data.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class PasswordResetConfirm(APIView):
@@ -66,9 +83,15 @@ class PasswordResetConfirm(APIView):
         uidb64 = request.data.pop('uidb64', None)
         token = request.data.pop('token', None)
         if not uidb64:
-            return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error_message': _('uidb64 is not provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if not token:
-            return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error_message': _('token is not provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         try:
             # urlsafe_base64_decode() decodes to bytestring on Python 3
             uid = force_text(urlsafe_base64_decode(uidb64))
@@ -79,7 +102,13 @@ class PasswordResetConfirm(APIView):
             form = HappSetPasswordForm(user, request.data)
             if form.is_valid():
                 form.save()
-                return Response({'status': True}, status=status.HTTP_200_OK)
-            return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_200_OK)
+            return Response(
+                {'error_message': _('Invalid data.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        return Response({'status': False}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+                {'error_message': _('No such user or token is not valid.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )

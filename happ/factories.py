@@ -61,7 +61,8 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     author = factory.LazyAttribute(lambda x: User.objects.first())
     city = factory.LazyAttribute(lambda x: random.choice(ALL_CITIES) if ALL_CITIES.count() > 0 else None)
     currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES) if ALL_CURRENCIES.count() > 0 else None)
-    price = factory.Faker('pyint')
+    min_price = factory.Faker('pyint')
+    max_price = factory.Faker('pyint')
     address = factory.Faker('street_address')
     # phones = 
     email = factory.Faker('email')
