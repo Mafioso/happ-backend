@@ -51,6 +51,7 @@ class User(AbstractUser, HappBaseDocument):
     GENDERS = (MALE, FEMALE) = range(2)
 
     username = StringField(required=True)
+    fullname = StringField()
     email = EmailField()
     password = StringField()
     phone = StringField()
@@ -62,6 +63,10 @@ class User(AbstractUser, HappBaseDocument):
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
     last_login = DateTimeField(blank=True, null=True)
+
+    @property
+    def fn(self):
+        return self.fullname if self.fullname else self.username
 
 
 class Interest(HappBaseDocument):
@@ -82,7 +87,7 @@ class Event(HappBaseDocument):
 
     title = StringField()
     description = StringField()
-    language = StringField(default='en') # en ru fr it es de
+    language = StringField(default=settings.HAPP_LANGUAGES[0]) # en ru fr it es de
     type = IntField(choices=TYPES, default=NORMAL)
     status = IntField(choices=STATUSES, default=MODERATION)
     author = ReferenceField(User, reverse_delete_rule=CASCADE)

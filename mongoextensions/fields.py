@@ -57,7 +57,11 @@ class TimeStringField(StringField):
             self.error(u'cannot parse time "%s"' % value)
 
     def to_python(self, value):
-        return datetime.datetime.strptime(self.to_mongo(value), self.format).time()
+        if isinstance(value, datetime.time):
+            return value
+        if isinstance(value, datetime.datetime):
+            return value.time()
+        return datetime.datetime.strptime(value, self.format).time()
 
     def to_mongo(self, value):
         if value is None:

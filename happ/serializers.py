@@ -1,6 +1,6 @@
 from rest_framework_mongoengine import serializers
 
-from .models import City, Currency, User, UserSettings, Interest
+from .models import City, Currency, User, UserSettings, Interest, Event
 
 
 class CitySerializer(serializers.DocumentSerializer):
@@ -26,6 +26,16 @@ class UserPayloadSerializer(serializers.DocumentSerializer):
         fields = (
             'id',
             'username',
+        )
+
+
+class AuthorSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'fn',
         )
 
 
@@ -84,3 +94,12 @@ class InterestParentSerializer(serializers.DocumentSerializer):
             'is_global',
             'local_cities',
         )
+
+
+class EventSerializer(serializers.DocumentSerializer):
+    interests = InterestChildSerializer(many=True)
+    currency = CurrencySerializer()
+    author = AuthorSerializer()
+
+    class Meta:
+        model = Event

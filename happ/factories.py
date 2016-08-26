@@ -68,6 +68,10 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     email = factory.Faker('email')
     web_site = factory.Faker('url')
     votes = factory.Faker('pyint')
+    start_date = factory.Faker('date_time')
+    start_time = factory.Faker('date_time')
+    end_date = factory.Faker('date_time')
+    end_time = factory.Faker('date_time')
 
     # def geopoint(self):
     #     print factory.Faker('longitude'), factory.Faker('latitude'),

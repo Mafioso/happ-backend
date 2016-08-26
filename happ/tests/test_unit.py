@@ -39,6 +39,7 @@ class EventTests(SimpleTestCase):
             and we can make queries
         """
 
+        Event.objects.delete()
         for x in range(5):
             event = EventFactory(start_time=datetime.datetime(2016, 10, 1, 10, (x+1), 30))
             event.save()

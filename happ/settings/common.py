@@ -161,3 +161,12 @@ ANYMAIL = {
 }
 
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
+
+HAPP_LANGUAGES = (
+    'en',
+    'ru',
+    'fr',
+    'it',
+    'es',
+    'de',
+)
