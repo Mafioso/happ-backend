@@ -71,6 +71,10 @@ class Interest(HappBaseDocument):
     parent = ReferenceField('self')
     color = StringField()
 
+    @property
+    def children(self):
+        return Interest.objects.filter(parent=self)
+
 
 class Event(HappBaseDocument):
     TYPES = (NORMAL, FEATURED, ADS) = range(3)

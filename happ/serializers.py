@@ -59,3 +59,28 @@ class InterestSerializer(serializers.DocumentSerializer):
             'is_global',
             'local_cities',
         )
+
+
+class InterestChildSerializer(serializers.DocumentSerializer):
+    parent = InterestSerializer()
+
+    class Meta:
+        model = Interest
+        exclude = (
+            'date_created',
+            'date_edited',
+            'is_global',
+            'local_cities',
+        )
+
+class InterestParentSerializer(serializers.DocumentSerializer):
+    children = InterestSerializer(many=True)
+
+    class Meta:
+        model = Interest
+        exclude = (
+            'date_created',
+            'date_edited',
+            'is_global',
+            'local_cities',
+        )
