@@ -69,6 +69,7 @@ class Interest(HappBaseDocument):
     is_global = BooleanField(default=True)
     local_cities = ListField(ReferenceField(City))
     parent = ReferenceField('self')
+    color = StringField()
 
 
 class Event(HappBaseDocument):
@@ -77,12 +78,14 @@ class Event(HappBaseDocument):
 
     title = StringField()
     description = StringField()
+    language = StringField(default='en') # en ru fr it es de
     type = IntField(choices=TYPES, default=NORMAL)
     status = IntField(choices=STATUSES, default=MODERATION)
     author = ReferenceField(User, reverse_delete_rule=CASCADE)
     city = ReferenceField(City, reverse_delete_rule=CASCADE)
     currency = ReferenceField(Currency)
-    price = IntField() # we need handle (from .. to ..) scenario
+    min_price = IntField()
+    max_price = IntField()
     interests = ListField(ReferenceField(Interest))
     address = StringField()
     geopoint = GeoPointField()

@@ -1,6 +1,6 @@
 from rest_framework_mongoengine import serializers
 
-from .models import City, Currency, User, UserSettings
+from .models import City, Currency, User, UserSettings, Interest
 
 
 class CitySerializer(serializers.DocumentSerializer):
@@ -47,3 +47,15 @@ class UserSerializer(serializers.DocumentSerializer):
         user.save()
 
         return user
+
+
+class InterestSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = Interest
+        exclude = (
+            'date_created',
+            'date_edited',
+            'is_global',
+            'local_cities',
+        )
