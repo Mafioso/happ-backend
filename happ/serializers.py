@@ -1,3 +1,6 @@
+from django.utils.translation import ugettext_lazy as _
+
+from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
 from .models import City, Currency, User, UserSettings, Interest, Event
@@ -111,18 +114,18 @@ class EventSerializer(serializers.DocumentSerializer):
         try:
             city = City.objects.get(id=value)
         except City.DoesNotExist:
-            raise serializers.ValidationError('No city with this city_id')
+            raise ValidationError(_('No city with this city_id'))
         except City.MultipleObjectsReturned:
-            raise serializers.ValidationError('Too many cities with this city_id')
+            raise ValidationError(_('Too many cities with this city_id'))
         return city
 
     def validate_currency_id(self, value):
         try:
             currency = Currency.objects.get(id=value)
         except Currency.DoesNotExist:
-            raise serializers.ValidationError('No currency with this currency_id')
+            raise ValidationError(_('No currency with this currency_id'))
         except Currency.MultipleObjectsReturned:
-            raise serializers.ValidationError('Too many currencies with this currency_id')
+            raise ValidationError(_('Too many currencies with this currency_id'))
         return currency
 
     def create(self, validated_data):

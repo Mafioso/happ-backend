@@ -62,4 +62,15 @@ class EventViewSet(viewsets.ModelViewSet):
         request.data['start_time'] = datetime.datetime.strftime(dateutil.parser.parse(start_datetime), settings.TIME_STRING_FIELD_FORMAT)
         request.data['end_date'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.DATE_STRING_FIELD_FORMAT)
         request.data['end_time'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.TIME_STRING_FIELD_FORMAT)
-        return super(EventViewSet, self).create(request, *args, **kwargs)
+
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+
+            return Response(status=status.HTTP_201_CREATED, headers=headers)
+        else:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
