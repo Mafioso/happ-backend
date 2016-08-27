@@ -128,6 +128,16 @@ class EventSerializer(serializers.DocumentSerializer):
             raise ValidationError(_('Too many currencies with this currency_id'))
         return currency
 
+    def validate(self, data):
+        """
+        Min_price should be less than Max_price.
+        """
+        if 'min_price' in data and 'max_price' in data and data['min_price'] > data['max_price']:
+            raise ValidationError(_("Min_price should be less than Max_price"))
+        if data['start_date'] + data['start_time'] > data['end_date'] + data['end_time']:
+            raise ValidationError(_("Start date should be earlier than End date"))
+        return data
+
     def create(self, validated_data):
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
