@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.core.urlresolvers import reverse
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -7,8 +9,8 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
-from ..models import User
-from ..factories import UserFactory
+from ..models import User, City, Currency, Event
+from ..factories import UserFactory, CityFactory, CurrencyFactory
 
 
 class CitiesTests(APISimpleTestCase):
@@ -305,3 +307,38 @@ class AuthTests(APISimpleTestCase):
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class EventTests(APISimpleTestCase):
+
+    def test_create_event(self):
+        """
+        We can create event
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = reverse('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+
+        url = reverse('events-list')
+        n = Event.objects.count()
+
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'start_datetime': datetime.now(),
+            'end_datetime': datetime.now() + timedelta(days=1, hours=1),
+            'min_price': 100,
+            'max_price': 120,
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, response.data['token']))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(n+1, Event.objects.count())

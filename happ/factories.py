@@ -13,6 +13,19 @@ from models import (
 ALL_CITIES = City.objects
 ALL_CURRENCIES = Currency.objects
 
+class CityFactory(factory.mongoengine.MongoEngineFactory):
+    name = factory.Faker('word')
+
+    class Meta:
+        model = City
+
+
+class CurrencyFactory(factory.mongoengine.MongoEngineFactory):
+    name = factory.Faker('word')
+
+    class Meta:
+        model = Currency
+
 
 class UserSettingsFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:

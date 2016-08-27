@@ -170,3 +170,6 @@ HAPP_LANGUAGES = (
     'es',
     'de',
 )
+
+DATE_STRING_FIELD_FORMAT = "%Y%m%d"
+TIME_STRING_FIELD_FORMAT = "%H%M%S"

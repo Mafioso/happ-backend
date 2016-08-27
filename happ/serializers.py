@@ -97,9 +97,40 @@ class InterestParentSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(serializers.DocumentSerializer):
-    interests = InterestChildSerializer(many=True)
-    currency = CurrencySerializer()
-    author = AuthorSerializer()
+    interests = InterestChildSerializer(many=True, required=False)
+    currency = CurrencySerializer(read_only=True)
+    currency_id = serializers.ObjectIdField(write_only=True)
+    city = serializers.ObjectIdField(read_only=True)
+    city_id = serializers.ObjectIdField(write_only=True)
+    author = AuthorSerializer(read_only=True)
 
     class Meta:
         model = Event
+
+    def validate_city_id(self, value):
+        try:
+            city = City.objects.get(id=value)
+        except City.DoesNotExist:
+            raise serializers.ValidationError('No city with this city_id')
+        except City.MultipleObjectsReturned:
+            raise serializers.ValidationError('Too many cities with this city_id')
+        return city
+
+    def validate_currency_id(self, value):
+        try:
+            currency = Currency.objects.get(id=value)
+        except Currency.DoesNotExist:
+            raise serializers.ValidationError('No currency with this currency_id')
+        except Currency.MultipleObjectsReturned:
+            raise serializers.ValidationError('Too many currencies with this currency_id')
+        return currency
+
+    def create(self, validated_data):
+        city = validated_data.pop('city_id')
+        currency = validated_data.pop('currency_id')
+        event = Event.objects.create(**validated_data)
+
+        event.city = city
+        event.currency = currency
+        event.save()
+        return event
