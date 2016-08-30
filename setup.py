@@ -78,7 +78,7 @@ setup(
     url='https://github.com/pypa/sampleproject',
 
     # Author details
-    author='xepa4ep, askhat, ...',
+    author='JarviSystems',
     author_email='',
 
     # Choose your license
