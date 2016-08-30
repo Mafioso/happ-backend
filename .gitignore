@@ -5,4 +5,10 @@
 *.mo
 *.sqlite3
 *.pid
+*.tar.gz
+&.sw*
+*.log
+build/
+dist/
+*.egg-info
 .cache/

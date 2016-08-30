@@ -17,7 +17,6 @@ class UserQuerySet(QuerySet):
     def model(self):
         return self._document
     
-
     @classmethod
     def normalize_email(cls, email):
         """
