@@ -32,8 +32,8 @@ class UserSettingsFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = UserSettings
 
-    city = factory.LazyAttribute(lambda x: random.choice(ALL_CITIES) if ALL_CITIES.count() > 5 else None)
-    currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES) if ALL_CURRENCIES.count() > 5 else None)
+    # city = factory.LazyAttribute(lambda x: random.choice(ALL_CITIES) if ALL_CITIES.count() > 5 else None)
+    # currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES) if ALL_CURRENCIES.count() > 5 else None)
 
 
 class UserFactory(factory.mongoengine.MongoEngineFactory):
@@ -78,7 +78,7 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     min_price = factory.Faker('pyint')
     max_price = factory.Faker('pyint')
     address = factory.Faker('street_address')
-    # phones = 
+    # phones =
     email = factory.Faker('email')
     web_site = factory.Faker('url')
     votes = factory.Faker('pyint')

@@ -663,3 +663,28 @@ class EventTests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], u.username)
+
+    def test_user_set_city(self):
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = reverse('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.assertEqual(u.settings.city, None)
+
+        city = CityFactory()
+        city.save()
+
+        url = reverse('cities-set', kwargs={'id': str(city.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        u = User.objects.get(id=u.id)
+        self.assertEqual(u.settings.city, city)
