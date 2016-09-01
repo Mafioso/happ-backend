@@ -110,7 +110,7 @@ class Event(HappBaseDocument):
 
     def localized(self, language=settings.HAPP_LANGUAGES[0]):
         try:
-            return Localized.objects.get(language=language)
+            return Localized.objects.get(entity=self, language=language)
         except:
             return None
 
