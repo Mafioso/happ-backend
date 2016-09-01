@@ -1,9 +1,25 @@
 from django.utils.translation import ugettext_lazy as _
 
+from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
 from .models import City, Currency, User, UserSettings, Interest, Event
+
+
+class LocalizedSerializer(serializers.DocumentSerializer):
+
+    def to_representation(self, instance):
+        language = self.context['request'].user.settings.language
+        data = super(LocalizedSerializer, self).to_representation(instance)
+        localized_instance = instance.localized(language=language)
+        if not localized_instance:
+            return data
+        if hasattr(self.Meta, 'localized_fields') and self.Meta.localized_fields:
+            for field in self.Meta.localized_fields:
+                if field in localized_instance.data:
+                    data[field] = localized_instance.data[field]
+        return data
 
 
 class CitySerializer(serializers.DocumentSerializer):
@@ -99,7 +115,7 @@ class InterestParentSerializer(serializers.DocumentSerializer):
         )
 
 
-class EventSerializer(serializers.DocumentSerializer):
+class EventSerializer(LocalizedSerializer):
     interests = InterestChildSerializer(many=True, required=False)
     currency = CurrencySerializer(read_only=True)
     currency_id = serializers.ObjectIdField(write_only=True)
@@ -109,6 +125,7 @@ class EventSerializer(serializers.DocumentSerializer):
 
     class Meta:
         model = Event
+        localized_fields = ['title']
 
     def validate_city_id(self, value):
         try:

@@ -10,7 +10,7 @@ from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
 from ..models import User, City, Currency, Event
-from ..factories import UserFactory, CityFactory, CurrencyFactory
+from ..factories import UserFactory, CityFactory, CurrencyFactory, EventFactory, LocalizedFactory
 
 
 class CitiesTests(APISimpleTestCase):
@@ -585,3 +585,58 @@ class EventTests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(n, Event.objects.count())
+
+    def test_retrieve_event(self):
+        """
+        We can retrieve event
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = reverse('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        e = EventFactory()
+        e.save()
+        url = reverse('events-detail', kwargs={'id': str(e.id)})
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], e.title)
+
+    def test_retrieve_event_localized(self):
+        """
+        We can retrieve event
+        """
+        language = 'de'
+        localized_title = 'german title'
+        u = UserFactory()
+        u.set_password('123')
+        u.settings.language = language
+        u.save()
+
+        auth_url = reverse('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        e = EventFactory()
+        e.save()
+        l = LocalizedFactory(entity=e, language=language, data={'title': localized_title})
+        l.save()
+        url = reverse('events-detail', kwargs={'id': str(e.id)})
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], localized_title)

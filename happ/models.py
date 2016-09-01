@@ -42,6 +42,7 @@ class UserSettings(EmbeddedDocument):
     city = ReferenceField(City)
     currency = ReferenceField(Currency)
     notifications = DictField()
+    language = StringField(default=settings.HAPP_LANGUAGES[0])
 
 
 class User(AbstractUser, HappBaseDocument):
@@ -106,3 +107,15 @@ class Event(HappBaseDocument):
     start_time = TimeStringField()
     end_date = DateStringField()
     end_time = TimeStringField()
+
+    def localized(self, language=settings.HAPP_LANGUAGES[0]):
+        try:
+            return Localized.objects.get(language=language)
+        except:
+            return None
+
+
+class Localized(Document):
+    language = StringField(default=settings.HAPP_LANGUAGES[0])
+    data = DictField()
+    entity = GenericReferenceField()
