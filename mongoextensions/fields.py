@@ -1,6 +1,8 @@
 import datetime
 import dateutil
 
+from django.conf import settings
+
 from mongoengine.fields import StringField
 
 
@@ -10,7 +12,7 @@ class DateStringField(StringField):
     """
     
     def __init__(self, format=None, **kwargs):
-        self.format = format or "%Y%m%d"
+        self.format = format or settings.DATE_STRING_FIELD_FORMAT
         super(DateStringField, self).__init__(**kwargs)
 
     def validate(self, value):
@@ -48,7 +50,7 @@ class TimeStringField(StringField):
     """
     
     def __init__(self, format=None, **kwargs):
-        self.format = format or "%H%M%S"
+        self.format = format or settings.TIME_STRING_FIELD_FORMAT
         super(TimeStringField, self).__init__(**kwargs)
 
     def validate(self, value):
@@ -76,7 +78,8 @@ class TimeStringField(StringField):
 
         # Attempt to parse a datetime:
         try:
-            return datetime.datetime.strftime(dateutil.parser.parse(value), self.format)
+            datetime.datetime.strptime(value, self.format)
+            return value
         except (TypeError, ValueError):
             return None
 

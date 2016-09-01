@@ -8,10 +8,24 @@ from models import (
     Currency,
     Interest,
     Event,
+    Localized
 )
 
 ALL_CITIES = City.objects
 ALL_CURRENCIES = Currency.objects
+
+class CityFactory(factory.mongoengine.MongoEngineFactory):
+    name = factory.Faker('word')
+
+    class Meta:
+        model = City
+
+
+class CurrencyFactory(factory.mongoengine.MongoEngineFactory):
+    name = factory.Faker('word')
+
+    class Meta:
+        model = Currency
 
 
 class UserSettingsFactory(factory.mongoengine.MongoEngineFactory):
@@ -83,3 +97,9 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
         if interests.count() < 3:
             return []
         return random.sample(interests, random.randint(1,3))
+
+
+class LocalizedFactory(factory.mongoengine.MongoEngineFactory):
+
+    class Meta:
+        model = Localized
