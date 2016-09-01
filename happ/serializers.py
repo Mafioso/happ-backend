@@ -38,6 +38,32 @@ class CurrencySerializer(serializers.DocumentSerializer):
         )
 
 
+class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
+
+    class Meta:
+        model = UserSettings
+
+class UserSerializer(serializers.DocumentSerializer):
+    settings = UserSettingsSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+        )
+        user.set_password(validated_data['password'])
+        user.settings = UserSettings()
+        user.save()
+
+        return user
+
+
 class UserPayloadSerializer(serializers.DocumentSerializer):
 
     class Meta:
@@ -56,26 +82,6 @@ class AuthorSerializer(serializers.DocumentSerializer):
             'id',
             'fn',
         )
-
-
-class UserSerializer(serializers.DocumentSerializer):
-
-    class Meta:
-        model = User
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
-        user.set_password(validated_data['password'])
-        user.settings = UserSettings()
-        user.save()
-
-        return user
 
 
 class InterestSerializer(serializers.DocumentSerializer):

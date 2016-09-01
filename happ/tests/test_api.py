@@ -37,7 +37,7 @@ class CitiesTests(APISimpleTestCase):
             'password': '123'
         }
         response = self.client.post(auth_url, data=data, format='json')
-        
+
         url = reverse('cities-list')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, response.data['token']))
         response = self.client.get(url, format='json')
@@ -68,7 +68,7 @@ class CurrenciesTests(APISimpleTestCase):
             'password': '123'
         }
         response = self.client.post(auth_url, data=data, format='json')
-        
+
         url = reverse('currencies-list')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, response.data['token']))
         response = self.client.get(url, format='json')
@@ -613,7 +613,7 @@ class EventTests(APISimpleTestCase):
 
     def test_retrieve_event_localized(self):
         """
-        We can retrieve event
+        We can retrieve event with translated field according to current user's language
         """
         language = 'de'
         localized_title = 'german title'
@@ -640,3 +640,26 @@ class EventTests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], localized_title)
+
+    def test_get_current_user(self):
+        """
+        We can get current user
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = reverse('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = reverse('users-current')
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], u.username)
