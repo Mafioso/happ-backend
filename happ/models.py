@@ -33,6 +33,10 @@ class City(HappBaseDocument):
     name = StringField(required=True)
     country = ReferenceField(Country, reverse_delete_rule=CASCADE)
 
+    @property
+    def country_name(self):
+        return self.country.name
+
 
 class Currency(HappBaseDocument):
     name = StringField(required=True)

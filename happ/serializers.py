@@ -23,9 +23,15 @@ class LocalizedSerializer(serializers.DocumentSerializer):
 
 
 class CitySerializer(serializers.DocumentSerializer):
+    country_name = drf_serializers.CharField()
 
     class Meta:
         model = City
+        exclude = (
+            'date_created',
+            'date_edited',
+            'country',
+        )
 
 
 class CurrencySerializer(serializers.DocumentSerializer):
