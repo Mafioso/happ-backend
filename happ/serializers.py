@@ -4,7 +4,7 @@ from .models import City, Currency, User, UserSettings, Interest, Event
 
 
 class CitySerializer(serializers.DocumentSerializer):
-    
+
     class Meta:
         model = City
 
