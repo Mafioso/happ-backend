@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework_mongoengine import viewsets
 
+from mongoextensions import filters
 from ..models import City
 from ..serializers import CitySerializer
 
@@ -12,6 +13,8 @@ from ..serializers import CitySerializer
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     queryset = City.objects.all()
+    filter_backends = (filters.MongoSearchFilter, )
+    search_fields = ('name', )
 
     @detail_route(methods=['get'], url_path='set')
     def set(self, request, id=None, *args, **kwargs):
