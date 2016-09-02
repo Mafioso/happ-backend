@@ -33,6 +33,35 @@ class AuthTests(APISimpleTestCase):
         self.assertNotEqual(user.settings, None)
         self.assertIn('token', response.data)
 
+    def test_user_registration_same_username(self):
+        """
+        We cannot register user with existing username
+        """
+        n = User.objects.count()
+        url = prepare_url('register')
+        data = {
+            'username': 'username',
+            'email': 'email@mail.com',
+            'password': '123',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = User.objects.get(username='username')
+        self.assertEqual(User.objects.count(), n+1)
+        self.assertNotEqual(user.settings, None)
+        self.assertIn('token', response.data)
+
+        n = User.objects.count()
+        url = prepare_url('register')
+        data = {
+            'username': 'username',
+            'email': 'email@mail.com',
+            'password': '123',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), n)
+
     def test_user_registration_no_username(self):
         """
         Ensures that we cannot register without username
@@ -48,20 +77,20 @@ class AuthTests(APISimpleTestCase):
         self.assertIn('error_message', response.data)
         self.assertEqual(User.objects.count(), n)
 
-    def test_user_registration_no_email(self):
-        """
-        Ensures that we cannot register without email
-        """
-        n = User.objects.count()
-        url = prepare_url('register')
-        data = {
-            'username': 'username',
-            'password': '123',
-        }
-        response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('error_message', response.data)
-        self.assertEqual(User.objects.count(), n)
+    # def test_user_registration_no_email(self):
+    #     """
+    #     Ensures that we cannot register without email
+    #     """
+    #     n = User.objects.count()
+    #     url = prepare_url('register')
+    #     data = {
+    #         'username': 'username',
+    #         'password': '123',
+    #     }
+    #     response = self.client.post(url, data=data, format='json')
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    #     self.assertIn('error_message', response.data)
+    #     self.assertEqual(User.objects.count(), n)
 
     def test_user_registration_no_password(self):
         """

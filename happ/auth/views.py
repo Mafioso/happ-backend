@@ -18,7 +18,7 @@ jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
 class UserRegister(CreateAPIView):
-    model = get_user_model()
+    UserModel = get_user_model()
     serializer_class = UserSerializer
     permission_classes = ()
 
@@ -31,16 +31,24 @@ class UserRegister(CreateAPIView):
                 {'error_message': _('No username provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'email' not in request.data:
-            return Response(
-                {'error_message': _('No email provided.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # if 'email' not in request.data:
+        #     return Response(
+        #         {'error_message': _('No email provided.')},
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
         if 'password' not in request.data:
             return Response(
                 {'error_message': _('No password provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        try:
+            UserModel.objects.get(username=request.data['username'])
+            return Response(
+                {'error_message': _('Username already exists.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except:
+            pass
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

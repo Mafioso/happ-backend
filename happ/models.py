@@ -57,7 +57,7 @@ class User(AbstractUser, HappBaseDocument):
     }
     GENDERS = (MALE, FEMALE) = range(2)
 
-    username = StringField(required=True)
+    username = StringField(required=True, unique=True)
     fullname = StringField()
     email = EmailField()
     password = StringField()

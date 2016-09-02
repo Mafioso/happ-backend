@@ -11,7 +11,7 @@ class UsersViewSet(viewsets.GenericViewSet):
     queryset = User.objects.all()
 
     @list_route(methods=['get'], url_path='current')
-    def find(self, request, *args, **kwargs):
+    def current(self, request, *args, **kwargs):
         user = request.user
         serializer = self.get_serializer(user)
         return Response(serializer.data)
