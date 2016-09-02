@@ -71,7 +71,7 @@ class CitiesTests(APISimpleTestCase):
 
     def test_user_set_city(self):
         """
-        We can set current city for user
+        We can set city for user
         """
         u = UserFactory()
         u.set_password('123')
