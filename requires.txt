@@ -1,5 +1,6 @@
 Django==1.10
 django-anymail==0.5
+django-filter==0.14.0
 django-rest-framework-mongoengine==3.3.0
 djangorestframework==3.4.4
 djangorestframework-jwt==1.8.0
