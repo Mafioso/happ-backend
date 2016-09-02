@@ -34,9 +34,10 @@ class InterestsTests(APISimpleTestCase):
             'password': '123'
         }
         response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
 
         url = prepare_url('interests-list')
-        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, response.data['token']))
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -62,9 +63,10 @@ class InterestsTests(APISimpleTestCase):
             'password': '123'
         }
         response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
 
         url = prepare_url('interests-list', query={'search': 'hoc'})
-        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, response.data['token']))
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)

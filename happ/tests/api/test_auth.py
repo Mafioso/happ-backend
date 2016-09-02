@@ -243,3 +243,98 @@ class AuthTests(APISimpleTestCase):
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_password(self):
+        """
+        We can change user's password
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        url = prepare_url('password-change')
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data['token'], None)
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        data = {
+            'old_password': '123',
+            'new_password1': '1234qwerASDF!@#$',
+            'new_password2': '1234qwerASDF!@#$',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = {
+            'username': u.username,
+            'password': '1234qwerASDF!@#$'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data['token'], None)
+
+    def test_change_password_wrong_old(self):
+        """
+        We cannot change user's password with wrong old password
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        url = prepare_url('password-change')
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data['token'], None)
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        data = {
+            'old_password': '1234',
+            'new_password1': '1234qwerASDF!@#$',
+            'new_password2': '1234qwerASDF!@#$',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_password_mismatch(self):
+        """
+        We cannot change user's password when passwords mismatch
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        url = prepare_url('password-change')
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response.data['token'], None)
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        data = {
+            'old_password': '123',
+            'new_password1': '1234qwerASDF!@#$',
+            'new_password2': '1234qwerASDF!@',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

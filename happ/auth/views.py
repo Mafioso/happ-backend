@@ -11,7 +11,7 @@ from rest_framework_jwt.settings import api_settings
 
 from happ.serializers import UserSerializer, UserPayloadSerializer
 
-from .forms import HappPasswordResetForm, HappSetPasswordForm
+from .forms import HappPasswordResetForm, HappSetPasswordForm, PasswordChangeForm
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -110,5 +110,23 @@ class PasswordResetConfirm(APIView):
 
         return Response(
                 {'error_message': _('No such user or token is not valid.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+class PasswordChange(APIView):
+    def post(self, request, format=None):
+        """
+        Submits form which changes user password
+        """
+        print request.user
+        form = PasswordChangeForm(user=request.user, data=request.data)
+        if form.is_valid():
+            form.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            print form._errors
+
+        return Response(
+                {'error_message': _('Invalid data.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
