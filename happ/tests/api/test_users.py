@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
@@ -30,3 +32,42 @@ class UsersTests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], u.username)
+
+    def test_edit_current_user(self):
+        """
+        We can get edit current user
+        """
+        u = UserFactory(**{
+            'fullname': 'Michael Brown',
+            'phone': '87015555555',
+            'gender': 0,
+            'date_of_birth': datetime(1991, 12, 23)
+        })
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('users-current/edit')
+
+        data = {
+            'fullname': 'Adam Smith',
+            'phone': '87017777777',
+            'gender': 1,
+            'date_of_birth': datetime(1990, 10, 15)
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        u = User.objects.get(username=u.username)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(u.fullname, 'Adam Smith')
+        self.assertEqual(u.phone, '87017777777')
+        self.assertEqual(u.gender, 1)
+        self.assertEqual(u.date_of_birth, datetime(1990, 10, 15))
