@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import list_route
 from rest_framework_mongoengine import viewsets
 
+from mongoextensions import filters
 from ..models import Interest
 from ..serializers import InterestSerializer
 
@@ -13,6 +14,8 @@ class InterestViewSet(viewsets.ModelViewSet):
     serializer_class = InterestSerializer
     queryset = Interest.objects.all()
     pagination_class = None
+    filter_backends = (filters.MongoSearchFilter, )
+    search_fields = ('title', )
 
     @list_route(methods=['post'], url_path='set')
     def set(self, request, id=None, *args, **kwargs):
