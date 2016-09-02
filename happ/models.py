@@ -35,7 +35,9 @@ class City(HappBaseDocument):
 
     @property
     def country_name(self):
-        return self.country.name
+        if self.country:
+            return self.country.name
+        return ''
 
 
 class Currency(HappBaseDocument):
