@@ -92,6 +92,8 @@ class Event(HappBaseDocument):
     TYPES = (NORMAL, FEATURED, ADS) = range(3)
     STATUSES = (MODERATION, APPROVED, REJECTED) = range(3)
 
+    localized_fields = ('title', )
+
     title = StringField()
     description = StringField()
     language = StringField(default=settings.HAPP_LANGUAGES[0]) # en ru fr it es de

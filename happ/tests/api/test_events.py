@@ -113,7 +113,6 @@ class EventTests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
 
-
     def test_create_event_no_title(self):
         """
         We cannot create event without title

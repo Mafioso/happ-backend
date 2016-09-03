@@ -10,13 +10,15 @@ from .models import City, Currency, User, UserSettings, Interest, Event
 class LocalizedSerializer(serializers.DocumentSerializer):
 
     def to_representation(self, instance):
-        language = self.context['request'].user.settings.language
         data = super(LocalizedSerializer, self).to_representation(instance)
+        if 'request' not in self.context:
+            return data
+        language = self.context['request'].user.settings.language
         localized_instance = instance.localized(language=language)
         if not localized_instance:
             return data
-        if hasattr(self.Meta, 'localized_fields') and self.Meta.localized_fields:
-            for field in self.Meta.localized_fields:
+        if hasattr(self.Meta.model, 'localized_fields') and self.Meta.model.localized_fields:
+            for field in self.Meta.model.localized_fields:
                 if field in localized_instance.data:
                     data[field] = localized_instance.data[field]
         return data
@@ -137,7 +139,6 @@ class EventSerializer(LocalizedSerializer):
 
     class Meta:
         model = Event
-        localized_fields = ['title']
 
     def validate_city_id(self, value):
         try:

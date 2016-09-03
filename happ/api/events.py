@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 
+from ..tasks import translate_event
 from ..models import Event
 from ..serializers import EventSerializer
 
@@ -67,6 +68,8 @@ class EventViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
+            for language in settings.HAPP_LANGUAGES:
+                translate_event.delay(event=serializer.data, target=language)
 
             return Response(status=status.HTTP_201_CREATED, headers=headers)
         else:
