@@ -378,3 +378,42 @@ class EventTests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['title'], localized_title)
+
+    def test_edit_event(self):
+        """
+        we can edit event
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-detail', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'start_datetime': datetime.now(),
+            'end_datetime': datetime.now() + timedelta(days=1),
+            'min_price': 100,
+            'max_price': 120,
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['title'], 'New event')
+        self.assertEqual(response.data['min_price'], 100)
+        self.assertEqual(response.data['max_price'], 120)
+        self.assertEqual(Event.objects.count(), n)
