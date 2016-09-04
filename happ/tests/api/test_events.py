@@ -444,3 +444,31 @@ class EventTests(APISimpleTestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Event.objects.count(), n-1)
+
+    def test_copy_event(self):
+        """
+        we can copy event
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-copy', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Event.objects.count(), (n+1))
+        self.assertNotEqual(response.data['id'], str(e.id))

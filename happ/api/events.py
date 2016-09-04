@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import detail_route
 from rest_framework_mongoengine import viewsets
 
 from ..tasks import translate_event
@@ -141,3 +142,11 @@ class EventViewSet(viewsets.ModelViewSet):
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+    @detail_route(methods=['get'], url_path='copy')
+    def copy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        new_instance = instance.copy()
+        serializer = self.get_serializer(new_instance)
+        self.translate(serializer)
+        return Response(serializer.data)

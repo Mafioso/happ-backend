@@ -1,7 +1,9 @@
+from copy import deepcopy
 from datetime import datetime
-from mongoengine import *
 
 from django.conf import settings
+
+from mongoengine import *
 
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
@@ -121,6 +123,12 @@ class Event(HappBaseDocument):
             return Localized.objects.get(entity=self, language=language)
         except:
             return None
+
+    def copy(self):
+        new_instance = deepcopy(self)
+        new_instance.id = None
+        new_instance.save()
+        return new_instance
 
 
 class Localized(Document):
