@@ -69,9 +69,9 @@ class EventViewSet(viewsets.ModelViewSet):
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
             for language in settings.HAPP_LANGUAGES:
-                translate_event.delay(event=serializer.data, target=language)
+                translate_event.delay(id=serializer.data['id'], target=language)
 
-            return Response(status=status.HTTP_201_CREATED, headers=headers)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
             return Response(
                 serializer.errors,
