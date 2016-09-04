@@ -17,8 +17,17 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
 
+    def translate(self, serializer):
+        for language in settings.HAPP_LANGUAGES:
+            translate_event.delay(id=serializer.data['id'], target=language)
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+        self.translate(serializer)
+
+    def perform_update(self, serializer):
+        serializer.save()
+        self.translate(serializer)
 
     def create(self, request, *args, **kwargs):
         """
@@ -68,8 +77,6 @@ class EventViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
-            for language in settings.HAPP_LANGUAGES:
-                translate_event.delay(id=serializer.data['id'], target=language)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
@@ -123,12 +130,10 @@ class EventViewSet(viewsets.ModelViewSet):
         request.data['end_date'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.DATE_STRING_FIELD_FORMAT)
         request.data['end_time'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.TIME_STRING_FIELD_FORMAT)
 
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
             self.perform_update(serializer)
             headers = self.get_success_headers(serializer.data)
-            for language in settings.HAPP_LANGUAGES:
-                translate_event.delay(id=serializer.data['id'], target=language)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
