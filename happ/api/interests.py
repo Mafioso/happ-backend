@@ -30,7 +30,7 @@ class InterestViewSet(viewsets.ModelViewSet):
             )
         except Exception as e:
             return Response(
-                {'error_message': _('Bad data.')},
+                {'error_message': _('Invalid data.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
         user.interests = interests

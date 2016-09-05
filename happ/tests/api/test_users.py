@@ -71,3 +71,82 @@ class UsersTests(APISimpleTestCase):
         self.assertEqual(u.phone, '87017777777')
         self.assertEqual(u.gender, 1)
         self.assertEqual(u.date_of_birth, datetime(1990, 10, 15))
+
+    def test_set_language(self):
+        """
+        We can set language for current user
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('users-current/set/language')
+
+        data = {
+            'language': 'it',
+        }
+        response = self.client.post(url, data=data, format='json')
+        u = User.objects.get(username=u.username)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['settings']['language'], 'it')
+        self.assertEqual(u.settings.language, 'it')
+
+    def test_set_language_no_lang(self):
+        """
+        We cannot set language for current user with no lang
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('users-current/set/language')
+
+        data = {}
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_set_language_wrong_lang(self):
+        """
+        We cannot set language for current user with wrong lang
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('users-current/set/language')
+
+        data = {
+            'language': 'kk',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

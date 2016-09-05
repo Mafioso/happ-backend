@@ -51,6 +51,7 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
     class Meta:
         model = UserSettings
 
+
 class UserSerializer(serializers.DocumentSerializer):
     settings = UserSettingsSerializer(read_only=True)
 
@@ -68,7 +69,6 @@ class UserSerializer(serializers.DocumentSerializer):
         user.set_password(validated_data['password'])
         user.settings = UserSettings()
         user.save()
-
         return user
 
 
