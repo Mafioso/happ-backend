@@ -60,6 +60,10 @@ class UserSerializer(serializers.DocumentSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+        exclude = (
+            'interests',
+            'favorites',
+        )
 
     def create(self, validated_data):
         user = User.objects.create(
