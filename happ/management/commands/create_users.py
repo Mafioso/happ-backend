@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('n', type=int)
 
     def handle(self, *args, **options):
-        users = [UserFactory() for x in range(options['n'])]
+        users = [UserFactory() for x in xrange(options['n'])]
         User.objects.insert(users)
         self.stdout.write(
                 self.style.SUCCESS(
