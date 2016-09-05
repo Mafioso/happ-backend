@@ -1,0 +1,41 @@
+version: '2'
+services:
+  rabbitmq:
+    extends:
+      file: docker-compose.base.yml
+      service: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+
+  mongo:
+    extends:
+      file: docker-compose.base.yml
+      service: mongo
+
+  app:
+    extends:
+      file: docker-compose.base.yml
+      service: app
+    environment:
+      - DJANGO_SETTINGS_MODULE=happ.settings.dev
+      - MONGODB_PORT=27017
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+    volumes:
+      - .:/happ
+    links:
+      - mongo
+      - rabbitmq
+
+  celery:
+    extends:
+      file: docker-compose.base.yml
+      service: celery
+    environment:
+      - MONGODB_PORT=27017
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+    links:
+      - mongo
+      - rabbitmq:rabbit

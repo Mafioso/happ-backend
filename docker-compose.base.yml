@@ -1,0 +1,26 @@
+version: '2'
+services:
+  rabbitmq:
+    image: rabbitmq:3.5.4-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_VHOST='/'
+      - RABBITMQ_USER_PASSWD=guest:guest
+
+  mongo:
+    image: mongo:3.2
+    command: mongod --dbpath=/data/db --bind_ip=0.0.0.0
+    restart: always
+    ports:
+      - "27017:27017"
+
+  app:
+    image: happ
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+
+  celery:
+    image: celery:3.1.23
