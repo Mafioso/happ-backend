@@ -45,7 +45,7 @@ class UserFactory(factory.mongoengine.MongoEngineFactory):
         model = User
 
     username = factory.LazyAttribute(lambda x: faker.user_name() + u" ".join(faker.words()))
-    email = factory.LazyAttribute(lambda x: u" ".join(faker.words()) + faker.email())
+    email = factory.LazyAttribute(lambda x: u"".join(faker.words()) + u"_" +  faker.email())
     settings = factory.SubFactory(UserSettingsFactory)
 
     @factory.lazy_attribute
