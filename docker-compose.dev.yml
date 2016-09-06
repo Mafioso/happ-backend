@@ -1,12 +1,23 @@
 version: '2'
 services:
+  media:
+    extends:
+      file: docker-compose.base.yml
+      service: media
+
+  nginx:
+    extends:
+      file: docker-compose.base.yml
+      service: nginx
+    volumes_from:
+      - media
+    links:
+      - app
+
   rabbitmq:
     extends:
       file: docker-compose.base.yml
       service: rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=guest
-      - RABBITMQ_DEFAULT_PASS=guest
 
   mongo:
     extends:
@@ -19,11 +30,11 @@ services:
       service: app
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.dev
-    volumes:
-      - .:/happ
     links:
       - mongo
       - rabbitmq
+    volumes_from:
+      - media
 
   celery:
     extends:

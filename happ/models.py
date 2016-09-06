@@ -113,6 +113,7 @@ class Event(HappBaseDocument):
     email = EmailField()
     web_site = URLField()
     votes = IntField(default=0)
+    images = ListField(StringField())
     start_date = DateStringField()
     start_time = TimeStringField()
     end_date = DateStringField()

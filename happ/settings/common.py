@@ -122,6 +122,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/uploads/'
+MEDIA_URL_NO_TRAILING_SLASH = '/uploads'
+MEDIA_ROOT = '/uploads'
+
+NGINX_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'media')
+NGINX_TMP_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'tmp')
 
 MONGODB_PORT = 27017
 MONGODB_HOST_NAME = os.getenv('MONGO_PORT_27017_TCP_ADDR', '127.0.0.1')

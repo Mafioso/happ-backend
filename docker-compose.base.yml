@@ -1,5 +1,19 @@
 version: '2'
 services:
+  media:
+    image: busybox:ubuntu-14.04
+    command: mkdir -p /uploads && mkdir -p /uploads/tmp && mkdir -p /uploads/media
+    volumes:
+      - ./uploads:/uploads
+
+  nginx:
+    image: anguis/nginx:1.9.4
+    ports:
+      - "9000:80"
+    volumes:
+      - ./conf/nginx:/etc/nginx/sites-enabled
+    restart: always
+
   rabbitmq:
     image: rabbitmq:3.5.4-management
     ports:
@@ -25,6 +39,8 @@ services:
       - MONGODB_PORT=27017
       - MONGO_PORT_27017_TCP_ADDR=mongo
       - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+    volumes:
+      - .:/happ
 
   celery:
     image: happ
