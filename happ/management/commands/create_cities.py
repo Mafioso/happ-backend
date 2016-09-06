@@ -22,7 +22,7 @@ class Command(BaseCommand):
                 self.stdout.write(
                     'Created {} cities {}'.format(len(v), self.style.SUCCESS('[ OK ]')),
                 )
-            
+
             self.stdout.write(
                 self.style.SUCCESS(
                     'Successfully created {} counties and {} cities'.format(len(s), i)

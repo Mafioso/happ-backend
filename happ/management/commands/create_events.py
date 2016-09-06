@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 from happ.factories import EventFactory
+from happ.models import Event
 
 
 class Command(BaseCommand):
@@ -14,9 +15,8 @@ class Command(BaseCommand):
         parser.add_argument('n', type=int)
 
     def handle(self, *args, **options):
-        for x in range(options['n']):
-            event = EventFactory()
-            event.save()
+        events = [EventFactory() for x in xrange(options['n'])]
+        Event.objects.insert(events)
         self.stdout.write(
                 self.style.SUCCESS(
                     'Successfully created {} events'.format(options['n'])

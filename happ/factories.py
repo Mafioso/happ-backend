@@ -1,5 +1,6 @@
 import random
 import factory
+from faker import Factory as FakerFactory
 
 from models import (
     User,
@@ -13,6 +14,9 @@ from models import (
 
 ALL_CITIES = City.objects
 ALL_CURRENCIES = Currency.objects
+
+faker = FakerFactory.create()
+
 
 class CityFactory(factory.mongoengine.MongoEngineFactory):
     name = factory.Faker('word')
@@ -40,8 +44,8 @@ class UserFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = User
 
-    username = factory.Faker('word')
-    email = factory.Faker('email')
+    username = factory.LazyAttribute(lambda x: faker.user_name() + u" ".join(faker.words()))
+    email = factory.LazyAttribute(lambda x: u"".join(faker.words()) + u"_" +  faker.email())
     settings = factory.SubFactory(UserSettingsFactory)
 
     @factory.lazy_attribute
