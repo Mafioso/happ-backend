@@ -46,7 +46,7 @@ class DateStringField(StringField):
 
 class TimeStringField(StringField):
     """
-        A custom date field which stores date as YYYYMMDD string.
+        A custom time field which stores time as HHMMSS string.
     """
 
     def __init__(self, format=None, **kwargs):
