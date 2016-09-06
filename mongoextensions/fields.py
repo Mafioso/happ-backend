@@ -10,7 +10,7 @@ class DateStringField(StringField):
     """
         A custom date field which stores date as YYYYMMDD string.
     """
-    
+
     def __init__(self, format=None, **kwargs):
         self.format = format or settings.DATE_STRING_FIELD_FORMAT
         super(DateStringField, self).__init__(**kwargs)
@@ -48,7 +48,7 @@ class TimeStringField(StringField):
     """
         A custom date field which stores date as YYYYMMDD string.
     """
-    
+
     def __init__(self, format=None, **kwargs):
         self.format = format or settings.TIME_STRING_FIELD_FORMAT
         super(TimeStringField, self).__init__(**kwargs)

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers as drf_serializers
@@ -46,56 +48,6 @@ class CurrencySerializer(serializers.DocumentSerializer):
         )
 
 
-class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
-
-    class Meta:
-        model = UserSettings
-
-
-class UserSerializer(serializers.DocumentSerializer):
-    settings = UserSettingsSerializer(read_only=True)
-
-    class Meta:
-        model = User
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
-        exclude = (
-            'interests',
-            'favorites',
-        )
-
-    def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
-        user.set_password(validated_data['password'])
-        user.settings = UserSettings()
-        user.save()
-        return user
-
-
-class UserPayloadSerializer(serializers.DocumentSerializer):
-
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'username',
-        )
-
-
-class AuthorSerializer(serializers.DocumentSerializer):
-
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'fn',
-        )
-
-
 class InterestSerializer(serializers.DocumentSerializer):
 
     class Meta:
@@ -133,6 +85,56 @@ class InterestParentSerializer(serializers.DocumentSerializer):
         )
 
 
+class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
+
+    class Meta:
+        model = UserSettings
+
+
+class UserSerializer(serializers.DocumentSerializer):
+    interests = InterestSerializer(many=True, read_only=True)
+    settings = UserSettingsSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+        exclude = (
+            'favorites',
+        )
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+        )
+        user.set_password(validated_data['password'])
+        user.settings = UserSettings()
+        user.save()
+        return user
+
+
+class UserPayloadSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'username',
+        )
+
+
+class AuthorSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'fn',
+        )
+
+
 class EventSerializer(LocalizedSerializer):
     interests = InterestChildSerializer(many=True, required=False)
     currency = CurrencySerializer(read_only=True)
@@ -140,9 +142,17 @@ class EventSerializer(LocalizedSerializer):
     city = serializers.ObjectIdField(read_only=True)
     city_id = serializers.ObjectIdField(write_only=True)
     author = AuthorSerializer(read_only=True)
+    start_datetime = drf_serializers.SerializerMethodField()
+    end_datetime = drf_serializers.SerializerMethodField()
 
     class Meta:
         model = Event
+        extra_kwargs = {
+            'start_date': {'write_only': True},
+            'start_time': {'write_only': True},
+            'end_date': {'write_only': True},
+            'end_time': {'write_only': True},
+        }
 
     def validate_city_id(self, value):
         try:
@@ -181,3 +191,9 @@ class EventSerializer(LocalizedSerializer):
         event.currency = currency
         event.save()
         return event
+
+    def get_start_datetime(self, obj):
+        return datetime.combine(obj.start_date, obj.start_time).isoformat()
+
+    def get_end_datetime(self, obj):
+        return datetime.combine(obj.end_date, obj.end_time).isoformat()
