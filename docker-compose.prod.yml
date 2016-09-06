@@ -10,7 +10,7 @@ services:
       file: docker-compose.base.yml
       service: nginx
     volumes:
-      - ./conf/nginx/dev:/etc/nginx/sites-enabled
+      - ./conf/nginx/prod:/etc/nginx/sites-enabled
     volumes_from:
       - media
     links:
@@ -31,7 +31,7 @@ services:
       file: docker-compose.base.yml
       service: app
     environment:
-      - DJANGO_SETTINGS_MODULE=happ.settings.dev
+      - DJANGO_SETTINGS_MODULE=happ.settings.prod
     links:
       - mongo
       - rabbitmq
@@ -43,7 +43,7 @@ services:
       file: docker-compose.base.yml
       service: celery
     environment:
-      - DJANGO_SETTINGS_MODULE=happ.settings.dev
+      - DJANGO_SETTINGS_MODULE=happ.settings.prod
     links:
       - mongo
       - rabbitmq

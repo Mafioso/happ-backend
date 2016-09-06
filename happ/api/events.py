@@ -155,4 +155,4 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['post'], url_path='upload')
     def upload(self, request, *args, **kwargs):
-        return Response(request.data.getlist('files', []))
+        return Response(request.data.getlist('images', []))

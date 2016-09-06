@@ -10,8 +10,6 @@ services:
     image: anguis/nginx:1.9.4
     ports:
       - "9000:80"
-    volumes:
-      - ./conf/nginx:/etc/nginx/sites-enabled
     restart: always
 
   rabbitmq:
