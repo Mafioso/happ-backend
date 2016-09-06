@@ -21,6 +21,21 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
+    environment:
+      - MONGODB_PORT=27017
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
 
   celery:
-    image: celery:3.1.23
+    image: happ
+    working_dir: /happ
+    command: celery -A happ worker -l debug --concurrency=2
+    volumes:
+      - .:/happ
+    environment:
+      - C_FORCE_ROOT='true'
+      - MONGODB_PORT=27017
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+      - RABBITMQ_PORT_5672_TCP_PORT=5672
+      - RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST='/'

@@ -19,9 +19,6 @@ services:
       service: app
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.dev
-      - MONGODB_PORT=27017
-      - MONGO_PORT_27017_TCP_ADDR=mongo
-      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
     volumes:
       - .:/happ
     links:
@@ -33,9 +30,7 @@ services:
       file: docker-compose.base.yml
       service: celery
     environment:
-      - MONGODB_PORT=27017
-      - MONGO_PORT_27017_TCP_ADDR=mongo
-      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+      - DJANGO_SETTINGS_MODULE=happ.settings.dev
     links:
       - mongo
-      - rabbitmq:rabbit
+      - rabbitmq

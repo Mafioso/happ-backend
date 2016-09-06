@@ -177,3 +177,18 @@ TIME_STRING_FIELD_FORMAT = "%H%M%S"
 
 GOOGLE_TRANSLATE_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
 GOOGLE_TRANSLATE_LINK = 'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
+
+CELERY_ACCEPT_CONTENT = ['json']
+
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+BROKER_USER_PASSWORD = os.getenv('RABBITMQ_ENV_RABBITMQ_USER_PASSWD', 'guest:guest')
+BROKER_VHOST = os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
+
+BROKER_URL = 'amqp://{user_passwd}@{host}/{vhost}'.format(**{
+    'user_passwd': BROKER_USER_PASSWORD,
+    'host': os.getenv('RABBITMQ_PORT_5672_TCP_ADDR', '127.0.0.1'),
+    'port': os.getenv('RABBITMQ_PORT_5672_TCP_PORT', 5672),
+    'vhost': BROKER_VHOST
+})
