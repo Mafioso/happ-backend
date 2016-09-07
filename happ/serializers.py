@@ -142,8 +142,6 @@ class EventSerializer(LocalizedSerializer):
     city = serializers.ObjectIdField(read_only=True)
     city_id = serializers.ObjectIdField(write_only=True)
     author = AuthorSerializer(read_only=True)
-    start_datetime = drf_serializers.SerializerMethodField()
-    end_datetime = drf_serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -152,6 +150,8 @@ class EventSerializer(LocalizedSerializer):
             'start_time': {'write_only': True},
             'end_date': {'write_only': True},
             'end_time': {'write_only': True},
+            'start_datetime': {'read_only': True},
+            'end_datetime': {'read_only': True},
         }
 
     def validate_city_id(self, value):
@@ -185,10 +185,12 @@ class EventSerializer(LocalizedSerializer):
     def create(self, validated_data):
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
+        author = validated_data.pop('author')
         event = super(EventSerializer, self).create(validated_data)
 
         event.city = city
         event.currency = currency
+        event.author
         event.save()
         event.translate()
         return event
@@ -197,9 +199,3 @@ class EventSerializer(LocalizedSerializer):
         event = super(EventSerializer, self).update(instance, validated_data)
         event.translate()
         return event
-
-    def get_start_datetime(self, obj):
-        return datetime.combine(obj.start_date, obj.start_time).isoformat()
-
-    def get_end_datetime(self, obj):
-        return datetime.combine(obj.end_date, obj.end_time).isoformat()

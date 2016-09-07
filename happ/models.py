@@ -119,6 +119,14 @@ class Event(HappBaseDocument):
     end_date = DateStringField()
     end_time = TimeStringField()
 
+    @property
+    def start_datetime(self):
+        return datetime.combine(self.start_date, self.start_time).isoformat()
+
+    @property
+    def end_datetime(self):
+        return datetime.combine(self.end_date, self.end_time).isoformat()
+
     def localized(self, language=settings.HAPP_LANGUAGES[0]):
         try:
             return Localized.objects.get(entity=self, language=language)
