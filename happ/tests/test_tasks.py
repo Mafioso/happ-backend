@@ -1,17 +1,17 @@
 from django.test import SimpleTestCase, override_settings
 
-from ..tasks import translate_event
+from ..tasks import translate_entity
 from ..models import Localized
 from ..factories import EventFactory
 from . import *
 
 
-class CeleryTests(SimpleTestCase):
+class TasksTests(SimpleTestCase):
 
     @override_settings(CELERY_ALWAYS_EAGER=True)
-    def test_translate_event(self):
+    def test_translate_entity(self):
         """
-        ensure that translate_event task works properly
+        ensure that translate_entity task works properly
         """
 
         event = EventFactory()
@@ -19,5 +19,5 @@ class CeleryTests(SimpleTestCase):
 
         n = Localized.objects.count()
 
-        self.assertTrue(translate_event.delay(id=event.id, target='de'))
+        translate_entity(cls=event.__class__, id=event.id, target='de')
         self.assertEqual(Localized.objects.count(), (n+1))

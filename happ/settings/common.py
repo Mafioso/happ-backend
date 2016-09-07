@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_mongoengine',
+    'djcelery',
     'anymail',
     'happ',
 ]
@@ -122,6 +123,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/uploads/'
+MEDIA_URL_NO_TRAILING_SLASH = '/uploads'
+MEDIA_ROOT = '/uploads'
+
+NGINX_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'media')
+NGINX_TMP_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'tmp')
 
 MONGODB_PORT = 27017
 MONGODB_HOST_NAME = os.getenv('MONGO_PORT_27017_TCP_ADDR', '127.0.0.1')
@@ -177,3 +184,13 @@ TIME_STRING_FIELD_FORMAT = "%H%M%S"
 
 GOOGLE_TRANSLATE_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
 GOOGLE_TRANSLATE_LINK = 'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
+
+BROKER_USER_PASSWORD = os.getenv('RABBITMQ_ENV_RABBITMQ_USER_PASSWD', 'guest:guest')
+# BROKER_VHOST = os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
+
+BROKER_URL = 'amqp://{user_passwd}@{host}/{vhost}'.format(**{
+    'user_passwd': BROKER_USER_PASSWORD,
+    'host': os.getenv('RABBITMQ_PORT_5672_TCP_ADDR', '127.0.0.1'),
+    'port': os.getenv('RABBITMQ_PORT_5672_TCP_PORT', 5672),
+    'vhost': os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
+})

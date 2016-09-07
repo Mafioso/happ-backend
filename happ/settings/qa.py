@@ -5,4 +5,3 @@ MONGODB_HOST = 'mongodb://{host}:{port}'.format(host=MONGODB_HOST_NAME, port=MON
 MONGODB_NAME = 'happ2_qa'
 
 GOOGLE_TRANSLATE_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
-GOOGLE_TRANSLATE_LINK = 'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'

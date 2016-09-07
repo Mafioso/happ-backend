@@ -120,10 +120,19 @@ class Event(HappBaseDocument):
     email = EmailField()
     web_site = URLField()
     votes = IntField(default=0)
+    images = ListField(StringField())
     start_date = DateStringField()
     start_time = TimeStringField()
     end_date = DateStringField()
     end_time = TimeStringField()
+
+    @property
+    def start_datetime(self):
+        return datetime.combine(self.start_date, self.start_time).isoformat()
+
+    @property
+    def end_datetime(self):
+        return datetime.combine(self.end_date, self.end_time).isoformat()
 
     def localized(self, language=settings.HAPP_LANGUAGES[0]):
         try:
@@ -136,6 +145,14 @@ class Event(HappBaseDocument):
         new_instance.id = None
         new_instance.save()
         return new_instance
+
+    def translate(self, language=None):
+        from .tasks import translate_entity
+        if language:
+            translate_entity.delay(cls=self.__class__, id=self.id, target=language)
+        else:
+            for language in settings.HAPP_LANGUAGES:
+                translate_entity.delay(cls=self.__class__, id=self.id, target=language)
 
 
 class Localized(Document):

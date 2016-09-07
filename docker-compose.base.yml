@@ -1,0 +1,55 @@
+version: '2'
+services:
+  media:
+    image: busybox:ubuntu-14.04
+    command: mkdir -p /uploads && mkdir -p /uploads/tmp && mkdir -p /uploads/media
+    volumes:
+      - ./uploads:/uploads
+
+  nginx:
+    image: anguis/nginx:1.9.4
+    ports:
+      - "9000:80"
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3.5.4-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_VHOST='/'
+      - RABBITMQ_USER_PASSWD=guest:guest
+
+  mongo:
+    image: mongo:3.2
+    command: mongod --dbpath=/data/db --bind_ip=0.0.0.0
+    restart: always
+    ports:
+      - "27017:27017"
+
+  app:
+    image: happ
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_PORT=27017
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+    volumes:
+      - .:/happ
+
+  celery:
+    image: happ
+    working_dir: /happ
+    command: celery -A happ worker -l debug --concurrency=2
+    volumes:
+      - .:/happ
+    environment:
+      - C_FORCE_ROOT='true'
+      - MONGODB_PORT=27017
+      - MONGO_PORT_27017_TCP_ADDR=mongo
+      - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+      - RABBITMQ_PORT_5672_TCP_PORT=5672
+      - RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST='/'
