@@ -10,5 +10,6 @@
 *.log
 build/
 dist/
+venv
 *.egg-info
 .cache/

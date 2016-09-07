@@ -2,15 +2,17 @@ from copy import deepcopy
 from datetime import datetime
 
 from django.conf import settings
-
+import pymongo
 from mongoengine import *
-
+from mongoengine.connection import _get_db
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
 
 
-connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
+conn = connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
 
+def get_db():
+    return _get_db('default', reconnect=True)
 
 class HappBaseDocument(Document):
     meta = {
@@ -47,10 +49,15 @@ class Currency(HappBaseDocument):
 
 
 class UserSettings(EmbeddedDocument):
-    city = ReferenceField(City)
-    currency = ReferenceField(Currency)
+    city = ReferenceField('City')
+    currency = ReferenceField('Currency')
     notifications = DictField()
     language = StringField(default=settings.HAPP_LANGUAGES[0])
+
+
+class CityInterests(EmbeddedDocument):
+    c = ReferenceField('City')
+    ins = ListField(ReferenceField('Interest'))
 
 
 class User(AbstractUser, HappBaseDocument):
@@ -67,7 +74,7 @@ class User(AbstractUser, HappBaseDocument):
     date_of_birth = DateTimeField()
     gender = IntField(choices=GENDERS, default=MALE)
     organization = BooleanField(default=False)
-    interests = ListField(ReferenceField('Interest'))
+    interests = ListField(EmbeddedDocumentField('CityInterests'))
     favorites = ListField(ReferenceField('Event'))
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
