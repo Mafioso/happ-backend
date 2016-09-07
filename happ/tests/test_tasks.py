@@ -19,5 +19,5 @@ class TasksTests(SimpleTestCase):
 
         n = Localized.objects.count()
 
-        self.assertTrue(translate_entity.delay(cls=event.__class__, id=event.id, target='de'))
+        translate_entity(cls=event.__class__, id=event.id, target='de')
         self.assertEqual(Localized.objects.count(), (n+1))
