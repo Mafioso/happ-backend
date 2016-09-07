@@ -131,6 +131,14 @@ class Event(HappBaseDocument):
         new_instance.save()
         return new_instance
 
+    def translate(self, language=None):
+        from .tasks import translate_entity
+        if language:
+            translate_entity.delay(cls=self.__class__, id=self.id, target=language)
+        else:
+            for language in settings.HAPP_LANGUAGES:
+                translate_entity.delay(cls=self.__class__, id=self.id, target=language)
+
 
 class Localized(Document):
     language = StringField(default=settings.HAPP_LANGUAGES[0])

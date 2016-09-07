@@ -10,7 +10,6 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from ..utils import store_file
-from ..tasks import translate_event
 from ..models import Event
 from ..serializers import EventSerializer
 
@@ -19,17 +18,8 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
 
-    def translate(self, serializer):
-        for language in settings.HAPP_LANGUAGES:
-            translate_event.delay(id=serializer.data['id'], target=language)
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-        self.translate(serializer)
-
-    def perform_update(self, serializer):
-        serializer.save()
-        self.translate(serializer)
 
     def create(self, request, *args, **kwargs):
         """
@@ -150,7 +140,7 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         new_instance = instance.copy()
         serializer = self.get_serializer(new_instance)
-        self.translate(serializer)
+        new_instance.translate()
         return Response(serializer.data)
 
     @list_route(methods=['post'], url_path='upload')

@@ -185,11 +185,17 @@ class EventSerializer(LocalizedSerializer):
     def create(self, validated_data):
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
-        event = Event.objects.create(**validated_data)
+        event = super(EventSerializer, self).create(validated_data)
 
         event.city = city
         event.currency = currency
         event.save()
+        event.translate()
+        return event
+
+    def update(self, instance, validated_data):
+        event = super(EventSerializer, self).update(instance, validated_data)
+        event.translate()
         return event
 
     def get_start_datetime(self, obj):
