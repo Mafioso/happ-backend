@@ -15,3 +15,7 @@ Cities and currencies are created from fixtures. Interests, users and events are
 ``` ./manage.py create_events N ```
 
 Create cities and currencies first, then interests and users, and after that - events.
+
+## migrate your mongo schema or data
+
+./manage.py migrate 000X   #  check migration number you need to upgrade to in `happ.migrations` module and then do following migrations
