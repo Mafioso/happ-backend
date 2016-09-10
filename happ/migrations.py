@@ -39,30 +39,42 @@ def migration__event__upvotes_is_embed__0003():
     pass
 
 
-def migration__event__compound_index_by_status_and_city_for_feed__0004():
-    event_coll = get_db()['event']
-    event_coll.create_index([
-        ('status', pymongo.ASCENDING),
-        ('city', pymongo.ASCENDING)], background=True)
-
-
-def migration__event__compound_index_by_status_and_geopoint_for_feed__0005():
-    event_coll = get_db()['event']
-    event_coll.create_index([
-        ('geopoint', pymongo.GEO2D),
-        ('status', pymongo.ASCENDING)], background=True)
-
-
-def migration__event__compound_index_by_interests_and_end_date_and_end_time__0006():
+def migration__event__compound_index_by_world():
     event_coll = get_db()['event']
     event_coll.create_index([
         ('interests', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
         ('end_time', pymongo.ASCENDING)], background=True)
-
-def migration__event__compound_index_by_interests_and_end_date_and_votes__0007():
-    event_coll = get_db()['event']
     event_coll.create_index([
         ('interests', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
+        ('votes', pymongo.DESCENDING)], background=True)
+
+def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time__0007():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('geopoint', pymongo.GEO2D),
+        ('status', pymongo.ASCENDING),
+        ('interests', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
         ('end_time', pymongo.DESCENDING)], background=True)
+    event_coll.create_index([
+        ('geopoint', pymongo.GEO2D),
+        ('status', pymongo.ASCENDING),
+        ('interests', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('votes', pymongo.DESCENDING)], background=True)
+
+    event_coll.create_index([
+        ('status', pymongo.ASCENDING),
+        ('city', pymongo.ASCENDING),
+        ('interests', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('end_time', pymongo.DESCENDING)], background=True)
+    event_coll.create_index([
+        ('status', pymongo.ASCENDING),
+        ('city', pymongo.ASCENDING),
+        ('interests', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('votes', pymongo.DESCENDING)], background=True)
+
