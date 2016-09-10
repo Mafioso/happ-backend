@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 
+from django.conf import settings
+
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from django.conf import settings
 
 from .integrations import translate
 from .models import Localized
