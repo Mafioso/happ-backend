@@ -18,7 +18,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     environment:
-      - RABBITMQ_DEFAULT_VHOST='/'
+      - RABBITMQ_DEFAULT_VHOST=/
       - RABBITMQ_USER_PASSWD=guest:guest
 
   mongo:
@@ -52,4 +52,4 @@ services:
       - MONGO_PORT_27017_TCP_ADDR=mongo
       - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
       - RABBITMQ_PORT_5672_TCP_PORT=5672
-      - RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST='/'
+      - RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST=/
