@@ -1,4 +1,6 @@
-from .models import get_db, pymongo
+import datetime
+import random
+from .models import get_db, pymongo, User
 
 
 def migration__user__change_interests_schema__0001():
@@ -36,10 +38,16 @@ def migration__user__add_multikey_index_on_interests__0002():
 
 
 def migration__event__upvotes_is_embed__0003():
-    pass
+    event_coll = get_db()['event']
+    user_coll = get_db()['user']
+    ucount = user_coll.count()
+    for ev in event_coll.find({}):
+        uidx = random.randint(1, ucount) - 1
+        upvotes = [{'user': user_coll.find().limit(-1).skip(uidx).next()['_id'], 'ts': datetime.datetime.utcnow()} for _ in xrange(ev['votes'] % 100)]
+        event_coll.update({'_id': ev['_id']}, {'$set': {'votes': upvotes, 'votes_num': len(upvotes)}})
 
 
-def migration__event__compound_index_by_world():
+def migration__event__compound_index_by_world__0004():
     event_coll = get_db()['event']
     event_coll.create_index([
         ('interests', pymongo.ASCENDING),
@@ -48,9 +56,9 @@ def migration__event__compound_index_by_world():
     event_coll.create_index([
         ('interests', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
-        ('votes', pymongo.DESCENDING)], background=True)
+        ('votes_num', pymongo.DESCENDING)], background=True)
 
-def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time__0007():
+def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time__0005():
     event_coll = get_db()['event']
     event_coll.create_index([
         ('geopoint', pymongo.GEO2D),
@@ -63,7 +71,7 @@ def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time
         ('status', pymongo.ASCENDING),
         ('interests', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
-        ('votes', pymongo.DESCENDING)], background=True)
+        ('votes_num', pymongo.DESCENDING)], background=True)
 
     event_coll.create_index([
         ('status', pymongo.ASCENDING),
@@ -76,5 +84,5 @@ def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time
         ('city', pymongo.ASCENDING),
         ('interests', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
-        ('votes', pymongo.DESCENDING)], background=True)
+        ('votes_num', pymongo.DESCENDING)], background=True)
 
