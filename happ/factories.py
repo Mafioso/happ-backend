@@ -117,6 +117,8 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     @factory.lazy_attribute
     def votes(self):
         num_users = User.objects.count() % 100
+        if num_users == 0:
+            return []
         users = random.sample(User.objects(), random.randint(1, num_users) - 1)
         return [Upvote(user=u, ts=faker.date_time()) for u in users]
 

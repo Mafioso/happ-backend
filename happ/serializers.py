@@ -92,7 +92,7 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
 
 
 class UserSerializer(serializers.DocumentSerializer):
-    interests = InterestSerializer(many=True, read_only=True)
+    interests = drf_serializers.SerializerMethodField()
     settings = UserSettingsSerializer(read_only=True)
 
     class Meta:
@@ -113,6 +113,12 @@ class UserSerializer(serializers.DocumentSerializer):
         user.settings = UserSettings()
         user.save()
         return user
+
+    def get_interests(self, obj):
+        if not obj.settings.city:
+            return []
+        ins = map(lambda x: ins, obj.interests.get(c=obj.settings.city))
+        return InterestSerializer(inc, many=True)
 
 
 class UserPayloadSerializer(serializers.DocumentSerializer):
