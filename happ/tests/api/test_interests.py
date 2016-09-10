@@ -6,6 +6,7 @@ from happ.models import User, Interest
 from happ.factories import (
     UserFactory,
     InterestFactory,
+    CityFactory,
 )
 from .. import *
 
@@ -97,7 +98,12 @@ class InterestsTests(APISimpleTestCase):
         url = prepare_url('interests-set')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # user has no city, so he cannot set interests
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        u.settings.city = CityFactory()
+        u.save()
 
+        response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
         u = User.objects.get(id=u.id)
-        self.assertEqual(len(u.interests), 3)
+        self.assertEqual(len(u.interests), 1)
+        self.assertEqual(len(u.current_interests), 3)
