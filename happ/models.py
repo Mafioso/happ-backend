@@ -97,6 +97,11 @@ class Interest(HappBaseDocument):
         return Interest.objects.filter(parent=self)
 
 
+class Upvote(EmbeddedDocument):
+    user = ReferenceField('User')
+    ts = DateTimeField()
+
+
 class Event(HappBaseDocument):
     TYPES = (NORMAL, FEATURED, ADS) = range(3)
     STATUSES = (MODERATION, APPROVED, REJECTED) = range(3)
@@ -119,7 +124,8 @@ class Event(HappBaseDocument):
     phones = ListField(StringField())
     email = EmailField()
     web_site = URLField()
-    votes = IntField(default=0)
+    votes = ListField(EmbeddedDocumentField('Upvote'))
+    votes_num = IntField(default=0)
     images = ListField(StringField())
     start_date = DateStringField()
     start_time = TimeStringField()

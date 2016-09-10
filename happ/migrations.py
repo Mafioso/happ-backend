@@ -33,3 +33,36 @@ def migration__user__add_multikey_index_on_interests__0002():
     # CAREFUL: probably we do not need it because we always do search queries by user_id and there is always index by _id. Fetch by user_id locates a single document so index is utilized fully.
     user_coll = get_db()['user']
     user_coll.create_index([("interests.c", pymongo.ASCENDING), ("interests.ins", pymongo.ASCENDING)], background=True)
+
+
+def migration__event__upvotes_is_embed__0003():
+    pass
+
+
+def migration__event__compound_index_by_status_and_city_for_feed__0004():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('status', pymongo.ASCENDING),
+        ('city', pymongo.ASCENDING)], background=True)
+
+
+def migration__event__compound_index_by_status_and_geopoint_for_feed__0005():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('geopoint', pymongo.GEO2D),
+        ('status', pymongo.ASCENDING)], background=True)
+
+
+def migration__event__compound_index_by_interests_and_end_date_and_end_time__0006():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('interests', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('end_time', pymongo.ASCENDING)], background=True)
+
+def migration__event__compound_index_by_interests_and_end_date_and_votes__0007():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('interests', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('end_time', pymongo.DESCENDING)], background=True)
