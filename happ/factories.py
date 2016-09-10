@@ -7,9 +7,11 @@ from models import (
     UserSettings,
     City,
     Currency,
+    Upvote,
     Interest,
     Event,
-    Localized
+    Localized,
+    CityInterests
 )
 
 ALL_CITIES = City.objects
@@ -40,6 +42,12 @@ class UserSettingsFactory(factory.mongoengine.MongoEngineFactory):
     # currency = factory.LazyAttribute(lambda x: random.choice(ALL_CURRENCIES) if ALL_CURRENCIES.count() > 5 else None)
 
 
+class CityInterestsFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = CityInterests
+
+
+
 class UserFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = User
@@ -50,9 +58,8 @@ class UserFactory(factory.mongoengine.MongoEngineFactory):
 
     @factory.lazy_attribute
     def interests(self):
-        interests = Interest.objects()
-        return random.sample(interests, random.randint(1,3)) if interests.count() > 3 else []
-
+        cities = [City.objects.first() for _ in xrange(random.randint(2, 4))]
+        return [CityInterestsFactory(c=city, ins=[Interest.objects.first() for _ in xrange(random.randint(0, 3))]) for city in cities]
 
 class InterestFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
@@ -70,6 +77,11 @@ class InterestFactory(factory.mongoengine.MongoEngineFactory):
         return None
 
 
+class UpvoteFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = Upvote
+
+
 class EventFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = Event
@@ -85,7 +97,7 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     # phones =
     email = factory.Faker('email')
     web_site = factory.Faker('url')
-    votes = factory.Faker('pyint')
+    # votes = factory.Faker('pyint')
     start_date = factory.Faker('date_time')
     start_time = factory.Faker('date_time')
     end_date = factory.Faker('date_time')
@@ -101,6 +113,16 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
         if interests.count() < 3:
             return []
         return random.sample(interests, random.randint(1,3))
+
+    @factory.lazy_attribute
+    def votes(self):
+        num_users = User.objects.count() % 100
+        users = random.sample(User.objects(), random.randint(1, num_users) - 1)
+        return [Upvote(user=u, ts=faker.date_time()) for u in users]
+
+    @factory.lazy_attribute
+    def votes_num(self):
+        return len(self.votes)
 
 
 class LocalizedFactory(factory.mongoengine.MongoEngineFactory):
