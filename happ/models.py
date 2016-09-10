@@ -1,10 +1,12 @@
+import pymongo
 from copy import deepcopy
 from datetime import datetime
 
 from django.conf import settings
-import pymongo
+
 from mongoengine import *
 from mongoengine.connection import _get_db
+
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
 

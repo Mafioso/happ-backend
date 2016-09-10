@@ -3,8 +3,9 @@ import json
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from happ.models import Interest
+
 from happ.factories import InterestFactory
+from happ.models import Interest
 
 
 class Command(BaseCommand):
