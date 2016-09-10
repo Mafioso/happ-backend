@@ -47,7 +47,6 @@ class CityInterestsFactory(factory.mongoengine.MongoEngineFactory):
         model = CityInterests
 
 
-
 class UserFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = User
@@ -59,7 +58,8 @@ class UserFactory(factory.mongoengine.MongoEngineFactory):
     @factory.lazy_attribute
     def interests(self):
         cities = [City.objects.first() for _ in xrange(random.randint(2, 4))]
-        return [CityInterestsFactory(c=city, ins=[Interest.objects.first() for _ in xrange(random.randint(0, 3))]) for city in cities]
+        return [CityInterests(c=city, ins=[Interest.objects.first() for _ in xrange(random.randint(0, 3))]) for city in cities]
+
 
 class InterestFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:

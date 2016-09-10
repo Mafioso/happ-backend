@@ -3,7 +3,7 @@ import json
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-
+from happ.models import Interest
 from happ.factories import InterestFactory
 
 
@@ -14,9 +14,8 @@ class Command(BaseCommand):
         parser.add_argument('n', type=int)
 
     def handle(self, *args, **options):
-        for x in range(options['n']):
-            interest = InterestFactory()
-            interest.save()
+        ins = [InterestFactory.build() for x in range(options['n'])]:
+        Interest.objects.insert(ins)
         self.stdout.write(
                 self.style.SUCCESS(
                     'Successfully created {} interests'.format(options['n'])

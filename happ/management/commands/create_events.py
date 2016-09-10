@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('n', type=int)
 
     def handle(self, *args, **options):
-        events = [EventFactory() for x in xrange(options['n'])]
+        events = [EventFactory.build() for x in xrange(options['n'])]
         Event.objects.insert(events)
         self.stdout.write(
                 self.style.SUCCESS(
