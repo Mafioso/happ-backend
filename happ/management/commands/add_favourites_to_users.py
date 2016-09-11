@@ -13,9 +13,9 @@ class Command(BaseCommand):
     help = 'Creates random users using UserFactory'
 
     def handle(self, *args, **options):
-        user_ids = User.objects().values_list('id')
+        user_refs = [DBRef(User._meta['collection'], uid) for uid in User.objects().values_list('id')]
         for evt in Event.objects(in_favourites__exists=False):
-            evt.in_favourites = random.sample(user_ids, 3)
+            evt.in_favourites = random.sample(user_refs, 3)
             evt.save()
         self.stdout.write(
             self.style.SUCCESS(
