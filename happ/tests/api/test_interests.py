@@ -107,3 +107,32 @@ class InterestsTests(APISimpleTestCase):
         u = User.objects.get(id=u.id)
         self.assertEqual(len(u.interests), 1)
         self.assertEqual(len(u.current_interests), 3)
+
+        # lets change the list of interests for current city
+        # the amount of CityInterests records should not have been changed
+        interests = []
+        for i in range(4):
+            interest = InterestFactory()
+            interest.save()
+            interests.append(interest)
+
+        response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
+        u = User.objects.get(id=u.id)
+        self.assertEqual(len(u.interests), 1)
+        self.assertEqual(len(u.current_interests), 4)
+
+        # lets change user's current city and save interests for this city
+        # the amount of CityInterests should have been incremented
+        u.settings.city = CityFactory()
+        u.save()
+
+        interests = []
+        for i in range(2):
+            interest = InterestFactory()
+            interest.save()
+            interests.append(interest)
+
+        response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
+        u = User.objects.get(id=u.id)
+        self.assertEqual(len(u.interests), 2)
+        self.assertEqual(len(u.current_interests), 2)

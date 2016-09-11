@@ -39,9 +39,10 @@ class InterestViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            city_interests = user.interests.get(c=user.settings.city)
+            city_interests = next(x for x in user.interests if x.c==user.settings.city)
             city_interests.ins = interests
-        except:
+            user.save()
+        except Exception as e:
             city_interests = CityInterests(c=user.settings.city, ins=interests)
-        user.update(add_to_set__interests=city_interests)
+            user.update(push__interests=city_interests)
         return Response(status=status.HTTP_200_OK)
