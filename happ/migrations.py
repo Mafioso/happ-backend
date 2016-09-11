@@ -94,3 +94,11 @@ def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time
 def migration__user__remove_field_favourites__0006():
     user_coll = get_db()['user']
     user_coll.update({}, {'$unset': {'favorites': ''}}, multi=True)
+
+
+def migration__event__add_index_by_infavourites__0007():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('in_favourites', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('end_time', pymongo.DESCENDING)], background=True)
