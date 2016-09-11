@@ -1,10 +1,10 @@
-testimport datetime
+import datetime
 
 from django.test import SimpleTestCase
 
-from ..models import Event
-from ..factories import EventFactory
-from . import *
+from happ.models import Event
+from happ.factories import EventFactory
+from .. import *
 
 
 class FieldTests(SimpleTestCase):
