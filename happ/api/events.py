@@ -146,3 +146,14 @@ class EventViewSet(viewsets.ModelViewSet):
     @list_route(methods=['post'], url_path='upload')
     def upload(self, request, *args, **kwargs):
         return Response(request.data.getlist('images', []))
+
+    @detail_route(methods=['get'], url_path='upvote')
+    def upvote(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.is_upvoted(self.request.user):
+            return Response(
+                {'error_message': _('User has already upvoted this event.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        instance.upvote(self.request.user)
+        return Response(status=status.HTTP_200_OK)
