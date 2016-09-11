@@ -150,10 +150,21 @@ class EventViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['get'], url_path='upvote')
     def upvote(self, request, *args, **kwargs):
         instance = self.get_object()
-        vote = instance.upvote(self.request.user)
-        if not vote:
+        flag = instance.upvote(self.request.user)
+        if not flag:
             return Response(
                 {'error_message': _('User has already upvoted this event.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(status=status.HTTP_200_OK)
+
+    @detail_route(methods=['get'], url_path='downvote')
+    def downvote(self, request, *args, **kwargs):
+        instance = self.get_object()
+        flag = instance.downvote(self.request.user)
+        if not flag:
+            return Response(
+                {'error_message': _('User should upvote this event first.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(status=status.HTTP_200_OK)
