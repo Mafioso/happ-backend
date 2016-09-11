@@ -75,7 +75,7 @@ class User(AbstractUser, HappBaseDocument):
     date_of_birth = DateTimeField()
     gender = IntField(choices=GENDERS, default=MALE)
     organization = BooleanField(default=False)
-    interests = ListField(EmbeddedDocumentField('CityInterests'))
+    interests = EmbeddedDocumentListField('CityInterests')
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
     last_login = DateTimeField(blank=True, null=True)
@@ -135,7 +135,7 @@ class Event(HappBaseDocument):
     phones = ListField(StringField())
     email = EmailField()
     web_site = URLField()
-    votes = ListField(EmbeddedDocumentField('Upvote'))  # 3200  => {user: date} % 1000
+    votes = EmbeddedDocumentListField('Upvote')  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
     images = ListField(StringField())
     start_date = DateStringField()

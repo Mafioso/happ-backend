@@ -100,9 +100,6 @@ class UserSerializer(serializers.DocumentSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
-        exclude = (
-            'favorites',
-        )
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -136,7 +133,7 @@ class AuthorSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(LocalizedSerializer):
-    interests = InterestChildSerializer(many=True, required=False, read_only=True)
+    interests = InterestChildSerializer(many=True, required=False)
     currency = CurrencySerializer(read_only=True)
     currency_id = serializers.ObjectIdField(write_only=True)
     city = serializers.ObjectIdField(read_only=True)
