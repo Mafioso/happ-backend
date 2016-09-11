@@ -22,3 +22,16 @@ class EventsTests(SimpleTestCase):
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.votes.count(), n+1)
         self.assertEqual(e.votes_num, n+1)
+
+    def test_is_upvoted(self):
+        """
+        ensure that after upvoting is_upvoted returns True
+        """
+
+        u = UserFactory()
+        e = EventFactory()
+        self.assertFalse(e.is_upvoted(u))
+
+        e.upvote(u)
+        e = Event.objects.get(id=e.id)
+        self.assertTrue(e.is_upvoted(u))

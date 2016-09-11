@@ -172,6 +172,13 @@ class Event(HappBaseDocument):
             for language in settings.HAPP_LANGUAGES:
                 translate_entity.delay(cls=self.__class__, id=self.id, target=language)
 
+    def is_upvoted(self, user):
+        try:
+            self.votes.get(user=user)
+            return True
+        except:
+            return False
+
     def upvote(self, user):
         upvote = Upvote(user=user)
         self.update(push__votes=upvote, inc__votes_num=1)

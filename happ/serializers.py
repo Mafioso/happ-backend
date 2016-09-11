@@ -136,12 +136,15 @@ class AuthorSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(LocalizedSerializer):
-    interests = InterestChildSerializer(many=True, required=False)
+    interests = InterestChildSerializer(many=True, required=False, read_only=True)
     currency = CurrencySerializer(read_only=True)
     currency_id = serializers.ObjectIdField(write_only=True)
     city = serializers.ObjectIdField(read_only=True)
     city_id = serializers.ObjectIdField(write_only=True)
     author = AuthorSerializer(read_only=True)
+    start_datetime = drf_serializers.CharField(read_only=True)
+    end_datetime = drf_serializers.CharField(read_only=True)
+    is_upvoted = drf_serializers.SerializerMethodField()
 
     class Meta:
         model = Event
@@ -150,9 +153,10 @@ class EventSerializer(LocalizedSerializer):
             'start_time': {'write_only': True},
             'end_date': {'write_only': True},
             'end_time': {'write_only': True},
-            'start_datetime': {'read_only': True},
-            'end_datetime': {'read_only': True},
         }
+        exclude = (
+            'votes',
+        )
 
     def validate_city_id(self, value):
         try:
@@ -199,3 +203,8 @@ class EventSerializer(LocalizedSerializer):
         event = super(EventSerializer, self).update(instance, validated_data)
         event.translate()
         return event
+
+    def get_is_upvoted(self, obj):
+        if 'request' not in self.context:
+            return False
+        return obj.is_upvoted(self.context['request'].user)
