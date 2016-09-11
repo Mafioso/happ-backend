@@ -1,7 +1,7 @@
 import os
 import json
 import random
-
+from bson.dbref import DBRef
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
