@@ -111,7 +111,7 @@ class Interest(HappBaseDocument):
 
 class Upvote(EmbeddedDocument):
     user = ReferenceField('User')
-    ts = DateTimeField()
+    ts = DateTimeField(default=datetime.now)
 
 
 class Event(HappBaseDocument):
@@ -171,6 +171,10 @@ class Event(HappBaseDocument):
         else:
             for language in settings.HAPP_LANGUAGES:
                 translate_entity.delay(cls=self.__class__, id=self.id, target=language)
+
+    def upvote(self, user):
+        upvote = Upvote(user=user)
+        self.update(push__votes=upvote, inc__votes_num=1)
 
 
 class Localized(Document):
