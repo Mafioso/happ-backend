@@ -10,7 +10,7 @@ from happ.factories import (
 from .. import *
 
 
-class CurrenciesTests(APISimpleTestCase):
+class Tests(APISimpleTestCase):
 
     def test_get_without_auth(self):
         """

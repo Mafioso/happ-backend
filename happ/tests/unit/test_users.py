@@ -4,7 +4,7 @@ from happ.factories import UserFactory, CityFactory, CityInterestsFactory
 from .. import *
 
 
-class UsersTests(SimpleTestCase):
+class Tests(SimpleTestCase):
 
     def test_user_current_interests(self):
         """

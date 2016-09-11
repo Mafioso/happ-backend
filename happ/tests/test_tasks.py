@@ -6,7 +6,7 @@ from ..factories import EventFactory
 from . import *
 
 
-class TasksTests(SimpleTestCase):
+class Tests(SimpleTestCase):
 
     @override_settings(CELERY_ALWAYS_EAGER=True)
     def test_translate_entity(self):

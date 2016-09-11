@@ -9,7 +9,8 @@ from happ.factories import UserFactory
 from .. import *
 
 
-class UsersTests(APISimpleTestCase):
+class Tests(APISimpleTestCase):
+
     def test_get_current_user(self):
         """
         We can get current user

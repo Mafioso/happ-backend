@@ -7,7 +7,7 @@ from happ.factories import EventFactory
 from .. import *
 
 
-class FieldTests(SimpleTestCase):
+class Tests(SimpleTestCase):
 
     def test_event_date_field(self):
         """

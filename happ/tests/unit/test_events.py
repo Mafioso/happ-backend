@@ -5,7 +5,7 @@ from happ.factories import UserFactory, EventFactory
 from .. import *
 
 
-class EventsTests(SimpleTestCase):
+class Tests(SimpleTestCase):
 
     def test_upvote(self):
         """

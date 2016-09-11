@@ -11,7 +11,7 @@ from happ.factories import UserFactory
 from .. import *
 
 
-class AuthTests(APISimpleTestCase):
+class Tests(APISimpleTestCase):
 
     def test_user_registration(self):
         """

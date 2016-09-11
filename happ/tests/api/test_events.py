@@ -20,7 +20,8 @@ from happ.factories import (
 from .. import *
 
 
-class EventTests(APISimpleTestCase):
+class Tests(APISimpleTestCase):
+
     def test_get_without_auth(self):
         """
         Resourse is not available without authentication
