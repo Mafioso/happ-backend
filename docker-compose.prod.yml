@@ -10,7 +10,7 @@ services:
       file: docker-compose.base.yml
       service: nginx
     volumes:
-      - ./conf/nginx/prod:/etc/nginx/sites-enabled
+      - /happ/conf/nginx/prod:/etc/nginx/sites-enabled
     volumes_from:
       - media
     links:
@@ -30,11 +30,16 @@ services:
     extends:
       file: docker-compose.base.yml
       service: app
+    image: askhatomarov/happ:latest
+    command: uwsgi --ini uwsgi.ini
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.prod
     links:
       - mongo
       - rabbitmq
+    working_dir: /happ
+    volumes:
+      - /happ
     volumes_from:
       - media
 
