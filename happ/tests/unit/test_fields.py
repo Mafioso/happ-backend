@@ -1,4 +1,4 @@
-import datetime
+testimport datetime
 
 from django.test import SimpleTestCase
 
@@ -10,10 +10,10 @@ from . import *
 class FieldTests(SimpleTestCase):
 
     def test_event_date_field(self):
-    	"""
-    		ensure that we store date properly
+        """
+            ensure that we store date properly
             and we can make queries
-    	"""
+        """
 
         for x in range(5):
             event = EventFactory(start_date=datetime.datetime(2016, 10, (x+1)))
