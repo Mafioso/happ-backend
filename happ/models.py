@@ -1,12 +1,11 @@
-import pymongo
+# -*- coding: utf-8 -*-
 from copy import deepcopy
 from datetime import datetime
 
 from django.conf import settings
-
+import pymongo
 from mongoengine import *
 from mongoengine.connection import _get_db
-
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
 
@@ -77,7 +76,6 @@ class User(AbstractUser, HappBaseDocument):
     gender = IntField(choices=GENDERS, default=MALE)
     organization = BooleanField(default=False)
     interests = ListField(EmbeddedDocumentField('CityInterests'))
-    favorites = ListField(ReferenceField('Event'))
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
     last_login = DateTimeField(blank=True, null=True)
@@ -120,19 +118,22 @@ class Event(HappBaseDocument):
     currency = ReferenceField(Currency, required=False)
     min_price = IntField()
     max_price = IntField()
-    interests = ListField(ReferenceField(Interest))
+    interests = ListField(ReferenceField('Interest'))
+    in_favourites = ListField(ReferenceField('User'))
     address = StringField()
     geopoint = GeoPointField()
     phones = ListField(StringField())
     email = EmailField()
     web_site = URLField()
-    votes = ListField(EmbeddedDocumentField('Upvote'))
+    votes = ListField(EmbeddedDocumentField('Upvote'))  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
     images = ListField(StringField())
     start_date = DateStringField()
     start_time = TimeStringField()
     end_date = DateStringField()
     end_time = TimeStringField()
+
+    # ATTENTION: add `organizator` field soon
 
     @property
     def start_datetime(self):
@@ -167,3 +168,31 @@ class Localized(Document):
     language = StringField(default=settings.HAPP_LANGUAGES[0])
     data = DictField()
     entity = GenericReferenceField()
+
+
+# Notification
+#  - text
+#  - receivers
+#  - ts
+
+# Доставка уведомлений в ленту
+
+# 1. Добавление нового события
+#     - по событию id вытаскиваем всех пользователей id у которых данное событие в избранном
+#     - делаем рассылку push в специальную "раковину"
+
+# 2. Upvote события
+#     - по событию id вытаскиваем всех пользователей id у которых данное событие в избранном
+#     - рассылаем информацию о том что пользователь такой-то сделал upvote события такого-то
+
+# 4. Изменение даты окончания события
+#     - по событию id вытаскиваем всех пользователей id у которых данное событие в избранном
+#     - рассылаем информацию о том что дата окончания такого-то события изменилась
+
+# Внимание: добавить организатора ко всем
+
+
+# Notification
+#  - text
+#  - receivers
+#  - ts
