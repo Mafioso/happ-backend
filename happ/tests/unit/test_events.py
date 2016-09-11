@@ -18,7 +18,13 @@ class Tests(SimpleTestCase):
         count = e.votes.count()
         n = e.votes_num
 
-        e.upvote(u)
+        self.assertTrue(e.upvote(u))
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(e.votes.count(), n+1)
+        self.assertEqual(e.votes_num, n+1)
+
+        # we cannot upvote again
+        self.assertFalse(e.upvote(u))
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.votes.count(), n+1)
         self.assertEqual(e.votes_num, n+1)
@@ -35,3 +41,27 @@ class Tests(SimpleTestCase):
         e.upvote(u)
         e = Event.objects.get(id=e.id)
         self.assertTrue(e.is_upvoted(u))
+
+    def test_downvote(self):
+        """
+        ensure that we can downvote
+        """
+
+        u = UserFactory()
+        e = EventFactory()
+
+        count = e.votes.count()
+        n = e.votes_num
+
+        # we cannot downvote before upvote
+        self.assertFalse(e.downvote(u))
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(e.votes.count(), n)
+        self.assertEqual(e.votes_num, n)
+
+        e.upvote(u)
+        e = Event.objects.get(id=e.id)
+        self.assertTrue(e.downvote(u))
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(e.votes.count(), n)
+        self.assertEqual(e.votes_num, n)

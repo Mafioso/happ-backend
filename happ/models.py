@@ -175,14 +175,24 @@ class Event(HappBaseDocument):
 
     def is_upvoted(self, user):
         try:
-            self.votes.get(user=user)
-            return True
+            vote = self.votes.get(user=user)
+            return vote
         except:
             return False
 
     def upvote(self, user):
+        if self.is_upvoted(user):
+            return False
         upvote = Upvote(user=user)
         self.update(push__votes=upvote, inc__votes_num=1)
+        return True
+
+    def downvote(self, user):
+        vote = self.is_upvoted(user)
+        if not vote:
+            return False
+        self.update(pull__votes=vote, dec__votes_num=1)
+        return True
 
 
 class Localized(Document):
