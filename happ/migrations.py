@@ -102,3 +102,7 @@ def migration__event__add_index_by_infavourites__0007():
         ('in_favourites', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
         ('end_time', pymongo.DESCENDING)], background=True)
+    event_coll.create_index([
+        ('in_favourites', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('votes_num', pymongo.DESCENDING)], background=True)
