@@ -6,7 +6,7 @@ from rest_framework.decorators import list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from ..models import Interest, CityInterests
+from ..models import Interest, CityInterests, User
 from ..serializers import InterestSerializer
 
 
@@ -38,11 +38,8 @@ class InterestViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Invalid data.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        try:
-            city_interests = next(x for x in user.interests if x.c==user.settings.city)
-            city_interests.ins = interests
-            user.save()
-        except Exception as e:
+        updated = User.objects(id=user.id, interests__c=user.settings.city).update(set__interests__S__ins=interests)
+        if not updated:
             city_interests = CityInterests(c=user.settings.city, ins=interests)
             user.update(push__interests=city_interests)
         return Response(status=status.HTTP_200_OK)

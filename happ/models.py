@@ -76,7 +76,7 @@ class User(AbstractUser, HappBaseDocument):
     date_of_birth = DateTimeField()
     gender = IntField(choices=GENDERS, default=MALE)
     organization = BooleanField(default=False)
-    interests = ListField(EmbeddedDocumentField('CityInterests'))
+    interests = EmbeddedDocumentListField('CityInterests')
     favorites = ListField(ReferenceField('Event'))
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
@@ -91,7 +91,7 @@ class User(AbstractUser, HappBaseDocument):
         if not self.settings.city:
             return []
         try:
-            ci = next(x for x in self.interests if x.c==self.settings.city)
+            ci = self.interests.get(c=self.settings.city)
             return ci.ins
         except:
             return []
@@ -136,7 +136,7 @@ class Event(HappBaseDocument):
     phones = ListField(StringField())
     email = EmailField()
     web_site = URLField()
-    votes = ListField(EmbeddedDocumentField('Upvote'))
+    votes = EmbeddedDocumentListField('Upvote')
     votes_num = IntField(default=0)
     images = ListField(StringField())
     start_date = DateStringField()
