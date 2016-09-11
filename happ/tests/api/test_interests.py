@@ -6,6 +6,7 @@ from happ.models import User, Interest
 from happ.factories import (
     UserFactory,
     InterestFactory,
+    CityFactory,
 )
 from .. import *
 
@@ -97,7 +98,41 @@ class InterestsTests(APISimpleTestCase):
         url = prepare_url('interests-set')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # user has no city, so he cannot set interests
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        u.settings.city = CityFactory()
+        u.save()
 
+        response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
         u = User.objects.get(id=u.id)
-        self.assertEqual(len(u.interests), 3)
+        self.assertEqual(len(u.interests), 1)
+        self.assertEqual(len(u.current_interests), 3)
+
+        # lets change the list of interests for current city
+        # the amount of CityInterests records should not have been changed
+        interests = []
+        for i in range(4):
+            interest = InterestFactory()
+            interest.save()
+            interests.append(interest)
+
+        response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
+        u = User.objects.get(id=u.id)
+        self.assertEqual(len(u.interests), 1)
+        self.assertEqual(len(u.current_interests), 4)
+
+        # lets change user's current city and save interests for this city
+        # the amount of CityInterests should have been incremented
+        u.settings.city = CityFactory()
+        u.save()
+
+        interests = []
+        for i in range(2):
+            interest = InterestFactory()
+            interest.save()
+            interests.append(interest)
+
+        response = self.client.post(url, data=map(lambda x: str(x.id), interests), format='json')
+        u = User.objects.get(id=u.id)
+        self.assertEqual(len(u.interests), 2)
+        self.assertEqual(len(u.current_interests), 2)

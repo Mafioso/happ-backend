@@ -2,18 +2,18 @@ import datetime
 
 from django.test import SimpleTestCase
 
-from ..models import Event
-from ..factories import EventFactory
-from . import *
+from happ.models import Event
+from happ.factories import EventFactory
+from .. import *
 
 
 class FieldTests(SimpleTestCase):
 
     def test_event_date_field(self):
-    	"""
-    		ensure that we store date properly
+        """
+            ensure that we store date properly
             and we can make queries
-    	"""
+        """
 
         for x in range(5):
             event = EventFactory(start_date=datetime.datetime(2016, 10, (x+1)))

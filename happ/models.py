@@ -84,6 +84,16 @@ class User(AbstractUser, HappBaseDocument):
     def fn(self):
         return self.fullname if self.fullname else self.username
 
+    @property
+    def current_interests(self):
+        if not self.settings.city:
+            return []
+        try:
+            ci = self.interests.get(c=self.settings.city)
+            return ci.ins
+        except:
+            return []
+
 
 class Interest(HappBaseDocument):
     title = StringField()

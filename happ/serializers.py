@@ -92,7 +92,7 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
 
 
 class UserSerializer(serializers.DocumentSerializer):
-    interests = InterestSerializer(many=True, read_only=True)
+    interests = InterestSerializer(source='current_interests', many=True, read_only=True)
     settings = UserSettingsSerializer(read_only=True)
 
     class Meta:
