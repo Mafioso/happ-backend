@@ -41,9 +41,13 @@ def migration__event__upvotes_is_embed__0003():
     event_coll = get_db()['event']
     user_coll = get_db()['user']
     ucount = user_coll.count()
+    users = list(user_coll.find())
+    _now = datetime.datetime.utcnow()
     for ev in event_coll.find({}):
+        if isinstance(ev['votes'], list):
+            continue
         uidx = random.randint(1, ucount) - 1
-        upvotes = [{'user': user_coll.find().limit(-1).skip(uidx).next()['_id'], 'ts': datetime.datetime.utcnow()} for _ in xrange(ev['votes'] % 100)]
+        upvotes = [{'user': users[uidx]['_id'], 'ts': _now} for _ in xrange(ev['votes'] % 4)]
         event_coll.update({'_id': ev['_id']}, {'$set': {'votes': upvotes, 'votes_num': len(upvotes)}})
 
 
@@ -86,3 +90,19 @@ def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time
         ('end_date', pymongo.ASCENDING),
         ('votes_num', pymongo.DESCENDING)], background=True)
 
+
+def migration__user__remove_field_favourites__0006():
+    user_coll = get_db()['user']
+    user_coll.update({}, {'$unset': {'favorites': ''}}, multi=True)
+
+
+def migration__event__add_index_by_infavourites__0007():
+    event_coll = get_db()['event']
+    event_coll.create_index([
+        ('in_favourites', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('end_time', pymongo.DESCENDING)], background=True)
+    event_coll.create_index([
+        ('in_favourites', pymongo.ASCENDING),
+        ('end_date', pymongo.ASCENDING),
+        ('votes_num', pymongo.DESCENDING)], background=True)
