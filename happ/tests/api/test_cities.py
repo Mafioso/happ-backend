@@ -105,7 +105,6 @@ class Tests(APISimpleTestCase):
         """
         we can update city
         """
-        n = City.objects.count()
         country = CountryFactory()
         city = CityFactory()
         u = UserFactory()
@@ -126,10 +125,12 @@ class Tests(APISimpleTestCase):
             'country_id': str(country.id),
             'is_active': False
         }
+        n = City.objects.count()
+
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(City.objects.count(), n+1)
+        self.assertEqual(City.objects.count(), n)
         self.assertEqual(response.data['name'], 'NewCity name')
         self.assertEqual(response.data['is_active'], False)
         self.assertEqual(response.data['country_name'], country.name)

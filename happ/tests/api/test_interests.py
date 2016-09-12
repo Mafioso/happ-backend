@@ -97,13 +97,48 @@ class Tests(APISimpleTestCase):
             'local_cities': [],
             'color': '000000',
         }
+
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
-        print response.data
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Interest.objects.count(), n+1)
         self.assertEqual(response.data['title'], 'NewInterest name')
         self.assertEqual(response.data['color'], '000000')
+
+    def test_update_interest(self):
+        """
+        we can update interest
+        """
+        cities = map(lambda x: str(CityFactory().id), range(3))
+        interest = InterestFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('interests-detail', kwargs={'id': str(interest.id)})
+        data = {
+            'title': 'NewInterest name',
+            'parent_id': None,
+            'is_global': False,
+            'local_cities': cities,
+            'color': '00FF00',
+        }
+        n = Interest.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Interest.objects.count(), n)
+        self.assertEqual(response.data['title'], 'NewInterest name')
+        self.assertEqual(response.data['color'], '00FF00')
 
     def test_user_set_interests(self):
         """
