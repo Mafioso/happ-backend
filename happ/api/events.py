@@ -18,6 +18,11 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, template_name='events/detail.html')
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
