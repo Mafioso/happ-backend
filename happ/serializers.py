@@ -56,6 +56,14 @@ class CitySerializer(serializers.DocumentSerializer):
         city.save()
         return city
 
+    def update(self, instance, validated_data):
+        country_id = validated_data.pop('country_id')
+        city = super(CitySerializer, self).update(instance, validated_data)
+        country = Country.objects.get(id=country_id)
+        city.country = country
+        city.save()
+        return city
+
 
 class CurrencySerializer(serializers.DocumentSerializer):
 

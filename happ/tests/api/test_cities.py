@@ -101,6 +101,39 @@ class Tests(APISimpleTestCase):
         self.assertEqual(City.objects.count(), n+1)
         self.assertEqual(response.data['country_name'], country.name)
 
+    def test_update_city(self):
+        """
+        we can update city
+        """
+        n = City.objects.count()
+        country = CountryFactory()
+        city = CityFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('cities-detail', kwargs={'id': str(city.id)})
+        data = {
+            'name': 'NewCity name',
+            'country_id': str(country.id),
+            'is_active': False
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(City.objects.count(), n+1)
+        self.assertEqual(response.data['name'], 'NewCity name')
+        self.assertEqual(response.data['is_active'], False)
+        self.assertEqual(response.data['country_name'], country.name)
+
     def test_user_set_city(self):
         """
         We can set city for user
