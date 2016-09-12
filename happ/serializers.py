@@ -37,7 +37,8 @@ class CountrySerializer(serializers.DocumentSerializer):
 
 
 class CitySerializer(serializers.DocumentSerializer):
-    country_name = drf_serializers.CharField()
+    country_name = drf_serializers.CharField(read_only=True)
+    country_id = serializers.ObjectIdField(write_only=True)
 
     class Meta:
         model = City
@@ -46,6 +47,14 @@ class CitySerializer(serializers.DocumentSerializer):
             'date_edited',
             'country',
         )
+
+    def create(self, validated_data):
+        country_id = validated_data.pop('country_id')
+        city = City.objects.create(**validated_data)
+        country = Country.objects.get(id=country_id)
+        city.country = country
+        city.save()
+        return city
 
 
 class CurrencySerializer(serializers.DocumentSerializer):
