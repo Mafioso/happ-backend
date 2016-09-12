@@ -143,8 +143,8 @@ class Tests(APISimpleTestCase):
         u.set_password('123')
         u.save()
 
-        e = CityFactory()
-        e.save()
+        c = CityFactory()
+        c.save()
 
         auth_url = prepare_url('login')
         data = {
@@ -154,7 +154,7 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('cities-detail', kwargs={'id': str(e.id)})
+        url = prepare_url('cities-detail', kwargs={'id': str(c.id)})
         n = City.objects.count()
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))

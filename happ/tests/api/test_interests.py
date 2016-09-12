@@ -140,6 +140,33 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['title'], 'NewInterest name')
         self.assertEqual(response.data['color'], '00FF00')
 
+    def test_delete_interest(self):
+        """
+        we can delete interest
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        i = InterestFactory()
+        i.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('interests-detail', kwargs={'id': str(i.id)})
+        n = Interest.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Interest.objects.count(), n-1)
+
     def test_user_set_interests(self):
         """
         We can assign list of interests to user
