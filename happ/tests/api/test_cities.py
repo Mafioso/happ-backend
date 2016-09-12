@@ -134,6 +134,33 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['is_active'], False)
         self.assertEqual(response.data['country_name'], country.name)
 
+    def test_delete_city(self):
+        """
+        we can delete city
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = CityFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('cities-detail', kwargs={'id': str(e.id)})
+        n = City.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(City.objects.count(), n-1)
+
     def test_user_set_city(self):
         """
         We can set city for user
