@@ -79,15 +79,32 @@ class CurrencySerializer(serializers.DocumentSerializer):
 
 
 class InterestSerializer(serializers.DocumentSerializer):
+    # read only fields
+    parent = serializers.ObjectIdField(read_only=True)
+
+    # write only fields
+    is_global = drf_serializers.BooleanField(write_only=True)
+    parent_id = serializers.ObjectIdField(write_only=True, allow_null=True)
+    local_cities = drf_serializers.ListField(write_only=True)
 
     class Meta:
         model = Interest
         exclude = (
             'date_created',
             'date_edited',
-            'is_global',
-            'local_cities',
         )
+
+    def create(self, validated_data):
+        parent_id = validated_data.pop('parent_id')
+        local_cities = validated_data.pop('local_cities')
+        interest = Interest.objects.create(**validated_data)
+        if parent_id:
+            parent = Interest.objects.get(id=parent_id)
+            interest.parent = parent
+        local_cities = City.objects.filter(id__in=local_cities)
+        interest.local_cities = local_cities
+        interest.save()
+        return interest
 
 
 class InterestChildSerializer(serializers.DocumentSerializer):

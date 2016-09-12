@@ -72,6 +72,39 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 3)
 
+    def test_create_interest(self):
+        """
+        we can create interest
+        """
+        n = Interest.objects.count()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('interests-list')
+        data = {
+            'title': 'NewInterest name',
+            'parent_id': None,
+            'is_global': True,
+            'local_cities': [],
+            'color': '000000',
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        print response.data
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Interest.objects.count(), n+1)
+        self.assertEqual(response.data['title'], 'NewInterest name')
+        self.assertEqual(response.data['color'], '000000')
+
     def test_user_set_interests(self):
         """
         We can assign list of interests to user
