@@ -37,7 +37,10 @@ class CountrySerializer(serializers.DocumentSerializer):
 
 
 class CitySerializer(serializers.DocumentSerializer):
+    # read only fields
     country_name = drf_serializers.CharField(read_only=True)
+
+    # write only fields
     country_id = serializers.ObjectIdField(write_only=True)
 
     class Meta:
@@ -88,6 +91,7 @@ class InterestSerializer(serializers.DocumentSerializer):
 
 
 class InterestChildSerializer(serializers.DocumentSerializer):
+    # regular fields
     parent = InterestSerializer()
 
     class Meta:
@@ -100,6 +104,7 @@ class InterestChildSerializer(serializers.DocumentSerializer):
         )
 
 class InterestParentSerializer(serializers.DocumentSerializer):
+    # regular fields
     children = InterestSerializer(many=True)
 
     class Meta:
@@ -119,6 +124,7 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
 
 
 class UserSerializer(serializers.DocumentSerializer):
+    # read only fields
     interests = InterestSerializer(source='current_interests', many=True, read_only=True)
     settings = UserSettingsSerializer(read_only=True)
 
@@ -160,15 +166,20 @@ class AuthorSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(LocalizedSerializer):
+    # regular fields
     interests = InterestChildSerializer(many=True, required=False)
+
+    # read only fields
     currency = CurrencySerializer(read_only=True)
-    currency_id = serializers.ObjectIdField(write_only=True)
     city = serializers.ObjectIdField(read_only=True)
-    city_id = serializers.ObjectIdField(write_only=True)
     author = AuthorSerializer(read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
     end_datetime = drf_serializers.CharField(read_only=True)
     is_upvoted = drf_serializers.SerializerMethodField()
+
+    # write only fields
+    currency_id = serializers.ObjectIdField(write_only=True)
+    city_id = serializers.ObjectIdField(write_only=True)
 
     class Meta:
         model = Event
