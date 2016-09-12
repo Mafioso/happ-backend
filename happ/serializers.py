@@ -6,7 +6,7 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
-from .models import City, Currency, User, UserSettings, Interest, Event
+from .models import Country, City, Currency, User, UserSettings, Interest, Event
 
 
 class LocalizedSerializer(serializers.DocumentSerializer):
@@ -24,6 +24,16 @@ class LocalizedSerializer(serializers.DocumentSerializer):
                 if field in localized_instance.data:
                     data[field] = localized_instance.data[field]
         return data
+
+
+class CountrySerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = Country
+        exclude = (
+            'date_created',
+            'date_edited',
+        )
 
 
 class CitySerializer(serializers.DocumentSerializer):
