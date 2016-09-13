@@ -1,19 +1,18 @@
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.models import Interest, CityInterests, User
-from happ.serializers import InterestSerializer
+from happ.serializers import InterestParentSerializer
 
 
-class InterestViewSet(viewsets.ModelViewSet):
-    serializer_class = InterestSerializer
-    queryset = Interest.objects.all()
-    pagination_class = None
+class InterestViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = InterestParentSerializer
+    queryset = Interest.objects.filter(parent=None)
     filter_backends = (filters.MongoSearchFilter, )
     search_fields = ('title', )
 

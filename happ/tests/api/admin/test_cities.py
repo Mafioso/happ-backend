@@ -8,7 +8,7 @@ from happ.factories import (
     CountryFactory,
     CityFactory,
 )
-from .. import *
+from happ.tests import *
 
 
 class Tests(APISimpleTestCase):
@@ -90,7 +90,7 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('cities-list')
+        url = prepare_url('admin-cities-list')
         data = {
             'name': 'NewCity name',
             'country_id': str(country.id),
@@ -119,7 +119,7 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('cities-detail', kwargs={'id': str(city.id)})
+        url = prepare_url('admin-cities-detail', kwargs={'id': str(city.id)})
         data = {
             'name': 'NewCity name',
             'country_id': str(country.id),
@@ -154,38 +154,10 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('cities-detail', kwargs={'id': str(c.id)})
+        url = prepare_url('admin-cities-detail', kwargs={'id': str(c.id)})
         n = City.objects.count()
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(City.objects.count(), n-1)
-
-    def test_user_set_city(self):
-        """
-        We can set city for user
-        """
-        u = UserFactory()
-        u.set_password('123')
-        u.save()
-
-        auth_url = prepare_url('login')
-        data = {
-            'username': u.username,
-            'password': '123'
-        }
-        response = self.client.post(auth_url, data=data, format='json')
-        token = response.data['token']
-        self.assertEqual(u.settings.city, None)
-
-        city = CityFactory()
-        city.save()
-
-        url = prepare_url('cities-set', kwargs={'id': str(city.id)})
-        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        u = User.objects.get(id=u.id)
-        self.assertEqual(u.settings.city, city)

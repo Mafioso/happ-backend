@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework_mongoengine import viewsets
@@ -10,9 +10,9 @@ from happ.models import City
 from happ.serializers import CitySerializer
 
 
-class CityViewSet(viewsets.ModelViewSet):
+class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = CitySerializer
-    queryset = City.objects.all()
+    queryset = City.objects.filter(is_active=True)
     filter_backends = (filters.MongoSearchFilter, )
     search_fields = ('name', )
 

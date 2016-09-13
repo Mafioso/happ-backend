@@ -17,7 +17,7 @@ from happ.factories import (
     LocalizedFactory,
     InterestFactory,
 )
-from .. import *
+from happ.tests import *
 
 
 class Tests(APISimpleTestCase):
@@ -26,7 +26,7 @@ class Tests(APISimpleTestCase):
         """
         Resourse is not available without authentication
         """
-        url = prepare_url('interests-list')
+        url = prepare_url('events-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -46,7 +46,7 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('interests-list')
+        url = prepare_url('events-list')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)

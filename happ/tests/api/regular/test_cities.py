@@ -2,12 +2,13 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
-from happ.models import User, Currency
+from happ.models import User, City
 from happ.factories import (
     UserFactory,
-    CurrencyFactory,
+    CountryFactory,
+    CityFactory,
 )
-from .. import *
+from happ.tests import *
 
 
 class Tests(APISimpleTestCase):
@@ -16,7 +17,7 @@ class Tests(APISimpleTestCase):
         """
         Resourse is not available without authentication
         """
-        url = prepare_url('currencies-list')
+        url = prepare_url('cities-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -36,14 +37,44 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('currencies-list')
+        url = prepare_url('cities-list')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_user_set_currency(self):
+    def test_search_cities(self):
         """
-        We can set currency for user
+        We can search cities
+        """
+        City.objects.delete()
+        for i in range(3):
+            city = CityFactory(name='Petropavlovsk')
+            city.save()
+
+        city = CityFactory(name='Almaty')
+        city.save()
+
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('cities-list', query={'search': 'petro'})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+
+    def test_user_set_city(self):
+        """
+        We can set city for user
         """
         u = UserFactory()
         u.set_password('123')
@@ -56,15 +87,15 @@ class Tests(APISimpleTestCase):
         }
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
-        self.assertEqual(u.settings.currency, None)
+        self.assertEqual(u.settings.city, None)
 
-        currency = CurrencyFactory()
-        currency.save()
+        city = CityFactory()
+        city.save()
 
-        url = prepare_url('currencies-set', kwargs={'id': str(currency.id)})
+        url = prepare_url('cities-set', kwargs={'id': str(city.id)})
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         u = User.objects.get(id=u.id)
-        self.assertEqual(u.settings.currency, currency)
+        self.assertEqual(u.settings.city, city)
