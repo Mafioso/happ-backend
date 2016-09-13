@@ -9,3 +9,11 @@ class StaffPolicy(BaseComposedPermision):
 
     def object_permission_set(self):
         return And(permissions.IsAuthenticated, permissions.IsStaff)
+
+
+class RootPolicy(BaseComposedPermision):
+    def global_permission_set(self):
+        return And(permissions.IsAuthenticated, permissions.IsRoot)
+
+    def object_permission_set(self):
+        return And(permissions.IsAuthenticated, permissions.IsRoot)
