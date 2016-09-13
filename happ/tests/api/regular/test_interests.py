@@ -8,7 +8,7 @@ from happ.factories import (
     InterestFactory,
     CityFactory,
 )
-from .. import *
+from happ.tests import *
 
 
 class Tests(APISimpleTestCase):
@@ -48,10 +48,10 @@ class Tests(APISimpleTestCase):
         """
         Interest.objects.delete()
         for i in range(3):
-            interest = InterestFactory(title='Hockey')
+            interest = InterestFactory(title='Hockey', parent=None)
             interest.save()
 
-        interest = InterestFactory(title='Beer')
+        interest = InterestFactory(title='Beer', parent=None)
         interest.save()
 
         u = UserFactory()
@@ -70,7 +70,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 3)
+        self.assertEqual(response.data['count'], 3)
 
     def test_user_set_interests(self):
         """

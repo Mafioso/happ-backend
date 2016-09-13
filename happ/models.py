@@ -35,6 +35,7 @@ class Country(HappBaseDocument):
 
 
 class City(HappBaseDocument):
+    is_active = BooleanField(default=True)
     name = StringField(required=True)
     country = ReferenceField(Country, reverse_delete_rule=CASCADE)
 

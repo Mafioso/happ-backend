@@ -8,7 +8,7 @@ from rest_framework_jwt.settings import api_settings
 
 from happ.models import User
 from happ.factories import UserFactory
-from .. import *
+from happ.tests import *
 
 
 class Tests(APISimpleTestCase):

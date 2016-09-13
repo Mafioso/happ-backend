@@ -1,15 +1,15 @@
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 from rest_framework_mongoengine import viewsets
 
-from ..models import Currency
-from ..serializers import CurrencySerializer
+from happ.models import Currency
+from happ.serializers import CurrencySerializer
 
 
-class CurrencyViewSet(viewsets.ModelViewSet):
+class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = CurrencySerializer
     queryset = Currency.objects.all()
 

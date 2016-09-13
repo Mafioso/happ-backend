@@ -6,7 +6,7 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
-from .models import City, Currency, User, UserSettings, Interest, Event
+from .models import Country, City, Currency, User, UserSettings, Interest, Event
 
 
 class LocalizedSerializer(serializers.DocumentSerializer):
@@ -26,8 +26,22 @@ class LocalizedSerializer(serializers.DocumentSerializer):
         return data
 
 
+class CountrySerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = Country
+        exclude = (
+            'date_created',
+            'date_edited',
+        )
+
+
 class CitySerializer(serializers.DocumentSerializer):
-    country_name = drf_serializers.CharField()
+    # read only fields
+    country_name = drf_serializers.CharField(read_only=True)
+
+    # write only fields
+    country_id = serializers.ObjectIdField(write_only=True)
 
     class Meta:
         model = City
@@ -36,6 +50,22 @@ class CitySerializer(serializers.DocumentSerializer):
             'date_edited',
             'country',
         )
+
+    def create(self, validated_data):
+        country_id = validated_data.pop('country_id')
+        city = City.objects.create(**validated_data)
+        country = Country.objects.get(id=country_id)
+        city.country = country
+        city.save()
+        return city
+
+    def update(self, instance, validated_data):
+        country_id = validated_data.pop('country_id')
+        city = super(CitySerializer, self).update(instance, validated_data)
+        country = Country.objects.get(id=country_id)
+        city.country = country
+        city.save()
+        return city
 
 
 class CurrencySerializer(serializers.DocumentSerializer):
@@ -49,18 +79,48 @@ class CurrencySerializer(serializers.DocumentSerializer):
 
 
 class InterestSerializer(serializers.DocumentSerializer):
+    # read only fields
+    parent = serializers.ObjectIdField(read_only=True)
+
+    # write only fields
+    is_global = drf_serializers.BooleanField(write_only=True)
+    parent_id = serializers.ObjectIdField(write_only=True, allow_null=True)
+    local_cities = drf_serializers.ListField(write_only=True)
 
     class Meta:
         model = Interest
         exclude = (
             'date_created',
             'date_edited',
-            'is_global',
-            'local_cities',
         )
+
+    def create(self, validated_data):
+        parent_id = validated_data.pop('parent_id')
+        local_cities = validated_data.pop('local_cities')
+        interest = Interest.objects.create(**validated_data)
+        if parent_id:
+            parent = Interest.objects.get(id=parent_id)
+            interest.parent = parent
+        local_cities = City.objects.filter(id__in=local_cities)
+        interest.local_cities = local_cities
+        interest.save()
+        return interest
+
+    def update(self, instance, validated_data):
+        parent_id = validated_data.pop('parent_id')
+        local_cities = validated_data.pop('local_cities')
+        interest = super(InterestSerializer, self).update(instance, validated_data)
+        if parent_id:
+            parent = Interest.objects.get(id=parent_id)
+            interest.parent = parent
+        local_cities = City.objects.filter(id__in=local_cities)
+        interest.local_cities = local_cities
+        interest.save()
+        return interest
 
 
 class InterestChildSerializer(serializers.DocumentSerializer):
+    # regular fields
     parent = InterestSerializer()
 
     class Meta:
@@ -73,6 +133,7 @@ class InterestChildSerializer(serializers.DocumentSerializer):
         )
 
 class InterestParentSerializer(serializers.DocumentSerializer):
+    # regular fields
     children = InterestSerializer(many=True)
 
     class Meta:
@@ -92,6 +153,7 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
 
 
 class UserSerializer(serializers.DocumentSerializer):
+    # read only fields
     interests = InterestSerializer(source='current_interests', many=True, read_only=True)
     settings = UserSettingsSerializer(read_only=True)
 
@@ -133,15 +195,20 @@ class AuthorSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(LocalizedSerializer):
+    # regular fields
     interests = InterestChildSerializer(many=True, required=False)
+
+    # read only fields
     currency = CurrencySerializer(read_only=True)
-    currency_id = serializers.ObjectIdField(write_only=True)
     city = serializers.ObjectIdField(read_only=True)
-    city_id = serializers.ObjectIdField(write_only=True)
     author = AuthorSerializer(read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
     end_datetime = drf_serializers.CharField(read_only=True)
     is_upvoted = drf_serializers.SerializerMethodField()
+
+    # write only fields
+    currency_id = serializers.ObjectIdField(write_only=True)
+    city_id = serializers.ObjectIdField(write_only=True)
 
     class Meta:
         model = Event

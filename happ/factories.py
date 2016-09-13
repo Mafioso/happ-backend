@@ -5,6 +5,7 @@ from faker import Factory as FakerFactory
 from models import (
     User,
     UserSettings,
+    Country,
     City,
     Currency,
     Upvote,
@@ -18,6 +19,13 @@ ALL_CITIES = City.objects
 ALL_CURRENCIES = Currency.objects
 
 faker = FakerFactory.create()
+
+
+class CountryFactory(factory.mongoengine.MongoEngineFactory):
+    name = factory.Faker('word')
+
+    class Meta:
+        model = Country
 
 
 class CityFactory(factory.mongoengine.MongoEngineFactory):

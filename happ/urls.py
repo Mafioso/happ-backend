@@ -16,9 +16,11 @@ Including another URLconf
 from django.conf.urls import include, url
 
 from .auth.urls import urlpatterns as auth_urlpatterns
-from .api.urls import router
+from .api.regular.urls import router as regular_router
+from .api.admin.urls import router as admin_router
 
 urlpatterns = [
+    url(r'^api/v1/admin/', include(admin_router.urls)),
     url(r'^api/v1/auth/', include(auth_urlpatterns)),
-    url(r'^api/v1/', include(router.urls)),
+    url(r'^api/v1/', include(regular_router.urls)),
 ]
