@@ -16,7 +16,11 @@ class CookieJSONWebTokenAuthentication(JSONWebTokenAuthentication):
         session_id: JWT eyJhbGciOiAiSFMyNTYiLCAidHlwIj
     """
     def get_jwt_value(self, request):
-        auth = request.COOKIES.get(settings.SESSION_COOKIE_NAME).split()
+
+        auth = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
+        if not auth:
+            return None
+        auth = auth.split()
         auth_header_prefix = api_settings.JWT_AUTH_HEADER_PREFIX.lower()
 
         if not auth or smart_text(auth[0].lower()) != auth_header_prefix:
