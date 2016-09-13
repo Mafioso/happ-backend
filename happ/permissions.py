@@ -1,41 +1,55 @@
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import permissions
+from restfw_composed_permissions.base import BasePermissionComponent
 
 from happ.models import User
 
 
-class IsRoot(permissions.BasePermission):
+class IsAuthenticated(BasePermissionComponent):
     message = _('This action is not allowed.')
 
-    def has_permission(self, request, view):
+    def has_permission(self, permission, request, view):
+        return request.user and request.user.is_authenticated
+
+
+class IsRoot(BasePermissionComponent):
+    message = _('This action is not allowed.')
+
+    def has_permission(self, permission, request, view):
         return request.user.role == User.ROOT
 
 
-class IsAdministrator(permissions.BasePermission):
+class IsAdministrator(BasePermissionComponent):
     message = _('This action is not allowed.')
 
-    def has_permission(self, request, view):
-        return request.user.role >= User.ADMINISTRATOR
+    def has_permission(self, permission, request, view):
+        return request.user.role == User.ADMINISTRATOR
 
 
-class IsModerator(permissions.BasePermission):
+class IsModerator(BasePermissionComponent):
     message = _('This action is not allowed.')
 
-    def has_permission(self, request, view):
+    def has_permission(self, permission, request, view):
+        return request.user.role == User.MODERATOR
+
+
+class IsStaff(BasePermissionComponent):
+    message = _('This action is not allowed.')
+
+    def has_permission(self, permission, request, view):
         return request.user.role >= User.MODERATOR
 
 
-class IsOrganizer(permissions.BasePermission):
+class IsOrganizer(BasePermissionComponent):
     message = _('This action is not allowed.')
 
-    def has_permission(self, request, view):
-        return request.user.role >= User.ORGANIZER
+    def has_permission(self, permission, request, view):
+        return request.user.role == User.ORGANIZER
 
 
-class IsOwner(permissions.BasePermission):
+class IsOwner(BasePermissionComponent):
     message = _('This action is not allowed.')
 
-    def has_object_permission(self, request, view, obj):
+    def has_object_permission(self, permission, request, view, obj):
         return request.user == obj.author
 
