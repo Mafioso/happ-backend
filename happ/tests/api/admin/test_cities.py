@@ -102,6 +102,9 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+
+        url = prepare_url('admin-cities-list')
+
         city_data = {
             'name': 'NewCity name',
             'country_id': str(country.id),
@@ -112,41 +115,30 @@ class Tests(APISimpleTestCase):
             'username': u.username,
             'password': '123'
         }
+
+        # restricted for moderator
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
-
-        url = prepare_url('admin-cities-list')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=city_data, format='json')
-        # restricted for moderator
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+        # restricted for administrator
         u.role = User.ADMINISTRATOR
         u.save()
-        auth_url = prepare_url('login')
-        data = {
-            'username': u.username,
-            'password': '123'
-        }
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=city_data, format='json')
-        # restricted for administrator
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+        # ok for root
         u.role = User.ROOT
         u.save()
-        auth_url = prepare_url('login')
-        data = {
-            'username': u.username,
-            'password': '123'
-        }
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=city_data, format='json')
-        # ok for root
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(City.objects.count(), n+1)
         self.assertEqual(response.data['country_name'], country.name)

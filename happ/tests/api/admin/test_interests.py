@@ -118,12 +118,14 @@ class Tests(APISimpleTestCase):
             'password': '123'
         }
 
+        # restricted for moderator
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=interest_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+        # ok for administrator
         u.role = User.ADMINISTRATOR
         u.save()
         response = self.client.post(auth_url, data=data, format='json')
@@ -135,6 +137,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['title'], 'NewInterest name')
         self.assertEqual(response.data['color'], '000000')
 
+        # ok for root
         u.role = User.ROOT
         u.save()
         response = self.client.post(auth_url, data=data, format='json')
