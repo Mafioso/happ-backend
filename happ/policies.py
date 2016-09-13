@@ -17,3 +17,11 @@ class RootPolicy(BaseComposedPermision):
 
     def object_permission_set(self):
         return And(permissions.IsAuthenticated, permissions.IsRoot)
+
+
+class RootAdministratorPolicy(BaseComposedPermision):
+    def global_permission_set(self):
+        return And(permissions.IsAuthenticated, Or(permissions.IsRoot, permissions.IsAdministrator,))
+
+    def object_permission_set(self):
+        return And(permissions.IsAuthenticated, Or(permissions.IsRoot, permissions.IsAdministrator,))

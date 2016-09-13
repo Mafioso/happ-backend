@@ -102,16 +102,9 @@ class Tests(APISimpleTestCase):
         u.set_password('123')
         u.save()
 
-        auth_url = prepare_url('login')
-        data = {
-            'username': u.username,
-            'password': '123'
-        }
-        response = self.client.post(auth_url, data=data, format='json')
-        token = response.data['token']
-
         url = prepare_url('admin-interests-list')
-        data = {
+
+        interest_data = {
             'title': 'NewInterest name',
             'parent_id': None,
             'is_global': True,
@@ -119,10 +112,37 @@ class Tests(APISimpleTestCase):
             'color': '000000',
         }
 
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.post(url, data=data, format='json')
+        response = self.client.post(url, data=interest_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=interest_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Interest.objects.count(), n+1)
+        self.assertEqual(response.data['title'], 'NewInterest name')
+        self.assertEqual(response.data['color'], '000000')
+
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=interest_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Interest.objects.count(), n+2)
         self.assertEqual(response.data['title'], 'NewInterest name')
         self.assertEqual(response.data['color'], '000000')
 
