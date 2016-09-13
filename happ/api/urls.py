@@ -1,6 +1,6 @@
 from rest_framework_mongoengine.routers import DefaultRouter
 
-from . import countries, cities, currencies, interests, events, users
+from .regular import countries, cities, currencies, interests, events, users
 
 
 router = DefaultRouter()

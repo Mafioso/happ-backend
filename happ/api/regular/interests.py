@@ -6,8 +6,8 @@ from rest_framework.decorators import list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from ..models import Interest, CityInterests, User
-from ..serializers import InterestSerializer
+from happ.models import Interest, CityInterests, User
+from happ.serializers import InterestSerializer
 
 
 class InterestViewSet(viewsets.ModelViewSet):

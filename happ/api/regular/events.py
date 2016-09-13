@@ -9,9 +9,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
-from ..utils import store_file
-from ..models import Event
-from ..serializers import EventSerializer
+from happ.utils import store_file
+from happ.models import Event
+from happ.serializers import EventSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
