@@ -158,3 +158,38 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), n+3)
         self.assertEqual(response.data['username'], 'username3')
+
+        ## lets create ROOT
+        user_data = {
+            'username': 'username3',
+            'email': 'mail@mail.com',
+            'password': '123',
+            'role': User.ROOT
+        }
+
+        # restricted for moderator
+        u.role = User.MODERATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

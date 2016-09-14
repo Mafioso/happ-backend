@@ -24,4 +24,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 return Response(
                     status=status.HTTP_403_FORBIDDEN
                 )
+            if request.data['role'] == User.ROOT:
+                return Response(
+                    status=status.HTTP_403_FORBIDDEN
+                )
         return super(UserViewSet, self).create(request, *args, **kwargs)
