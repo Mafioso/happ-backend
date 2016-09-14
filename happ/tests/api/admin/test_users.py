@@ -60,3 +60,101 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_staff_user(self):
+        """
+        we can create staff user
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+        n = User.objects.count()
+
+        url = prepare_url('admin-users-list')
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+
+        ## lets create MODERATOR
+        user_data = {
+            'username': 'username1',
+            'email': 'mail@mail.com',
+            'password': '123',
+            'role': User.MODERATOR
+        }
+
+        # restricted for moderator
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), n+1)
+        self.assertEqual(response.data['username'], 'username1')
+
+        user_data = {
+            'username': 'username2',
+            'email': 'mail@mail.com',
+            'password': '123',
+            'role': User.MODERATOR
+        }
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), n+2)
+        self.assertEqual(response.data['username'], 'username2')
+
+        ## lets create ADMINISTRATOR
+        user_data = {
+            'username': 'username3',
+            'email': 'mail@mail.com',
+            'password': '123',
+            'role': User.ADMINISTRATOR
+        }
+
+        # restricted for moderator
+        u.role = User.MODERATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), n+3)
+        self.assertEqual(response.data['username'], 'username3')
