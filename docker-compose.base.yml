@@ -29,7 +29,7 @@ services:
       - "27017:27017"
 
   app:
-    image: happ
+    image: askhatomarov/happ:0.1
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
@@ -41,7 +41,7 @@ services:
       - .:/happ
 
   celery:
-    image: happ
+    image: askhatomarov/happ:0.1
     working_dir: /happ
     command: celery -A happ worker -l debug --concurrency=2
     volumes:
