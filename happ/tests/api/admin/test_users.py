@@ -193,3 +193,161 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=user_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_update_user(self):
+        """
+        we can update user
+        """
+        user = UserFactory()
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+        n = User.objects.count()
+
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+
+        user_data = {
+            'username': 'username',
+            'email': 'mail@mail.com',
+        }
+
+        # restricted for moderator
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.count(), n)
+        self.assertEqual(response.data['username'], 'username')
+
+        # ok for root
+        user_data = {
+            'username': 'username2',
+            'email': 'mail@mail.com',
+        }
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.count(), n)
+        self.assertEqual(response.data['username'], 'username2')
+
+        ## trying to change role to MODERATOR
+        user_data = {
+            'role': User.MODERATOR,
+        }
+
+        # restricted to MODERATOR
+        u.role = User.MODERATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.count(), n)
+        self.assertEqual(response.data['role'], User.MODERATOR)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.count(), n)
+        self.assertEqual(response.data['role'], User.MODERATOR)
+
+        ## trying to change role to ADMINISTRATOR
+        user_data = {
+            'role': User.ADMINISTRATOR,
+        }
+
+        # restricted to MODERATOR
+        u.role = User.MODERATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(User.objects.count(), n)
+        self.assertEqual(response.data['role'], User.ADMINISTRATOR)
+
+        ## trying to change role to ROOT
+        user_data = {
+            'role': User.ROOT,
+        }
+
+        # restricted to MODERATOR
+        u.role = User.MODERATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=user_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
