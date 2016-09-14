@@ -351,3 +351,174 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=user_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_user(self):
+        """
+        we can delete user
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        user = UserFactory()
+        n = User.objects.count()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+
+        ## regular user
+
+        # ok for moderator
+        user = UserFactory()
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), n-1)
+
+        # ok for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        user = UserFactory()
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), n-1)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        user = UserFactory()
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), n-1)
+
+        ## moderator user
+
+        # restricted for moderator
+        u.role = User.MODERATOR
+        u.save()
+        user = UserFactory(role=User.MODERATOR)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        user = UserFactory(role=User.MODERATOR)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), n-1)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        user = UserFactory(role=User.MODERATOR)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), n-1)
+
+        ## administrator user
+
+        # restricted for moderator
+        u.role = User.MODERATOR
+        u.save()
+        user = UserFactory(role=User.ADMINISTRATOR)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        user = UserFactory(role=User.ADMINISTRATOR)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        user = UserFactory(role=User.ADMINISTRATOR)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(User.objects.count(), n-1)
+
+        ## root user
+
+        # restricted for moderator
+        user = UserFactory(role=User.ROOT)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        user = UserFactory(role=User.ROOT)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for root
+        u.role = User.ROOT
+        u.save()
+        user = UserFactory(role=User.ROOT)
+        n = User.objects.count()
+        url = prepare_url('admin-users-detail', kwargs={'id': str(user.id)})
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

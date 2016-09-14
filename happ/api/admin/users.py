@@ -42,3 +42,19 @@ class UserViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_403_FORBIDDEN
                 )
         return super(UserViewSet, self).update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.role >= User.MODERATOR and request.user.role <= User.MODERATOR:
+                return Response(
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        if instance.role >= User.ADMINISTRATOR and request.user.role <= User.ADMINISTRATOR:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if instance.role == User.ROOT:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super(UserViewSet, self).destroy(request, *args, **kwargs)
