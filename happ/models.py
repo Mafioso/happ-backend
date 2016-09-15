@@ -195,6 +195,9 @@ class Event(HappBaseDocument):
         self.update(pull__votes=vote, dec__votes_num=1)
         return True
 
+    def add_to_favourites(self, user):
+        self.update(add_to_set__in_favourites=user)
+
 
 class Localized(Document):
     language = StringField(default=settings.HAPP_LANGUAGES[0])

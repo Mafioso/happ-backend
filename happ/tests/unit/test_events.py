@@ -65,3 +65,22 @@ class Tests(SimpleTestCase):
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.votes.count(), n)
         self.assertEqual(e.votes_num, n)
+
+    def test_add_to_favourites(self):
+        """
+        ensure that we can add to favourites
+        """
+
+        u = UserFactory()
+        e = EventFactory()
+
+        count = len(e.in_favourites)
+
+        e.add_to_favourites(u)
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(len(e.in_favourites), count+1)
+
+        # we cannot add to favourites again
+        e.add_to_favourites(u)
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(len(e.in_favourites), count+1)
