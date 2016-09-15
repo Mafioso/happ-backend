@@ -95,6 +95,9 @@ class User(AbstractUser, HappBaseDocument):
         except:
             return []
 
+    def get_favourites(self):
+        return Event.objects(in_favourites=self)
+
 
 class Interest(HappBaseDocument):
     title = StringField()

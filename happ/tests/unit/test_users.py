@@ -1,6 +1,7 @@
 from django.test import SimpleTestCase
 
-from happ.factories import UserFactory, CityFactory, CityInterestsFactory
+from happ.models import Event
+from happ.factories import UserFactory, CityFactory, CityInterestsFactory, EventFactory
 from .. import *
 
 
@@ -30,3 +31,19 @@ class Tests(SimpleTestCase):
         u.interests = [interests2]
         u.save()
         self.assertEqual(len(u.current_interests), len(interests2.ins))
+
+    def test_get_favourites(self):
+        """
+        we can take favourite event of current user
+        """
+
+        u = UserFactory()
+
+        for i in range(5):
+            EventFactory()
+
+        map(lambda x: x.add_to_favourites(u), Event.objects.all()[:4])
+        self.assertEqual(len(u.get_favourites()), 4)
+
+        Event.objects.all()[0].remove_from_favourites(u)
+        self.assertEqual(len(u.get_favourites()), 3)
