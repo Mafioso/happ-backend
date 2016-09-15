@@ -184,3 +184,14 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(status=status.HTTP_200_OK)
+
+    @detail_route(methods=['get'], url_path='unfav')
+    def unfav(self, request, *args, **kwargs):
+        instance = self.get_object()
+        flag = instance.remove_from_favourites(self.request.user)
+        if not flag:
+            return Response(
+                {'error_message': _('User should add this event to favourites first.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(status=status.HTTP_200_OK)

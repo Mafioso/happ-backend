@@ -572,3 +572,33 @@ class Tests(APISimpleTestCase):
         # we cannot add it to favourites again
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_unfav_event(self):
+        """
+        we can unfav event
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-unfav', kwargs={'id': str(e.id)})
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        # we cannot remove from favourites before adding
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        e.add_to_favourites(u)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
