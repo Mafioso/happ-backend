@@ -173,3 +173,14 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(status=status.HTTP_200_OK)
+
+    @detail_route(methods=['get'], url_path='fav')
+    def fav(self, request, *args, **kwargs):
+        instance = self.get_object()
+        flag = instance.add_to_favourites(self.request.user)
+        if not flag:
+            return Response(
+                {'error_message': _('User has already added this event to favourites.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return Response(status=status.HTTP_200_OK)
