@@ -97,3 +97,24 @@ class Tests(SimpleTestCase):
         e.add_to_favourites(u)
         e = Event.objects.get(id=e.id)
         self.assertTrue(e.is_in_favourites(u))
+
+    def test_remove_from_favourites(self):
+        """
+        ensure that we can remove from favourites
+        """
+
+        u = UserFactory()
+        e = EventFactory()
+
+        count = len(e.in_favourites)
+
+        # we cannot remove from favourites before adding
+        self.assertFalse(e.remove_from_favourites(u))
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(len(e.in_favourites), count)
+
+        e.add_to_favourites(u)
+        e = Event.objects.get(id=e.id)
+        self.assertTrue(e.remove_from_favourites(u))
+        e = Event.objects.get(id=e.id)
+        self.assertEqual(len(e.in_favourites), count)

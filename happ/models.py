@@ -204,6 +204,12 @@ class Event(HappBaseDocument):
     def is_in_favourites(self, user):
         return user in self.in_favourites
 
+    def remove_from_favourites(self, user):
+        if not self.is_in_favourites(user):
+            return False
+        self.update(pull__in_favourites=user)
+        return True
+
 
 class Localized(Document):
     language = StringField(default=settings.HAPP_LANGUAGES[0])
