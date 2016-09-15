@@ -195,3 +195,16 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(status=status.HTTP_200_OK)
+
+    @list_route(methods=['get'], url_path='favourites')
+    def favourites(self, request, *args, **kwargs):
+        queryset = self.request.user.get_favourites()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
