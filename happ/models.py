@@ -196,7 +196,13 @@ class Event(HappBaseDocument):
         return True
 
     def add_to_favourites(self, user):
+        if self.is_in_favourites(user):
+            return False
         self.update(add_to_set__in_favourites=user)
+        return True
+
+    def is_in_favourites(self, user):
+        return user in self.in_favourites
 
 
 class Localized(Document):

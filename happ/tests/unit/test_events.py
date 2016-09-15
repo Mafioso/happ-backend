@@ -76,11 +76,24 @@ class Tests(SimpleTestCase):
 
         count = len(e.in_favourites)
 
-        e.add_to_favourites(u)
+        self.assertTrue(e.add_to_favourites(u))
         e = Event.objects.get(id=e.id)
         self.assertEqual(len(e.in_favourites), count+1)
 
         # we cannot add to favourites again
-        e.add_to_favourites(u)
+        self.assertFalse(e.add_to_favourites(u))
         e = Event.objects.get(id=e.id)
         self.assertEqual(len(e.in_favourites), count+1)
+
+    def test_is_in_favourites(self):
+        """
+        ensure that after adding to favourites returns True
+        """
+
+        u = UserFactory()
+        e = EventFactory()
+        self.assertFalse(e.is_in_favourites(u))
+
+        e.add_to_favourites(u)
+        e = Event.objects.get(id=e.id)
+        self.assertTrue(e.is_in_favourites(u))
