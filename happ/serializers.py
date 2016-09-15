@@ -205,6 +205,7 @@ class EventSerializer(LocalizedSerializer):
     start_datetime = drf_serializers.CharField(read_only=True)
     end_datetime = drf_serializers.CharField(read_only=True)
     is_upvoted = drf_serializers.SerializerMethodField()
+    is_in_favourites = drf_serializers.SerializerMethodField()
 
     # write only fields
     currency_id = serializers.ObjectIdField(write_only=True)
@@ -220,6 +221,7 @@ class EventSerializer(LocalizedSerializer):
         }
         exclude = (
             'votes',
+            'in_favourites',
         )
 
     def validate_city_id(self, value):
@@ -272,3 +274,8 @@ class EventSerializer(LocalizedSerializer):
         if 'request' not in self.context:
             return False
         return obj.is_upvoted(self.context['request'].user)
+
+    def get_is_in_favourites(self, obj):
+        if 'request' not in self.context:
+            return False
+        return obj.is_in_favourites(self.context['request'].user)
