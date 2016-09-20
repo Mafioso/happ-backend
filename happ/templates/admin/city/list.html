@@ -1,0 +1,14 @@
+{% for item in results %}
+<tr id="row-{{item.id}}">
+  <th scope="row">{{forloop.counter}}</th>
+  <td>{{item.name}}</td>
+  <td>{{item.country_name}}</td>
+  <td>{{item.status}}</td>
+  <td>
+    <a href="#" class="btn btn-warning btn-xs"><i class="fa fa-power-off"></i> Деактивировать </a>
+    <a href="#" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
+    <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/cities/{{item.id}}/"><i class="fa fa-trash-o"></i> Удалить </a>
+  </td>
+</tr>
+{% endfor %}
+<tr ic-append-from="{{next}}" ic-trigger-on="scrolled-into-view" ic-target="#city-table-body" ic-indicator="#indicator"></tr>
