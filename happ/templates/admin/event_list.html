@@ -1,0 +1,162 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Список мероприятий
+{% endblock %}
+
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Список  <small>мероприятий</small></h3>
+    </div>
+
+    <div class="title_right">
+      <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Поиск...">
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Мероприятия</h2>
+
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div>
+            <div id="filter-panel" class="collapse filter-panel">
+              <div class="panel panel-default">
+                  <div class="panel-body">
+                      <form class="form-inline" role="form">
+                          <div class="form-group" style="margin-right:10px;">
+                              <label class="filter-col" style="margin-right:10px;" for="pref-perpage">Элементов на странице:</label>
+                              <select id="pref-perpage" class="form-control">
+                                  <option value="2">2</option>
+                                  <option value="3">3</option>
+                                  <option value="4">4</option>
+                                  <option value="5">5</option>
+                                  <option value="6">6</option>
+                                  <option value="7">7</option>
+                                  <option value="8">8</option>
+                                  <option value="9">9</option>
+                                  <option selected="selected" value="10">10</option>
+                                  <option value="15">15</option>
+                                  <option value="20">20</option>
+                                  <option value="30">30</option>
+                                  <option value="40">40</option>
+                                  <option value="50">50</option>
+                                  <option value="100">100</option>
+                                  <option value="200">200</option>
+                                  <option value="300">300</option>
+                                  <option value="400">400</option>
+                                  <option value="500">500</option>
+                                  <option value="1000">1000</option>
+                              </select>
+                          </div> <!-- form group [rows] -->
+                          <div class="form-group" style="margin-right:10px;">
+                              <label class="filter-col" style="margin-right:10px;" for="pref-search">Поиск:</label>
+                              <input type="text" class="form-control input-sm" id="pref-search">
+                          </div><!-- form group [search] -->
+                          <div class="form-group" style="margin-right:10px;">
+                              <label class="filter-col" style="margin-right:10px;" for="pref-orderby">Сортировать по:</label>
+                              <select id="pref-orderby" class="form-control">
+                                  <option>Названию</option>
+                                  <option>Городу</option>
+                                  <option>Дате</option>
+                              </select>
+                          </div> <!-- form group [order by] -->
+                          <div class="form-group" style="margin-right:10px;">
+                              <label class="filter-col"  for="pref-city">Город:</label>
+                              <select id="pref-city" class="form-control">
+                                  <option>Алматы</option>
+                                  <option>Астана</option>
+                                  <option>Караганда</option>
+                              </select>
+                          </div>
+                          <div class="form-group" style="margin-right:10px;">
+                              <label class="filter-col"  for="pref-city">Дата:</label>
+                              <input id="birthday" class="date-picker form-control" required="required" type="text">
+                          </div>
+                      </form>
+                  </div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#filter-panel">
+                <span class="fa fa-search"></span> Фильтр
+            </button>
+          </div>
+
+          <!-- start project list -->
+          <table id="events_table" class="table table-striped projects">
+            <thead>
+              <tr>
+                <th style="width: 1%">№</th>
+                <th>Фото</th>
+                <th style="width: 20%">Название мероприятия</th>
+                <th>Автор</th>
+                <th>Город</th>
+                <th>Место проведения</th>
+                <th>Дата</th>
+                <th>Дата создания</th>
+                <th>Статус</th>
+                <th style="width: 20%">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="event-table-body">
+              <tr ic-append-from="/api/v1/events.html/?page=2" ic-trigger-on="scrolled-into-view" ic-target="#event-table-body" ic-indicator="#indicator"></tr>
+            </tbody>
+          </table>
+          <center> <!-- lol -->
+            <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
+          </center>
+          <!-- end project list -->
+          <!-- <div class="btn-group pull-right">
+            <button class="btn btn-default" type="button"><i class="fa fa-angle-double-left"></i></button>
+            <button class="btn btn-default" type="button">1</button>
+            <button class="btn btn-default active" type="button">2</button>
+            <button class="btn btn-default" type="button">3</button>
+            <button class="btn btn-default" type="button"><i class="fa fa-angle-double-right"></i></button>
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block javascript %}
+<!-- jQuery -->
+<script src="/static/js/jquery.min.js"></script>
+<!-- Intercooler js -->
+<script src="/static/js/intercooler-0.9.7.min.js"></script>
+<!-- Bootstrap -->
+<script src="/static/js/bootstrap.min.js"></script>
+<!-- Custom -->
+<script src="/static/js/custom.js"></script>
+<!-- bootstrap-daterangepicker -->
+<script src="/static/js/moment/moment.min.js"></script>
+<script src="/static/js/datepicker/daterangepicker.js"></script>
+
+<script>
+  $(document).ready(function() {
+    $('#birthday').daterangepicker({
+      singleDatePicker: true,
+      calender_style: "picker_4"
+    }, function(start, end, label) {
+      console.log(start.toISOString(), end.toISOString(), label);
+    });
+  });
+</script>
+{% endblock %}

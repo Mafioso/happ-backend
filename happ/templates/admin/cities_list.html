@@ -1,0 +1,104 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Список городов
+{% endblock %}
+
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Список <small>городов</small></h3>
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Города</h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width:1%;">#</th>
+                <th>Название города</th>
+                <th>Страна</th>
+                <th>Статус</th>
+                <th style="width: 30%">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="city-table-body">
+              <tr ic-get-from="/api/v1/admin/cities.html" ic-trigger-on="load" ic-target="#city-table-body" ic-indicator="#indicator"></tr>
+            </tbody>
+          </table>
+          <center> <!-- lol -->
+            <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
+          </center>
+          <div class="pull-left">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg">Добавить город</button>
+
+            <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Добавить новый город</h4>
+                  </div>
+                  <form id="city-add-form" ic-post-to="/api/v1/admin/cities.html" ic-verb="POST" class="form-horizontal form-label-left">
+                  <div class="modal-body">
+
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="event-name">Название города <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" id="name" name="name" required="required" class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Страна</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select id="country_id" class="form-control col-md-7 col-xs-12" name="country_id" ic-get-from="/api/v1/admin/countries.html" ic-target="#country_id" ic-trigger-on="load">
+
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="city-name">Активен <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="checkbox" class="form-control flat" name="end-on-start">
+                        </div>
+                      </div>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="btn-group pull-right">
+            <button class="btn btn-default" type="button"><i class="fa fa-angle-double-left"></i></button>
+            <button class="btn btn-default" type="button">1</button>
+            <button class="btn btn-default active" type="button">2</button>
+            <button class="btn btn-default" type="button">3</button>
+            <button class="btn btn-default" type="button"><i class="fa fa-angle-double-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

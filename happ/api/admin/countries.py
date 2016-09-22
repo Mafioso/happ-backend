@@ -15,4 +15,4 @@ class CountryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         queryset = self.filter_queryset(self.get_queryset())
 
         serializer = self.get_serializer(queryset, many=True)
-        return Response({'results': serializer.data})
+        return Response({'results': serializer.data}, template_name='admin/city/country_list.html')
