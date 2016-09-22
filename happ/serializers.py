@@ -200,7 +200,6 @@ class EventSerializer(LocalizedSerializer):
 
     # read only fields
     currency = CurrencySerializer(read_only=True)
-    city = serializers.ObjectIdField(read_only=True)
     author = AuthorSerializer(read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
     end_datetime = drf_serializers.CharField(read_only=True)
@@ -273,7 +272,7 @@ class EventSerializer(LocalizedSerializer):
     def get_is_upvoted(self, obj):
         if 'request' not in self.context:
             return False
-        return obj.is_upvoted(self.context['request'].user)
+        return bool(obj.is_upvoted(self.context['request'].user))
 
     def get_is_in_favourites(self, obj):
         if 'request' not in self.context:

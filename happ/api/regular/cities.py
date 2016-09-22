@@ -10,7 +10,7 @@ from happ.models import City
 from happ.serializers import CitySerializer
 
 
-class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = CitySerializer
     queryset = City.objects.filter(is_active=True)
     filter_backends = (filters.MongoSearchFilter, )
