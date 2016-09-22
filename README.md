@@ -19,3 +19,24 @@ Create cities and currencies first, then interests and users, and after that - e
 ## migrate your mongo schema or data
 
 ./manage.py migrate 000X   #  check migration number you need to upgrade to in `happ.migrations` module and then do following migrations
+
+## Deployment strategy
+
+1. Containerize and name services using docker-compose
+2. Deploy app locally using nginx and two docker containers of app
+3. Split nginx features to different docker containers:
+	3.1 Serve static
+	3.2 Proxy
+4. Refine docker-compose and deploy 2) and 3) with docker-machine using one docker host
+5. Deploy whole application locally 1)-4) using two docker hosts with docker swarm and docker-machine
+	5.1 Determine naming conventions of images
+	5.2 Refine docker network topology with scale in mind
+6. Deply 5) on production environment
+
+# Automated deploy
+
+## Application provisioning
+
+1. Build wheel package of app with version-x.y.z
+2. App and celery compose files should change just version of app to install on image at pre-launch stage
+3. Refine docker-compose.prod.yml to reflect 1) and 2)
