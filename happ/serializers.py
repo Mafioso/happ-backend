@@ -195,10 +195,8 @@ class AuthorSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(LocalizedSerializer):
-    # regular fields
-    interests = InterestChildSerializer(many=True, required=False)
-
     # read only fields
+    interests = InterestChildSerializer(many=True, required=False, read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
@@ -207,6 +205,7 @@ class EventSerializer(LocalizedSerializer):
     is_in_favourites = drf_serializers.SerializerMethodField()
 
     # write only fields
+    interest_ids = drf_serializers.ListField(write_only=True)
     currency_id = serializers.ObjectIdField(write_only=True)
     city_id = serializers.ObjectIdField(write_only=True)
 
@@ -255,12 +254,14 @@ class EventSerializer(LocalizedSerializer):
     def create(self, validated_data):
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
+        interest_ids = validated_data.pop('interest_ids')
         author = validated_data.pop('author')
         event = super(EventSerializer, self).create(validated_data)
 
         event.city = city
         event.currency = currency
         event.author
+        event.interests = Interest.objects.filter(id__in=interest_ids)
         event.save()
         event.translate()
         return event
