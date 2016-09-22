@@ -217,6 +217,7 @@ class EventSerializer(LocalizedSerializer):
             'start_time': {'write_only': True},
             'end_date': {'write_only': True},
             'end_time': {'write_only': True},
+            'city': {'read_only': True},
         }
         exclude = (
             'votes',
