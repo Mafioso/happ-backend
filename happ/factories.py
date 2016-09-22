@@ -2,6 +2,8 @@ import random
 import factory
 from faker import Factory as FakerFactory
 
+from django.conf import settings
+
 from models import (
     User,
     UserSettings,
@@ -106,10 +108,10 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     email = factory.Faker('email')
     web_site = factory.Faker('url')
     # votes = factory.Faker('pyint')
-    start_date = factory.Faker('date_time')
-    start_time = factory.Faker('date_time')
-    end_date = factory.Faker('date_time')
-    end_time = factory.Faker('date_time')
+    start_date = factory.Faker('date', pattern=settings.DATE_STRING_FIELD_FORMAT)
+    start_time = factory.Faker('time', pattern=settings.TIME_STRING_FIELD_FORMAT)
+    end_date = factory.Faker('date', pattern=settings.DATE_STRING_FIELD_FORMAT)
+    end_time = factory.Faker('time', pattern=settings.TIME_STRING_FIELD_FORMAT)
 
     # def geopoint(self):
     #     print factory.Faker('longitude'), factory.Faker('latitude'),

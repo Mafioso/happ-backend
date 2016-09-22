@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
-from happ.utils import store_file
+from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
 from happ.serializers import EventSerializer
 
@@ -63,13 +63,14 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = request.data.pop('start_datetime')
-        end_datetime = request.data.pop('end_datetime')
+        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
+        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
+
         request.data['images'] = map(lambda x: store_file(x), request.data.pop('images'))
-        request.data['start_date'] = datetime.datetime.strftime(dateutil.parser.parse(start_datetime), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['start_time'] = datetime.datetime.strftime(dateutil.parser.parse(start_datetime), settings.TIME_STRING_FIELD_FORMAT)
-        request.data['end_date'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['end_time'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.TIME_STRING_FIELD_FORMAT)
+        request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
+        request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
+        request.data['end_date'] = string_to_date(datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
+        request.data['end_time'] = string_to_time(datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -121,12 +122,13 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = request.data.pop('start_datetime')
-        end_datetime = request.data.pop('end_datetime')
-        request.data['start_date'] = datetime.datetime.strftime(dateutil.parser.parse(start_datetime), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['start_time'] = datetime.datetime.strftime(dateutil.parser.parse(start_datetime), settings.TIME_STRING_FIELD_FORMAT)
-        request.data['end_date'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['end_time'] = datetime.datetime.strftime(dateutil.parser.parse(end_datetime), settings.TIME_STRING_FIELD_FORMAT)
+        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
+        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
+
+        request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
+        request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
+        request.data['end_date'] = string_to_date(datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
+        request.data['end_time'] = string_to_time(datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
 
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():

@@ -195,7 +195,7 @@ class AuthorSerializer(serializers.DocumentSerializer):
 
 class EventSerializer(LocalizedSerializer):
     # read only fields
-    interests = InterestChildSerializer(many=True, required=False, read_only=True)
+    interests = InterestChildSerializer(many=True, read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
@@ -204,17 +204,17 @@ class EventSerializer(LocalizedSerializer):
     is_in_favourites = drf_serializers.SerializerMethodField()
 
     # write only fields
-    interest_ids = drf_serializers.ListField(write_only=True)
-    currency_id = serializers.ObjectIdField(write_only=True)
-    city_id = serializers.ObjectIdField(write_only=True)
+    interest_ids = drf_serializers.ListField(write_only=True, required=False)
+    currency_id = serializers.ObjectIdField(write_only=True, required=False)
+    city_id = serializers.ObjectIdField(write_only=True, required=False)
+    start_date = drf_serializers.DateField(write_only=True, required=False)
+    start_time = drf_serializers.TimeField(write_only=True, required=False)
+    end_date = drf_serializers.DateField(write_only=True, required=False)
+    end_time = drf_serializers.TimeField(write_only=True, required=False)
 
     class Meta:
         model = Event
         extra_kwargs = {
-            'start_date': {'write_only': True},
-            'start_time': {'write_only': True},
-            'end_date': {'write_only': True},
-            'end_time': {'write_only': True},
             'city': {'read_only': True},
         }
         exclude = (
@@ -246,7 +246,7 @@ class EventSerializer(LocalizedSerializer):
         """
         if 'min_price' in data and 'max_price' in data and data['min_price'] > data['max_price']:
             raise ValidationError(_("Min_price should be less than Max_price"))
-        if data['start_date'] + data['start_time'] > data['end_date'] + data['end_time']:
+        if datetime.combine(data['start_date'], data['start_time']) > datetime.combine(data['end_date'], data['end_time']):
             raise ValidationError(_("Start date should be earlier than End date"))
         return data
 

@@ -335,6 +335,7 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'images': [],
+            'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -350,6 +351,7 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'images': [],
+            'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
