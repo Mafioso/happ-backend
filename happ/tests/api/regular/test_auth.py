@@ -77,20 +77,22 @@ class Tests(APISimpleTestCase):
         self.assertIn('error_message', response.data)
         self.assertEqual(User.objects.count(), n)
 
-    # def test_user_registration_no_email(self):
-    #     """
-    #     Ensures that we cannot register without email
-    #     """
-    #     n = User.objects.count()
-    #     url = prepare_url('register')
-    #     data = {
-    #         'username': 'username',
-    #         'password': '123',
-    #     }
-    #     response = self.client.post(url, data=data, format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    #     self.assertIn('error_message', response.data)
-    #     self.assertEqual(User.objects.count(), n)
+    def test_user_registration_no_email(self):
+        """
+        Ensures that we can register without email
+        """
+        n = User.objects.count()
+        url = prepare_url('register')
+        data = {
+            'username': 'username',
+            'password': '123',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = User.objects.get(username='username')
+        self.assertEqual(User.objects.count(), n+1)
+        self.assertNotEqual(user.settings, None)
+        self.assertIn('token', response.data)
 
     def test_user_registration_no_password(self):
         """
@@ -166,8 +168,7 @@ class Tests(APISimpleTestCase):
         data = {
             'uidb64': urlsafe_base64_encode(force_bytes(u.pk)),
             'token': default_token_generator.make_token(u),
-            'new_password1': '1234567a',
-            'new_password2': '1234567a',
+            'new_password': '1234567a',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -184,8 +185,7 @@ class Tests(APISimpleTestCase):
 
         data = {
             'token': default_token_generator.make_token(u),
-            'new_password1': '1234567a',
-            'new_password2': '1234567a',
+            'new_password': '1234567a',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -202,27 +202,7 @@ class Tests(APISimpleTestCase):
 
         data = {
             'uidb64': urlsafe_base64_encode(force_bytes(u.pk)),
-            'new_password1': '1234567a',
-            'new_password2': '1234567a',
-        }
-        response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_password_reset_confirm_password_mismatch(self):
-        """
-        Ensures that user cannot confirm password reset when two password are different
-        """
-        u = UserFactory()
-        u.set_password('123')
-        u.save()
-
-        url = prepare_url('password-reset-confirm')
-
-        data = {
-            'uidb64': urlsafe_base64_encode(force_bytes(u.pk)),
-            'token': default_token_generator.make_token(u),
-            'new_password1': '1234567a',
-            'new_password2': '1234567b',
+            'new_password': '1234567a',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -244,8 +224,7 @@ class Tests(APISimpleTestCase):
         data = {
             'uidb64': urlsafe_base64_encode(force_bytes(u2.pk)),
             'token': default_token_generator.make_token(u),
-            'new_password1': '1234567a',
-            'new_password2': '1234567a',
+            'new_password': '1234567a',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -267,8 +246,7 @@ class Tests(APISimpleTestCase):
         data = {
             'uidb64': urlsafe_base64_encode(force_bytes(u.pk)),
             'token': default_token_generator.make_token(u2),
-            'new_password1': '1234567a',
-            'new_password2': '1234567a',
+            'new_password': '1234567a',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -296,8 +274,7 @@ class Tests(APISimpleTestCase):
 
         data = {
             'old_password': '123',
-            'new_password1': '1234qwerASDF!@#$',
-            'new_password2': '1234qwerASDF!@#$',
+            'new_password': '1234qwerASDF!@#$',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -333,37 +310,7 @@ class Tests(APISimpleTestCase):
 
         data = {
             'old_password': '1234',
-            'new_password1': '1234qwerASDF!@#$',
-            'new_password2': '1234qwerASDF!@#$',
-        }
-        response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_change_password_mismatch(self):
-        """
-        We cannot change user's password when passwords mismatch
-        """
-        u = UserFactory()
-        u.set_password('123')
-        u.save()
-
-        url = prepare_url('password-change')
-
-        auth_url = prepare_url('login')
-        data = {
-            'username': u.username,
-            'password': '123'
-        }
-        response = self.client.post(auth_url, data=data, format='json')
-        token = response.data['token']
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertNotEqual(response.data['token'], None)
-        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-
-        data = {
-            'old_password': '123',
-            'new_password1': '1234qwerASDF!@#$',
-            'new_password2': '1234qwerASDF!@',
+            'new_password': '1234qwerASDF!@#$',
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

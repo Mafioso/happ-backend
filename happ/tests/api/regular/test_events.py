@@ -70,6 +70,7 @@ class Tests(APISimpleTestCase):
         url = prepare_url('events-list')
         n = Event.objects.count()
 
+        # full
         data = {
             'title': 'New event',
             'city_id': str(CityFactory.create().id),
@@ -79,14 +80,21 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'images': [],
+            'interest_ids': map(lambda _: str(InterestFactory().id), range(3)),
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
+        e = Event.objects.get(id=response.data['id'])
+        self.assertEqual(e.title, 'New event')
+        self.assertEqual(e.min_price, 100)
+        self.assertEqual(e.max_price, 120)
+        self.assertEqual(len(e.interests), 3)
 
         n = Event.objects.count()
 
+        # no max_price
         data = {
             'title': 'New event',
             'city_id': str(CityFactory.create().id),
@@ -95,14 +103,21 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'images': [],
+            'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
+        e = Event.objects.get(id=response.data['id'])
+        self.assertEqual(e.title, 'New event')
+        self.assertEqual(e.min_price, 100)
+        self.assertEqual(e.max_price, None)
+        self.assertEqual(len(e.interests), 0)
 
         n = Event.objects.count()
 
+        # no min_price
         data = {
             'title': 'New event',
             'city_id': str(CityFactory.create().id),
@@ -111,11 +126,17 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'max_price': 120,
             'images': [],
+            'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
+        e = Event.objects.get(id=response.data['id'])
+        self.assertEqual(e.title, 'New event')
+        self.assertEqual(e.min_price, None)
+        self.assertEqual(e.max_price, 120)
+        self.assertEqual(len(e.interests), 0)
 
     def test_create_event_no_title(self):
         """
@@ -314,6 +335,7 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'images': [],
+            'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -329,6 +351,7 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'images': [],
+            'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
