@@ -8,4 +8,5 @@ urlpatterns = [
     url(r'^$', views.IndexView.as_view(template_name='admin/index.html'), name="index"),
     url(r'^event/list/$', views.EventListView.as_view(template_name='admin/event_list.html'), name="event_list"),
     url(r'^city/list/$', views.CityListView.as_view(template_name='admin/cities_list.html'), name="city_list"),
+    url(r'^category/list/$', views.CityListView.as_view(template_name='admin/categories_list.html'), name="category_list"),
 ]

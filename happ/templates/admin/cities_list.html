@@ -22,20 +22,22 @@
           <div class="clearfix"></div>
         </div>
         <div class="x_content">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th style="width:1%;">#</th>
-                <th>Название города</th>
-                <th>Страна</th>
-                <th>Статус</th>
-                <th style="width: 30%">Действия</th>
-              </tr>
-            </thead>
-            <tbody id="city-table-body">
-              <tr ic-get-from="/api/v1/admin/cities.html" ic-trigger-on="load" ic-target="#city-table-body" ic-indicator="#indicator"></tr>
-            </tbody>
-          </table>
+          <div id="city-table">
+            <table class="table table-bordered" ic-src="/api/v1/admin/cities.html" ic-trigger-on="load" ic-target="#city-table" ic-indicator="#indicator">
+              <thead>
+                <tr>
+                  <th style="width:1%;">#</th>
+                  <th>Название города</th>
+                  <th>Страна</th>
+                  <th>Статус</th>
+                  <th style="width: 30%">Действия</th>
+                </tr>
+              </thead>
+              <tbody id="city-table-body">
+              </tbody>
+            </table>
+
+          </div>
           <center> <!-- lol -->
             <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
           </center>
@@ -88,13 +90,7 @@
               </div>
             </div>
           </div>
-          <div class="btn-group pull-right">
-            <button class="btn btn-default" type="button"><i class="fa fa-angle-double-left"></i></button>
-            <button class="btn btn-default" type="button">1</button>
-            <button class="btn btn-default active" type="button">2</button>
-            <button class="btn btn-default" type="button">3</button>
-            <button class="btn btn-default" type="button"><i class="fa fa-angle-double-right"></i></button>
-          </div>
+
         </div>
       </div>
     </div>
