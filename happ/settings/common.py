@@ -126,6 +126,7 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/uploads/'
 MEDIA_URL_NO_TRAILING_SLASH = '/uploads'
 MEDIA_ROOT = '/uploads'
+PAGE_SIZE = 10
 
 NGINX_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'media')
 NGINX_TMP_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'tmp')
@@ -137,7 +138,7 @@ MONGODB_NAME = 'happ1'
 
 REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': None, # temp
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': PAGE_SIZE,
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.TemplateHTMLRenderer',
