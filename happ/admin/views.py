@@ -14,6 +14,15 @@ class IndexView(TemplateView):
 
         return context
 
+class LoginView(TemplateView):
+    template_name = 'admin/login.html'
+
+    def get_context_data(self, * args, ** kwargs):
+        context = super(LoginView, self).get_context_data(**kwargs)
+
+        return context
+
+
 class EventListView(TemplateView):
     template_name = 'admin/event_list.html'
 
@@ -35,5 +44,13 @@ class CategoriesListView(TemplateView):
 
     def get_context_data(self, * args, ** kwargs):
         context = super(CategoriesListView, self).get_context_data(**kwargs)
+
+        return context
+
+class InterestListView(TemplateView):
+    template_name = 'admin/interest_list.html'
+
+    def get_context_data(self, * args, ** kwargs):
+        context = super(InterestListView, self).get_context_data(**kwargs)
 
         return context

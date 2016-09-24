@@ -18,6 +18,7 @@ class CookieJSONWebTokenAuthentication(JSONWebTokenAuthentication):
     def get_jwt_value(self, request):
 
         auth = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
+
         if not auth:
             return None
         auth = auth.split()
