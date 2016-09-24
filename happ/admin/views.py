@@ -2,6 +2,9 @@ from django.http import HttpResponse
 from django.views.generic import TemplateView, CreateView, UpdateView, RedirectView
 from django.core.urlresolvers import reverse
 
+from .mixins import JWTAuthRequiredMixin
+
+
 class IndexView(TemplateView):
     template_name = 'admin/index.html'
     #context_object_name = 'latest_question_list'

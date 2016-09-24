@@ -166,3 +166,61 @@ class Tests(APISimpleTestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Interest.objects.count(), n-1)
+
+    def test_get_categories(self):
+        """
+        Ensure that we can get only categories with api
+        """
+        Interest.objects.delete()
+        for i in range(3):
+            interest = InterestFactory(parent=None)
+
+        interest = InterestFactory(parent=interest)
+
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('admin-interests-categories')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(len(response.data['results'][2]['children']), 1)
+
+    def test_get_children(self):
+        """
+        Ensure that we can get only children with api
+        """
+        Interest.objects.delete()
+        for i in range(3):
+            interest = InterestFactory(parent=None)
+
+        interest = InterestFactory(parent=interest)
+
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('admin-interests-children')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertNotEqual(response.data['results'][0]['parent'], None)

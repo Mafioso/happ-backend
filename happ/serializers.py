@@ -122,14 +122,13 @@ class InterestSerializer(serializers.DocumentSerializer):
 class InterestChildSerializer(serializers.DocumentSerializer):
     # regular fields
     parent = InterestSerializer()
+    local_cities = CitySerializer(many=True)
 
     class Meta:
         model = Interest
         exclude = (
             'date_created',
             'date_edited',
-            'is_global',
-            'local_cities',
         )
 
 class InterestParentSerializer(serializers.DocumentSerializer):
