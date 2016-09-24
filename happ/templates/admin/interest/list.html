@@ -1,0 +1,33 @@
+{% load happ %}
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th style="width:1%;">#</th>
+      <th>Название Интереса</th>
+      <th>Категория</th>
+      <th>Тип</th>
+      <th>Город</th>
+      <th style="width: 30%">Действия</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for item in results %}
+    <tr id="row-{{item.id}}">
+      <th scope="row"></th>
+      <td>{{item.title}}</td>
+      <td>{{item.parent.title}}</td>
+      <td>{{item.is_global}}</td>
+      <td>{{item.local_cities}}</td>
+      <td>
+        <a href="#" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
+        <a ic-delete-from="/api/v1/admin/interests/{{item.id}}/" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Удалить <i class="ic-indicator fa fa-spinner fa-spin" style="display: none"></i> </a>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="btn-group pull-right">
+  {% for item in count|paginate %}
+  <button class="btn btn-default" type="button" ic-get-from="/api/v1/admin/interests.html?page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  {% endfor %}
+</div>
