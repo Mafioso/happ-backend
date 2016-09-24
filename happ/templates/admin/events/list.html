@@ -1,37 +1,60 @@
-{% for item in results %}
-<tr>
-  <td></td>
-  <td>
-    <img src="/static/images/picture.jpg" class="event-img" />
-  </td>
-  <td>
-    <a>{{item.title}}</a>
-  </td>
-  <td>
-    <img src="/static/images/marat.jpeg" class="avatar" alt="Avatar">
-    <br/><br/>
-    <a>{{item.author.fn}}</a>
-  </td>
-  <td>
-    {{city.title}}
-  </td>
-  <td>
-    {{item.address}}
-  </td>
-  <td>
-    {{item.date_edited}}
-  </td>
-  <td>
-    {{item.start_datetime}}
-  </td>
-  <td>
-    <button type="button" class="btn btn-success btn-xs">{{item.status}}</button>
-  </td>
-  <td>
-    <a href="/admin/event/{{item.id}}" class="btn btn-primary btn-xs"><i class="fa fa-eye"></i> Просмотр </a>
-    <a href="/admin/event/edit/{{item.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-    <a href="/admin/event/delete/{{item.id}}" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Удалить </a>
-  </td>
-</tr>
-{% endfor %}
-<tr ic-append-from="{{next}}" ic-trigger-on="scrolled-into-view" ic-target="#event-table-body" ic-indicator="#indicator"></tr>
+{% load happ %}
+<table id="events_table" class="table table-striped projects">
+  <thead>
+    <tr>
+      <th style="width: 1%">№</th>
+      <th>Фото</th>
+      <th style="width: 20%">Название мероприятия</th>
+      <th>Автор</th>
+      <th>Город</th>
+      <th>Место проведения</th>
+      <th>Дата</th>
+      <th>Дата создания</th>
+      <th>Статус</th>
+      <th style="width: 20%">Действия</th>
+    </tr>
+  </thead>
+  <tbody id="event-table-body">
+    {% for item in results %}
+      <tr>
+        <td>{{forloop.counter|page_counter:page}}</td>
+        <td>
+          <img src="{{item.images.0}}" class="event-img" />
+        </td>
+        <td>
+          <a>{{item.title}}</a>
+        </td>
+        <td>
+          <img src="/static/images/marat.jpeg" class="avatar" alt="Avatar">
+          <br/><br/>
+          <a>{{item.author.fn}}</a>
+        </td>
+        <td>
+          {{item.city.title}}
+        </td>
+        <td>
+          {{item.address}}
+        </td>
+        <td>
+          {{item.start_datetime}}
+        </td>
+        <td>
+          {{item.date_created}}
+        </td>
+        <td>
+          <button type="button" class="btn btn-success btn-xs">{{item.status}}</button>
+        </td>
+        <td>
+          <a href="/admin/event/{{item.id}}" class="btn btn-primary btn-xs"><i class="fa fa-eye"></i> Просмотр </a>
+          <a href="/admin/event/edit/{{item.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
+          <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/events/{{item.id}}/" indicator="#indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="btn-group pull-right">
+  {% for item in count|paginate %}
+  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/events.html?page={{forloop.counter}}" ic-target="#event-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  {% endfor %}
+</div>

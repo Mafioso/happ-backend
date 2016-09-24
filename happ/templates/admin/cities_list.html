@@ -22,20 +22,7 @@
           <div class="clearfix"></div>
         </div>
         <div class="x_content">
-          <div id="city-table">
-            <table class="table table-bordered" ic-src="/api/v1/admin/cities.html" ic-trigger-on="load" ic-target="#city-table" ic-indicator="#indicator">
-              <thead>
-                <tr>
-                  <th style="width:1%;">#</th>
-                  <th>Название города</th>
-                  <th>Страна</th>
-                  <th>Статус</th>
-                  <th style="width: 30%">Действия</th>
-                </tr>
-              </thead>
-              <tbody id="city-table-body">
-              </tbody>
-            </table>
+          <div id="city-table" ic-src="/api/v1/admin/cities.html" ic-trigger-on="load" ic-target="#city-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
           <center> <!-- lol -->

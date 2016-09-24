@@ -13,14 +13,18 @@
   <tbody>
   {% for item in results %}
     <tr id="row-{{item.id}}">
-      <th scope="row"></th>
+      <th scope="row">{{forloop.counter|page_counter:page}}</th>
       <td>{{item.title}}</td>
       <td>{{item.parent.title}}</td>
-      <td>{{item.is_global}}</td>
-      <td>{{item.local_cities}}</td>
+      <td>{% if item.is_global %}Глобальный{% else %}Городской{% endif %}</td>
       <td>
-        <a href="#" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-        <a ic-delete-from="/api/v1/admin/interests/{{item.id}}/" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Удалить <i class="ic-indicator fa fa-spinner fa-spin" style="display: none"></i> </a>
+        {% for city in item.local_cities %}
+          {{ city.name }},
+        {% endfor %}
+      </td>
+      <td>
+        <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="/api/v1/admin/interests/{{item.id}}.html" ic-target="#create-form" ic-indicator="indicator-update"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        <a ic-delete-from="/api/v1/admin/interests/{{item.id}}/" ic-indicator="delete_indicator" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Удалить <i id="delete_indicator" class="ic-indicator fa fa-spinner fa-spin" style="display: none"></i> </a>
       </td>
     </tr>
   {% endfor %}
@@ -28,6 +32,6 @@
 </table>
 <div class="btn-group pull-right">
   {% for item in count|paginate %}
-  <button class="btn btn-default" type="button" ic-get-from="/api/v1/admin/interests.html?page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/interests/children.html?page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
   {% endfor %}
 </div>
