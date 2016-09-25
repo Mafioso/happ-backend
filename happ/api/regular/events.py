@@ -11,6 +11,7 @@ from rest_framework_mongoengine import viewsets
 
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
+from happ.decorators import patch_queryset
 from happ.serializers import EventSerializer
 
 
@@ -199,14 +200,11 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     @list_route(methods=['get'], url_path='favourites')
+    @patch_queryset(lambda self, x: self.request.user.get_favourites())
     def favourites(self, request, *args, **kwargs):
-        queryset = self.request.user.get_favourites()
+        return super(EventViewSet, self).list(request, *args, **kwargs)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-
-        return Response(serializer.data)
+    @list_route(methods=['get'], url_path='feed')
+    @patch_queryset(lambda self, x: self.request.user.get_feed())
+    def feed(self, request, *args, **kwargs):
+        return super(EventViewSet, self).list(request, *args, **kwargs)

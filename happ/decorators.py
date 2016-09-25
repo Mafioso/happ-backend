@@ -15,7 +15,7 @@ def patch_queryset(funct):
     def decorator(fn):
         def wrapper(self, request, *a, **kw):
             prev_queryset = self.queryset
-            self.queryset = funct(prev_queryset)
+            self.queryset = funct(self, prev_queryset)
             rv = fn(self, request, *a, **kw)
             self.queryset = prev_queryset
             return rv
