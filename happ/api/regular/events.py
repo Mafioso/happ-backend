@@ -9,8 +9,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
+from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
+from happ.filters import EventFilter
 from happ.decorators import patch_queryset, patch_order
 from happ.serializers import EventSerializer
 
@@ -18,6 +20,8 @@ from happ.serializers import EventSerializer
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
+    filter_backends = (filters.MongoFilterBackend,)
+    filter_class = EventFilter
 
     def retrieve(self, request, *args, **kwargs):
         response = super(EventViewSet, self).retrieve(request, *args, **kwargs)

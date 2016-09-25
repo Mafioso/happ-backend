@@ -658,6 +658,8 @@ class Tests(APISimpleTestCase):
     def test_get_events_feed(self):
         """
         we can get events feed
+        we can get sorted by popularity feed
+        we can filter feed
         """
         c1 = CityFactory()
         ins_set = map(lambda _: InterestFactory(), range(3))
@@ -667,8 +669,8 @@ class Tests(APISimpleTestCase):
             EventFactory(
                 title='t{}'.format(i),
                 votes_num=(5-i),
-                start_date=datetime.strftime(datetime.now(), settings.DATE_STRING_FIELD_FORMAT),
-                start_time=datetime.strftime(datetime.now() + timedelta(hours=i), settings.TIME_STRING_FIELD_FORMAT),
+                start_date='20160520',
+                start_time='0{}3000'.format(i),
                 city=c1,
                 interests=[random.choice(ins_set)]
             )
@@ -689,6 +691,7 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('events-feed')
 
+        # simple
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -699,6 +702,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][3]['title'], 't1')
         self.assertEqual(response.data['results'][4]['title'], 't0')
 
+        # ordering
         url = prepare_url('events-feed', query={'order': 'popular'})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -708,3 +712,11 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][2]['title'], 't2')
         self.assertEqual(response.data['results'][3]['title'], 't3')
         self.assertEqual(response.data['results'][4]['title'], 't4')
+
+        # filtering
+        url = prepare_url('events-feed', query={'start_time': '033000'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['title'], 't4')
+        self.assertEqual(response.data['results'][1]['title'], 't3')
