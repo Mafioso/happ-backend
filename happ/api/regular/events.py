@@ -11,7 +11,7 @@ from rest_framework_mongoengine import viewsets
 
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
-from happ.decorators import patch_queryset
+from happ.decorators import patch_queryset, patch_order
 from happ.serializers import EventSerializer
 
 
@@ -206,5 +206,6 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'], url_path='feed')
     @patch_queryset(lambda self, x: self.request.user.get_feed())
+    @patch_order({'default': ('-start_date', '-start_time', ), 'popular': ('-start_date', '-votes_num')})
     def feed(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)

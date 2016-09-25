@@ -664,7 +664,14 @@ class Tests(APISimpleTestCase):
         ci1 = CityInterestsFactory(c=c1, ins=ins_set)
 
         for i in range(5):
-            EventFactory(city=c1, interests=[random.choice(ins_set)])
+            EventFactory(
+                title='t{}'.format(i),
+                votes_num=(5-i),
+                start_date=datetime.strftime(datetime.now(), settings.DATE_STRING_FIELD_FORMAT),
+                start_time=datetime.strftime(datetime.now() + timedelta(hours=i), settings.TIME_STRING_FIELD_FORMAT),
+                city=c1,
+                interests=[random.choice(ins_set)]
+            )
 
         u = UserFactory()
         u.interests = [ci1]
@@ -686,3 +693,18 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['results'][0]['title'], 't4')
+        self.assertEqual(response.data['results'][1]['title'], 't3')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+        self.assertEqual(response.data['results'][3]['title'], 't1')
+        self.assertEqual(response.data['results'][4]['title'], 't0')
+
+        url = prepare_url('events-feed', query={'order': 'popular'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['results'][0]['title'], 't0')
+        self.assertEqual(response.data['results'][1]['title'], 't1')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+        self.assertEqual(response.data['results'][3]['title'], 't3')
+        self.assertEqual(response.data['results'][4]['title'], 't4')
