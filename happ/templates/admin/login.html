@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Happ Admin panel</title>
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="/static/css/custom.css" rel="stylesheet">
+  </head>
+
+  <body class="login">
+      <div class="login_wrapper">
+        <div class="animate form login_form">
+          <section class="login_content">
+            <form id="auth" action="/api/v1/auth/login" method="POST">
+              <h1>Админ панель</h1>
+              <div>
+                <input type="text" name="username" class="form-control" placeholder="Логин" required="" />
+              </div>
+              <div>
+                <input type="password" name="password" class="form-control" placeholder="Пароль" required="" />
+              </div>
+              <div>
+                <button class="btn btn-default submit">Войти</button>
+                <a class="reset_pass" href="#">Забыли ваш пароль?</a>
+              </div>
+
+              <div class="clearfix"></div>
+
+              <div class="separator">
+
+                <div>
+                  <h1><i class="fa fa-feed"></i> HAPP</h1>
+                  <p>©2016 Все права защищены. Happ app! Developed by JarviSystem</p>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+
+  <!-- jQuery -->
+  <script src="/static/js/jquery.min.js"></script>
+  <!-- Intercooler js -->
+  <script src="/static/js/intercooler-0.9.7.min.js"></script>
+  <!-- Bootstrap -->
+  <script src="/static/js/bootstrap.min.js"></script>
+  <!-- Custom -->
+  <script src="/static/js/custom.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('form').submit(function(event){
+        $.post( "/api/v1/auth/login/", $( "#auth" ).serialize(), function( data ) {
+          document.cookie = "sessionid=JWT "+data.token+"; path=/";
+          window.location = "/";
+        });
+
+        event.preventDefault();
+      });
+    })
+  </script>
+
+  </body>
+</html>

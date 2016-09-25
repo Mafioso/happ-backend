@@ -52,21 +52,21 @@
                 <ul class="nav side-menu">
                   <li><a href="#"><i class="fa fa-home"></i> Главная <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="index.html">Dashboard</a></li>
+                      <li><a href="/">Dashboard</a></li>
                       <li><a href="#">Статистика</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-edit"></i> События <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="#">Создать событие</a></li>
-                      <li><a href="#">Список событий</a></li>
+                      <li><a href="{% url 'event_list' %}">Список событий</a></li>
                       <li><a href="#">На модерации</a></li>
-                      <li><a href="#">Form Wizard</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-list"></i> Справочники <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="#">Интересы</a></li>
+                      <li><a href="{% url 'category_list' %}">Категории</a></li>
+                      <li><a href="{% url 'interest_list' %}">Интересы</a></li>
                       <li><a href="{% url 'city_list' %}">Города</a></li>
                       <li><a href="#">Места</a></li>
                     </ul>

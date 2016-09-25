@@ -1,0 +1,58 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Список Интересов
+{% endblock %}
+
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Интересы <small>пользователей</small></h3>
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Интересы</h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div id="interest-table" ic-get-from="/api/v1/admin/interests/children.html" ic-src="/api/v1/admin/interests/children.html" ic-trigger-on="load" ic-target="#interest-table" ic-indicator="#indicator" ic-deps="*">
+
+          </div>
+          <center> <!-- lol -->
+            <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
+          </center>
+          <div class="pull-left">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ic-get-from="/api/v1/admin/interests/create.html" ic-target="#create-form" ic-indicator="indicator_form">Добавить Интерес</button>
+
+            <div id="create-form" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">Добавить новый Интерес</h4>
+                  </div>
+                  <div class="modal-body">
+
+                  </div>
+                  <div class="modal-footer">
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from .mixins import JWTAuthRequiredMixin
 
 
-class IndexView(TemplateView):
+class IndexView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/index.html'
     #context_object_name = 'latest_question_list'
 
@@ -17,7 +17,16 @@ class IndexView(TemplateView):
 
         return context
 
-class EventListView(TemplateView):
+class LoginView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/login.html'
+
+    def get_context_data(self, * args, ** kwargs):
+        context = super(LoginView, self).get_context_data(**kwargs)
+
+        return context
+
+
+class EventListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/event_list.html'
 
     def get_context_data(self, * args, ** kwargs):
@@ -25,7 +34,7 @@ class EventListView(TemplateView):
 
         return context
 
-class CityListView(TemplateView):
+class CityListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/cities_list.html'
 
     def get_context_data(self, * args, ** kwargs):
@@ -33,10 +42,17 @@ class CityListView(TemplateView):
 
         return context
 
-class CategoriesListView(TemplateView):
+class CategoriesListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/categories_list.html'
 
     def get_context_data(self, * args, ** kwargs):
         context = super(CategoriesListView, self).get_context_data(**kwargs)
+        return context
+
+class InterestListView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/interest_list.html'
+
+    def get_context_data(self, * args, ** kwargs):
+        context = super(InterestListView, self).get_context_data(**kwargs)
 
         return context

@@ -14,6 +14,8 @@ class CityViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         response = super(CityViewSet, self).list(request, *args, **kwargs)
         response.template_name = 'admin/city/list.html'
+        if request.GET.get('select'):
+            response.template_name = 'admin/city/select_city.html'
         return response
 
     def create(self, request, *args, **kwargs):

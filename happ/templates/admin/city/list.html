@@ -19,7 +19,7 @@
       <td>
         <a href="#" class="btn btn-warning btn-xs"><i class="fa fa-power-off"></i> Деактивировать </a>
         <a href="#" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/cities/{{item.id}}/"><i class="fa fa-trash-o"></i> Удалить </a>
+        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/cities/{{item.id}}/" ic-indicator="indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
   {% endfor %}

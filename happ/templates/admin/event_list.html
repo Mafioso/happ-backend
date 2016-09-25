@@ -98,25 +98,10 @@
           </div>
 
           <!-- start project list -->
-          <table id="events_table" class="table table-striped projects">
-            <thead>
-              <tr>
-                <th style="width: 1%">№</th>
-                <th>Фото</th>
-                <th style="width: 20%">Название мероприятия</th>
-                <th>Автор</th>
-                <th>Город</th>
-                <th>Место проведения</th>
-                <th>Дата</th>
-                <th>Дата создания</th>
-                <th>Статус</th>
-                <th style="width: 20%">Действия</th>
-              </tr>
-            </thead>
-            <tbody id="event-table-body">
-              <tr ic-append-from="/api/v1/events.html/?page=2" ic-trigger-on="scrolled-into-view" ic-target="#event-table-body" ic-indicator="#indicator"></tr>
-            </tbody>
-          </table>
+          <div id="event-table" ic-get-from="/api/v1/admin/events.html" ic-src="/api/v1/admin/events.html" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
+
+          </div>
+
           <center> <!-- lol -->
             <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
           </center>

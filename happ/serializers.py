@@ -108,13 +108,16 @@ class InterestSerializer(serializers.DocumentSerializer):
 
     def update(self, instance, validated_data):
         parent_id = validated_data.pop('parent_id')
-        local_cities = validated_data.pop('local_cities')
+        local_cities = None
+        if validated_data.get('local_cities') :
+            local_cities = validated_data.pop('local_cities')
         interest = super(InterestSerializer, self).update(instance, validated_data)
         if parent_id:
             parent = Interest.objects.get(id=parent_id)
             interest.parent = parent
-        local_cities = City.objects.filter(id__in=local_cities)
-        interest.local_cities = local_cities
+        if local_cities:
+            local_cities = City.objects.filter(id__in=local_cities)
+            interest.local_cities = local_cities
         interest.save()
         return interest
 
