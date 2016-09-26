@@ -671,6 +671,8 @@ class Tests(APISimpleTestCase):
                 votes_num=(5-i),
                 start_date='20160520',
                 start_time='0{}3000'.format(i),
+                min_price=i,
+                max_price=i+10,
                 city=c1,
                 interests=[random.choice(ins_set)]
             )
@@ -691,7 +693,7 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('events-feed')
 
-        # simple
+        ## simple
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -702,7 +704,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][3]['title'], 't1')
         self.assertEqual(response.data['results'][4]['title'], 't0')
 
-        # ordering
+        ## ordering
         url = prepare_url('events-feed', query={'order': 'popular'})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -713,13 +715,36 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][3]['title'], 't3')
         self.assertEqual(response.data['results'][4]['title'], 't4')
 
-        # filtering
+        ## filtering
+        # start_time
         url = prepare_url('events-feed', query={'start_time': '033000'})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 2)
         self.assertEqual(response.data['results'][0]['title'], 't4')
         self.assertEqual(response.data['results'][1]['title'], 't3')
+        # min_price
+        url = prepare_url('events-feed', query={'min_price': 1})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(response.data['results'][0]['title'], 't4')
+        self.assertEqual(response.data['results'][1]['title'], 't3')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+        self.assertEqual(response.data['results'][3]['title'], 't1')
+        # max_price
+        url = prepare_url('events-feed', query={'max_price': 11})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['title'], 't1')
+        self.assertEqual(response.data['results'][1]['title'], 't0')
+        # min_price and max_price
+        url = prepare_url('events-feed', query={'min_price': 1, 'max_price': 11})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 't1')
 
     def test_get_events_featured(self):
         """
