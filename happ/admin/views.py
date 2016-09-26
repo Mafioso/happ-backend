@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from .mixins import JWTAuthRequiredMixin
 
 
-class IndexView(JWTAuthRequiredMixin, TemplateView):
+class IndexView(TemplateView):
     template_name = 'admin/index.html'
     #context_object_name = 'latest_question_list'
 
@@ -17,7 +17,15 @@ class IndexView(JWTAuthRequiredMixin, TemplateView):
 
         return context
 
-class LoginView(JWTAuthRequiredMixin, TemplateView):
+class StatiscticView(TemplateView):
+    template_name = 'statisctic.html'
+
+    def get_context_data(self, * args, ** kwargs):
+        context = super(StatiscticView, self).get_context_data(**kwargs)
+
+        return context
+
+class LoginView(TemplateView):
     template_name = 'admin/login.html'
 
     def get_context_data(self, * args, ** kwargs):
@@ -31,6 +39,14 @@ class EventListView(JWTAuthRequiredMixin, TemplateView):
 
     def get_context_data(self, * args, ** kwargs):
         context = super(EventListView, self).get_context_data(**kwargs)
+
+        return context
+
+class EventCreateView(TemplateView):
+    template_name = 'admin/events/create.html'
+
+    def get_context_data(self, * args, ** kwargs):
+        context = super(EventCreateView, self).get_context_data(**kwargs)
 
         return context
 

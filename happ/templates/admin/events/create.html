@@ -1,0 +1,199 @@
+{% extends 'admin/base.html' %}
+{% block main %}
+<div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Создать событие</h3>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_content">
+                    <br />
+                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="event-name">Название события <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" id="event-name" name="event-name" required="required" class="form-control col-md-7 col-xs-12">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Тип проведения мероприятия</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select id="event-type" class="form-control col-md-7 col-xs-12" name="event-type">
+                            <option>Мастер-класс</option>
+                            <option>Лекция</option>
+                            <option>Семинар</option>
+                            <option>Выставка</option>
+                            <option>Опера</option>
+                            <option>Балет</option>
+                            <option>Тренинг</option>
+                            <option>Кинопоказ</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="city-name">Город проведения <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select id="city-name" name="city-name" required="required" class="form-control col-md-7 col-xs-12">
+                            <option>Алматы</option>
+                            <option>Астана</option>
+                            <option>Нью Йорк</option>
+                            <option>Лондон</option>
+                            <option>Париж</option>
+                            <option>Пекин</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="date" class="control-label col-md-3 col-sm-3 col-xs-12">Дата проведения мероприятия</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="date" class="date-picker form-control col-md-7 col-xs-12" type="text" name="date">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="end-on-start" class="control-label col-md-3 col-sm-3 col-xs-12">Можно посетить в любое время?</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="checkbox" class="form-control flat" name="end-on-start">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Стоимость билета</label>
+                        <div class="col-md-2 col-sm-3 col-xs-6">
+                          <label for="from-price" class="control-label col-md-1 col-sm-3 col-xs-12">От</label>
+                          <input id="from-price" class="form-control col-md-7 col-xs-12" type="text" name="from-price">
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-xs-6">
+                          <label for="to-price" class="control-label col-md-1 col-sm-3 col-xs-12">До</label>
+                          <input id="to-price" class="form-control col-md-7 col-xs-12" type="text" name="to-price">
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-xs-6">
+                          <label for="currency-price" class="control-label col-md-1 col-sm-3 col-xs-12">Валюта</label>
+                          <select id="currency-price" class="form-control col-md-7 col-xs-12" name="currency-price">
+                            <option>Тенге</option>
+                            <option>Доллар</option>
+                            <option>Евро</option>
+                            <option>Рубли</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Интерес</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select class="select2_group form-control">
+                            <optgroup label="Спорт">
+                              <option value="AK">Футбол</option>
+                              <option value="HI">Баскетбол</option>
+                            </optgroup>
+                            <optgroup label="Театр">
+                              <option value="CA">Спектакли</option>
+                              <option value="NV">Показы</option>
+                              <option value="OR">Опера</option>
+                              <option value="WA">Блабла</option>
+                            </optgroup>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Описание</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <textarea id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name" rows="10"></textarea>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Телефоны организаторов</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Email</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Веб сайт мероприятия или организатора</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Ссылка на регистрацию</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="age-restriction" class="control-label col-md-3 col-sm-3 col-xs-12">Возрастные ограничения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <select id="age-restriction" class="form-control col-md-7 col-xs-12" name="age-restriction">
+                            <option>0+</option>
+                            <option>5+</option>
+                            <option>12+</option>
+                            <option>18+</option>
+                            <option>21+</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                          <button type="submit" class="btn btn-primary">Отменить</button>
+                          <button type="submit" class="btn btn-success">Создать</button>
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+{% endblock%}
+
+{% block javascript %}
+<!-- jQuery -->
+    <script src="/static/js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- Custom -->
+    <script src="/static/js/custom.js"></script>
+
+    <script src="/static/js/moment/moment.min.js"></script>
+    <script type="text/javascript" src="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+
+
+    <script>
+      $(document).ready(function() {
+        $('#date').daterangepicker({
+            showDropdowns: true,
+            timePicker: true,
+            timePicker24Hour: true,
+            timePickerIncrement: 10,
+            locale: {
+              format: 'MM/DD/YYYY hh:mm'
+            }
+        }, function(start, end, label) {
+          console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+        });
+      });
+    </script>
+{% endblock %}
