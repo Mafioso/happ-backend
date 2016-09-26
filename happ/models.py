@@ -99,7 +99,7 @@ class User(AbstractUser, HappBaseDocument):
         return Event.objects(in_favourites=self)
 
     def get_feed(self):
-        return Event.objects(city=self.settings.city, interests__in=self.current_interests)
+        return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.NORMAL, Event.ADS])
 
 
 class Interest(HappBaseDocument):

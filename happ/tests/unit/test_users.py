@@ -75,9 +75,12 @@ class Tests(SimpleTestCase):
         u.save()
 
         for i in range(3):
-            EventFactory(city=c1, interests=[random.choice(ins_set2)])
+            if i % 2 == 1:
+                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=Event.FEATURED)
+            else:
+                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]))
 
         for i in range(4):
             EventFactory(city=c2, interests=[random.choice(ins_set3)])
 
-        self.assertEqual(len(u.get_feed()), 3)
+        self.assertEqual(len(u.get_feed()), 2)
