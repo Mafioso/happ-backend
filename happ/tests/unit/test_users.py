@@ -84,3 +84,44 @@ class Tests(SimpleTestCase):
             EventFactory(city=c2, interests=[random.choice(ins_set3)])
 
         self.assertEqual(len(u.get_feed()), 2)
+
+    def test_get_featured(self):
+        """
+        we can take featured events for a particular user
+        """
+        c1 = CityFactory()
+        c2 = CityFactory()
+
+        # this set is not used
+        ins_set1 = map(lambda _: InterestFactory(), range(5))
+
+        # this set is assigned to user for current city
+        ins_set2 = map(lambda _: InterestFactory(), range(3))
+
+        # this set is assigned to user but for an another city
+        ins_set3 = map(lambda _: InterestFactory(), range(4))
+
+        ci1 = CityInterestsFactory(c=c1, ins=ins_set2)
+        ci2 = CityInterestsFactory(c=c2, ins=ins_set3)
+
+        u = UserFactory()
+        u.interests = [ci1, ci2]
+        u.settings.city = c1
+        u.save()
+
+        for i in range(3):
+            if i % 2 == 1:
+                # this event is going to be in final set because one of the interest matches
+                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=Event.FEATURED)
+
+                # this event will be skipped because no one interest matches user's current set
+                EventFactory(city=c1, interests=[random.choice(ins_set3)], type=Event.FEATURED)
+            else:
+                # this event is not featured
+                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=random.choice([Event.NORMAL, Event.ADS]))
+
+        for i in range(4):
+            # NORMAL events by default
+            EventFactory(city=c2, interests=[random.choice(ins_set3)])
+
+        self.assertEqual(len(u.get_featured()), 1)

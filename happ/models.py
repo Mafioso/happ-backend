@@ -101,6 +101,9 @@ class User(AbstractUser, HappBaseDocument):
     def get_feed(self):
         return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.NORMAL, Event.ADS])
 
+    def get_featured(self):
+        return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.FEATURED])
+
 
 class Interest(HappBaseDocument):
     title = StringField()
