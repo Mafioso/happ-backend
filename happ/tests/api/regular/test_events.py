@@ -720,3 +720,39 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['count'], 2)
         self.assertEqual(response.data['results'][0]['title'], 't4')
         self.assertEqual(response.data['results'][1]['title'], 't3')
+
+    def test_get_events_featured(self):
+        """
+        we can get featured events
+        """
+        c1 = CityFactory()
+        ins_set = map(lambda _: InterestFactory(), range(3))
+        ci1 = CityInterestsFactory(c=c1, ins=ins_set)
+
+        for i in range(5):
+            EventFactory(
+                city=c1,
+                interests=[random.choice(ins_set)],
+                type=Event.FEATURED,
+            )
+
+        u = UserFactory()
+        u.interests = [ci1]
+        u.settings.city = c1
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-featured')
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
