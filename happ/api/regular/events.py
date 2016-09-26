@@ -9,14 +9,19 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
+from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
+from happ.filters import EventFilter
+from happ.decorators import patch_queryset, patch_order
 from happ.serializers import EventSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
+    filter_backends = (filters.MongoFilterBackend,)
+    filter_class = EventFilter
 
     def retrieve(self, request, *args, **kwargs):
         response = super(EventViewSet, self).retrieve(request, *args, **kwargs)
@@ -199,14 +204,12 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
     @list_route(methods=['get'], url_path='favourites')
+    @patch_queryset(lambda self, x: self.request.user.get_favourites())
     def favourites(self, request, *args, **kwargs):
-        queryset = self.request.user.get_favourites()
+        return super(EventViewSet, self).list(request, *args, **kwargs)
 
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-
-        return Response(serializer.data)
+    @list_route(methods=['get'], url_path='feed')
+    @patch_queryset(lambda self, x: self.request.user.get_feed())
+    @patch_order({'default': ('-start_date', '-start_time', ), 'popular': ('-start_date', '-votes_num')})
+    def feed(self, request, *args, **kwargs):
+        return super(EventViewSet, self).list(request, *args, **kwargs)

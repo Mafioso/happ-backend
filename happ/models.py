@@ -98,6 +98,9 @@ class User(AbstractUser, HappBaseDocument):
     def get_favourites(self):
         return Event.objects(in_favourites=self)
 
+    def get_feed(self):
+        return Event.objects(city=self.settings.city, interests__in=self.current_interests)
+
 
 class Interest(HappBaseDocument):
     title = StringField()

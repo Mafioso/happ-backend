@@ -1,7 +1,9 @@
+import random
+
 from django.test import SimpleTestCase
 
 from happ.models import Event
-from happ.factories import UserFactory, CityFactory, CityInterestsFactory, EventFactory
+from happ.factories import UserFactory, CityFactory, CityInterestsFactory, EventFactory, InterestFactory
 from .. import *
 
 
@@ -47,3 +49,35 @@ class Tests(SimpleTestCase):
 
         Event.objects.all()[0].remove_from_favourites(u)
         self.assertEqual(len(u.get_favourites()), 3)
+
+    def test_get_feed(self):
+        """
+        we can take feed for a particular user
+        """
+        c1 = CityFactory()
+        c2 = CityFactory()
+
+        # this set is not used
+        ins_set1 = map(lambda _: InterestFactory(), range(5))
+
+        # this set is assigned to user for current city
+        ins_set2 = map(lambda _: InterestFactory(), range(3))
+
+        # this set is assigned to user but for an another city
+        ins_set3 = map(lambda _: InterestFactory(), range(4))
+
+        ci1 = CityInterestsFactory(c=c1, ins=ins_set2)
+        ci2 = CityInterestsFactory(c=c2, ins=ins_set3)
+
+        u = UserFactory()
+        u.interests = [ci1, ci2]
+        u.settings.city = c1
+        u.save()
+
+        for i in range(3):
+            EventFactory(city=c1, interests=[random.choice(ins_set2)])
+
+        for i in range(4):
+            EventFactory(city=c2, interests=[random.choice(ins_set3)])
+
+        self.assertEqual(len(u.get_feed()), 3)

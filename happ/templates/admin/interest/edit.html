@@ -1,0 +1,52 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+      </button>
+      <h4 class="modal-title" id="myModalLabel">Редактировать Интерес</h4>
+    </div>
+    <div class="modal-body">
+      <form id="interest-form" data-parsley-validate class="form-horizontal form-label-left">
+
+        <div class="form-group">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="event-name">Название интереса <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <input type="text" id="event-name" name="title" required="required" class="form-control col-md-7 col-xs-12" value="{{title}}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Категория</label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <select id="category-name" name="parent_id" required="required" class="form-control col-md-7 col-xs-12" ic-get-from="/api/v1/admin/interests/categories.html?select=true" ic-target="#category-name" ic-trigger-on="load" value="{{parent_id}}">
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-md-3 col-sm-3 col-xs-12" for="city-name">Глобальный интерес? <span class="required">*</span>
+          </label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <input type="checkbox" class="form-control flat" name="is_global" value="{{is_global}}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Город</label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <select id="city-name" name="local_cities" required="required" class="form-control col-md-7 col-xs-12" ic-get-from="/api/v1/admin/cities.html?select=true" ic-target="#city-name" ic-trigger-on="load" value="{{local_cities}}">
+            </select>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+      <button type="button" class="btn btn-primary" ic-patch-to="/api/v1/admin/interests/" ic-include="#interest-form" ic-target="#success" ic-on-success="$('#create-form').modal('hide');"  ic-indicator="#indicator3">Сохранить</button>
+    </div>
+    <div id="success" style="display:none;">
+
+    </div>
+
+  </div>
+</div>

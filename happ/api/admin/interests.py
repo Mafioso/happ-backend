@@ -28,7 +28,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         return response
 
     @list_route(methods=['get'], url_path='categories')
-    @patch_queryset(lambda x: x.filter(parent=None))
+    @patch_queryset(lambda self, x: x.filter(parent=None))
     @patch_serializer_class(InterestParentSerializer)
     def categories(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).list(request, *args, **kwargs)
@@ -39,7 +39,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         return response
 
     @list_route(methods=['get'], url_path='children')
-    @patch_queryset(lambda x: x.filter(parent__ne=None))
+    @patch_queryset(lambda self, x: x.filter(parent__ne=None))
     @patch_serializer_class(InterestChildSerializer)
     def children(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).list(request, *args, **kwargs)

@@ -1,3 +1,4 @@
+import random
 from datetime import datetime, timedelta
 
 from django.utils.http import urlsafe_base64_encode
@@ -16,6 +17,7 @@ from happ.factories import (
     EventFactory,
     LocalizedFactory,
     InterestFactory,
+    CityInterestsFactory,
 )
 from happ.tests import *
 
@@ -652,3 +654,69 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 4)
+
+    def test_get_events_feed(self):
+        """
+        we can get events feed
+        we can get sorted by popularity feed
+        we can filter feed
+        """
+        c1 = CityFactory()
+        ins_set = map(lambda _: InterestFactory(), range(3))
+        ci1 = CityInterestsFactory(c=c1, ins=ins_set)
+
+        for i in range(5):
+            EventFactory(
+                title='t{}'.format(i),
+                votes_num=(5-i),
+                start_date='20160520',
+                start_time='0{}3000'.format(i),
+                city=c1,
+                interests=[random.choice(ins_set)]
+            )
+
+        u = UserFactory()
+        u.interests = [ci1]
+        u.settings.city = c1
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-feed')
+
+        # simple
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['results'][0]['title'], 't4')
+        self.assertEqual(response.data['results'][1]['title'], 't3')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+        self.assertEqual(response.data['results'][3]['title'], 't1')
+        self.assertEqual(response.data['results'][4]['title'], 't0')
+
+        # ordering
+        url = prepare_url('events-feed', query={'order': 'popular'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['results'][0]['title'], 't0')
+        self.assertEqual(response.data['results'][1]['title'], 't1')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+        self.assertEqual(response.data['results'][3]['title'], 't3')
+        self.assertEqual(response.data['results'][4]['title'], 't4')
+
+        # filtering
+        url = prepare_url('events-feed', query={'start_time': '033000'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['title'], 't4')
+        self.assertEqual(response.data['results'][1]['title'], 't3')
