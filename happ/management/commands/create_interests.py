@@ -15,7 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('n', type=int)
 
     def handle(self, *args, **options):
-        ins = [InterestFactory.build() for x in range(options['n'])]:
+        ins = [InterestFactory.build() for x in range(options['n'])]
         Interest.objects.insert(ins)
         self.stdout.write(
                 self.style.SUCCESS(
