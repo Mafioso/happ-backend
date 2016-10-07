@@ -158,6 +158,8 @@ JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,
 }
 
+LOGIN_URL = 'admin-login'
+
 AUTHENTICATION_BACKENDS = ('happ.auth.backends.HappAuthBackend', )
 
 DEFAULT_FROM_EMAIL = 'askhat.omarov91@gmail.com'
