@@ -67,6 +67,7 @@ class User(AbstractUser, HappBaseDocument):
         'queryset_class': UserQuerySet
     }
     GENDERS = (MALE, FEMALE) = range(2)
+    ROLES = (REGULAR, ORGANIZER, MODERATOR, ADMINISTRATOR, ROOT) = range(5)
 
     username = StringField(required=True, unique=True)
     fullname = StringField()
@@ -80,6 +81,7 @@ class User(AbstractUser, HappBaseDocument):
     settings = EmbeddedDocumentField(UserSettings)
     is_active = BooleanField(default=True)
     last_login = DateTimeField(blank=True, null=True)
+    role = IntField(choices=ROLES, default=REGULAR)
 
     @property
     def fn(self):

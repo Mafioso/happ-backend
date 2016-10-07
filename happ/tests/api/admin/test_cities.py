@@ -17,13 +17,13 @@ class Tests(APISimpleTestCase):
         """
         Resourse is not available without authentication
         """
-        url = prepare_url('cities-list')
+        url = prepare_url('admin-cities-list')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_with_auth(self):
+    def test_get_with_auth_not_staff(self):
         """
-        Resourse is available with authentication only
+        Resourse is not available for non-staff users
         """
         u = UserFactory()
         u.set_password('123')
@@ -37,7 +37,28 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('cities-list')
+        url = prepare_url('admin-cities-list')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_get_with_auth(self):
+        """
+        Resourse is available with authentication only and for staff
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('admin-cities-list')
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -54,7 +75,7 @@ class Tests(APISimpleTestCase):
         city = CityFactory(name='Almaty')
         city.save()
 
-        u = UserFactory()
+        u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
 
@@ -66,7 +87,7 @@ class Tests(APISimpleTestCase):
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
 
-        url = prepare_url('cities-list', query={'search': 'petro'})
+        url = prepare_url('admin-cities-list', query={'search': 'petro'})
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -78,25 +99,46 @@ class Tests(APISimpleTestCase):
         """
         n = City.objects.count()
         country = CountryFactory()
-        u = UserFactory()
+        u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+
+        url = prepare_url('admin-cities-list')
+
+        city_data = {
+            'name': 'NewCity name',
+            'country_id': str(country.id),
+        }
 
         auth_url = prepare_url('login')
         data = {
             'username': u.username,
             'password': '123'
         }
+
+        # restricted for moderator
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
-
-        url = prepare_url('admin-cities-list')
-        data = {
-            'name': 'NewCity name',
-            'country_id': str(country.id),
-        }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.post(url, data=data, format='json')
+        response = self.client.post(url, data=city_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # restricted for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=city_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=city_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(City.objects.count(), n+1)
         self.assertEqual(response.data['country_name'], country.name)
@@ -107,7 +149,7 @@ class Tests(APISimpleTestCase):
         """
         country = CountryFactory()
         city = CityFactory()
-        u = UserFactory()
+        u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
 
@@ -139,7 +181,7 @@ class Tests(APISimpleTestCase):
         """
         we can delete city
         """
-        u = UserFactory()
+        u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
 

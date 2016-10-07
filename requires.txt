@@ -8,6 +8,7 @@ django-celery==3.1.17
 django-filter==0.14.0
 django-rest-framework-mongoengine==3.3.0
 djangorestframework==3.4.4
+djangorestframework-composed-permissions==0.1
 djangorestframework-jwt==1.8.0
 ecdsa==0.13
 factory-boy==2.7.0
