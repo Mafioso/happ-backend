@@ -16,7 +16,7 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retriev
     filter_backends = (filters.MongoSearchFilter, )
     search_fields = ('name', )
 
-    @detail_route(methods=['get'], url_path='set')
+    @detail_route(methods=['post'], url_path='set')
     def set(self, request, id=None, *args, **kwargs):
         user = request.user
         try:

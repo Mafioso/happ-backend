@@ -13,7 +13,7 @@ class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
     serializer_class = CurrencySerializer
     queryset = Currency.objects.all()
 
-    @detail_route(methods=['get'], url_path='set')
+    @detail_route(methods=['post'], url_path='set')
     def set(self, request, id=None, *args, **kwargs):
         user = request.user
         try:

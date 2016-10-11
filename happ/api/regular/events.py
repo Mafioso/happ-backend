@@ -147,7 +147,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @detail_route(methods=['get'], url_path='copy')
+    @detail_route(methods=['post'], url_path='copy')
     def copy(self, request, *args, **kwargs):
         instance = self.get_object()
         new_instance = instance.copy()
@@ -159,7 +159,7 @@ class EventViewSet(viewsets.ModelViewSet):
     def upload(self, request, *args, **kwargs):
         return Response(request.data.getlist('images', []))
 
-    @detail_route(methods=['get'], url_path='upvote')
+    @detail_route(methods=['post'], url_path='upvote')
     def upvote(self, request, *args, **kwargs):
         instance = self.get_object()
         flag = instance.upvote(self.request.user)
@@ -170,7 +170,7 @@ class EventViewSet(viewsets.ModelViewSet):
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @detail_route(methods=['get'], url_path='downvote')
+    @detail_route(methods=['post'], url_path='downvote')
     def downvote(self, request, *args, **kwargs):
         instance = self.get_object()
         flag = instance.downvote(self.request.user)
@@ -181,7 +181,7 @@ class EventViewSet(viewsets.ModelViewSet):
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @detail_route(methods=['get'], url_path='fav')
+    @detail_route(methods=['post'], url_path='fav')
     def fav(self, request, *args, **kwargs):
         instance = self.get_object()
         flag = instance.add_to_favourites(self.request.user)
@@ -192,7 +192,7 @@ class EventViewSet(viewsets.ModelViewSet):
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @detail_route(methods=['get'], url_path='unfav')
+    @detail_route(methods=['post'], url_path='unfav')
     def unfav(self, request, *args, **kwargs):
         instance = self.get_object()
         flag = instance.remove_from_favourites(self.request.user)

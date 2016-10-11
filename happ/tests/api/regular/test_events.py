@@ -505,7 +505,7 @@ class Tests(APISimpleTestCase):
         n = Event.objects.count()
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Event.objects.count(), (n+1))
         self.assertNotEqual(response.data['id'], str(e.id))
@@ -532,11 +532,11 @@ class Tests(APISimpleTestCase):
         url = prepare_url('events-upvote', kwargs={'id': str(e.id)})
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # we cannot upvote it again
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_downvote_event(self):
@@ -561,12 +561,12 @@ class Tests(APISimpleTestCase):
         url = prepare_url('events-downvote', kwargs={'id': str(e.id)})
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         # we cannot downvote before upvote
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         e.upvote(u)
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_fav_event(self):
@@ -591,11 +591,11 @@ class Tests(APISimpleTestCase):
         url = prepare_url('events-fav', kwargs={'id': str(e.id)})
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # we cannot add it to favourites again
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unfav_event(self):
@@ -620,12 +620,12 @@ class Tests(APISimpleTestCase):
         url = prepare_url('events-unfav', kwargs={'id': str(e.id)})
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         # we cannot remove from favourites before adding
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
         e.add_to_favourites(u)
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_favourite_events(self):
