@@ -25,4 +25,4 @@ class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
             )
         user.settings.currency = currency
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

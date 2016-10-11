@@ -168,7 +168,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('User has already upvoted this event.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['get'], url_path='downvote')
     def downvote(self, request, *args, **kwargs):
@@ -179,7 +179,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('User should upvote this event first.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['get'], url_path='fav')
     def fav(self, request, *args, **kwargs):
@@ -190,7 +190,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('User has already added this event to favourites.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['get'], url_path='unfav')
     def unfav(self, request, *args, **kwargs):
@@ -201,7 +201,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('User should add this event to favourites first.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(methods=['get'], url_path='favourites')
     @patch_queryset(lambda self, x: self.request.user.get_favourites())

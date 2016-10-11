@@ -41,4 +41,4 @@ class InterestViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         if not updated:
             city_interests = CityInterests(c=user.settings.city, ins=interests)
             user.update(push__interests=city_interests)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

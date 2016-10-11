@@ -533,7 +533,7 @@ class Tests(APISimpleTestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # we cannot upvote it again
         response = self.client.get(url, format='json')
@@ -567,7 +567,7 @@ class Tests(APISimpleTestCase):
 
         e.upvote(u)
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_fav_event(self):
         """
@@ -592,7 +592,7 @@ class Tests(APISimpleTestCase):
 
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         # we cannot add it to favourites again
         response = self.client.get(url, format='json')
@@ -626,7 +626,7 @@ class Tests(APISimpleTestCase):
 
         e.add_to_favourites(u)
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_favourite_events(self):
         """

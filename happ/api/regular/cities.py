@@ -28,4 +28,4 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retriev
             )
         user.settings.city = city
         user.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

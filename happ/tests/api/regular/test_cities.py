@@ -95,7 +95,7 @@ class Tests(APISimpleTestCase):
         url = prepare_url('cities-set', kwargs={'id': str(city.id)})
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         u = User.objects.get(id=u.id)
         self.assertEqual(u.settings.city, city)
