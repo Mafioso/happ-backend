@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import datetime
 
+from django.utils.translation import ugettext_lazy as _
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -175,14 +177,16 @@ ANYMAIL = {
 
 EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
 
-HAPP_LANGUAGES = (
-    'en',
-    'ru',
-    'fr',
-    'it',
-    'es',
-    'de',
-)
+HAPP_LANGUAGES_VERBOSE = [
+    {'code': 'en', 'text': _('English'), },
+    {'code': 'ru', 'text': _('Russian'), },
+    {'code': 'fr', 'text': _('French'), },
+    {'code': 'it', 'text': _('Italian'), },
+    {'code': 'es', 'text': _('Spanish'), },
+    {'code': 'de', 'text': _('German'), },
+]
+
+HAPP_LANGUAGES = map(lambda x: x['code'], HAPP_LANGUAGES_VERBOSE)
 
 DATE_STRING_FIELD_FORMAT = "%Y%m%d"
 TIME_STRING_FIELD_FORMAT = "%H%M%S"
