@@ -21,7 +21,7 @@ def to_int(value, default='0'):
 
 @register.filter(name='paginate')
 def paginate(number):
-    x = (number/settings.PAGE_SIZE)+1
+    x = ((number-1)/settings.PAGE_SIZE)+1
     if x>10:
         x=10
     return range(x)

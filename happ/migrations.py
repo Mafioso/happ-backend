@@ -106,3 +106,10 @@ def migration__event__add_index_by_infavourites__0007():
         ('in_favourites', pymongo.ASCENDING),
         ('end_date', pymongo.ASCENDING),
         ('votes_num', pymongo.DESCENDING)], background=True)
+
+
+def migration__user__set_default_role__0008():
+    user_coll = get_db()['user']
+    for user_data in user_coll.find({}):
+        if 'role' not in user_data:
+            user_coll.update({'_id': user_data['_id']}, {'$set': {'role': 0}})

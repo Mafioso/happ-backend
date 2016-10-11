@@ -1,11 +1,12 @@
 from rest_framework import status
+from rest_framework.decorators import list_route
 from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.models import User
 from happ.policies import StaffPolicy, RootAdministratorPolicy
-from happ.decorators import patch_permission_classes
+from happ.decorators import patch_permission_classes, patch_queryset
 from happ.serializers import UserSerializer
 
 
@@ -59,9 +60,19 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         return super(UserViewSet, self).destroy(request, *args, **kwargs)
 
+    @patch_queryset(lambda self, x: x.filter(role__in=[User.REGULAR, User.ORGANIZER]))
     def list(self, request, *args, **kwargs):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
         response.template_name = 'admin/users/list.html'
+
+        return response
+
+    @list_route(methods=['get'], url_path='organizers')
+    @patch_queryset(lambda self, x: x.filter(role__in=[User.ORGANIZER]))
+    def organizers(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).list(request, *args, **kwargs)
+        response.data['page'] = int(request.GET.get('page', 1))
+        response.template_name = 'admin/users/organizers.html'
 
         return response

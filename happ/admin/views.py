@@ -75,3 +75,6 @@ class InterestListView(JWTAuthRequiredMixin, TemplateView):
 
 class UserListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/users_list.html'
+
+class OrganizersListView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/users_organizers.html'

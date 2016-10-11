@@ -61,6 +61,56 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_users_list(self):
+        """
+        it returns only REGULAR and ORGANIZER users
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        u = UserFactory(role=User.REGULAR)
+        u = UserFactory(role=User.ORGANIZER)
+
+        url = prepare_url('admin-users-list')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+
+    def test_get_users_organizers(self):
+        """
+        it returns only ORGANIZER users
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        u = UserFactory(role=User.REGULAR)
+        u = UserFactory(role=User.ORGANIZER)
+
+        url = prepare_url('admin-users-organizers')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+
     def test_create_staff_user(self):
         """
         we can create staff user

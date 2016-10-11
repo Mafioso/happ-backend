@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^category/list/$', views.CityListView.as_view(template_name='admin/categories_list.html'), name="category_list"),
     url(r'^interest/list/$', views.InterestListView.as_view(template_name='admin/interest_list.html'), name="interest_list"),
     url(r'^users/list/$', views.UserListView.as_view(), name="users_list"),
+    url(r'^users/organizers/$', views.OrganizersListView.as_view(), name="users_organizers"),
 ]
