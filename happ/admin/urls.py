@@ -7,7 +7,7 @@ urlpatterns = [
     #url(r'^admin/', admin.site.urls),
     url(r'^$', views.IndexView.as_view(), name="index"),
     url(r'^statisctic/$', views.StatiscticView.as_view(), name="statisctic"),
-    url(r'^login/$', views.IndexView.as_view(), name="admin-login"),
+    url(r'^login/$', views.LoginView.as_view(), name="admin-login"),
     url(r'^event/list/$', views.EventListView.as_view(), name="event_list"),
     url(r'^event/create/$', views.EventCreateView.as_view(), name="event_create"),
     url(r'^city/list/$', views.CityListView.as_view(), name="city_list"),

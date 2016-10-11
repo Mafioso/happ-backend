@@ -2,9 +2,10 @@ from django.conf.urls import url
 
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
-from .views import UserRegister, PasswordChange, PasswordReset, PasswordResetConfirm
+from .views import UserRegister, PasswordChange, PasswordReset, PasswordResetConfirm, AdminLogin
 
 urlpatterns = [
+    url(r'admin/login/$', AdminLogin.as_view(), name='admin-login-api'),
     url(r'login/$', obtain_jwt_token, name='login'),
     url(r'refresh/$', refresh_jwt_token, name='refresh'),
     url(r'register/$', UserRegister.as_view(), name='register'),

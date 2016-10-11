@@ -20,7 +20,7 @@
       <div class="login_wrapper">
         <div class="animate form login_form">
           <section class="login_content">
-            <form id="auth" action="/api/v1/auth/login" method="POST">
+            <form id="auth" action="/api/v1/auth/admin/login" method="POST">
               <h1>Админ панель</h1>
               <div>
                 <input type="text" name="username" class="form-control" placeholder="Логин" required="" />
@@ -59,7 +59,7 @@
   <script type="text/javascript">
     $(document).ready(function(){
       $('form').submit(function(event){
-        $.post( "/api/v1/auth/login/", $( "#auth" ).serialize(), function( data ) {
+        $.post( "/api/v1/auth/admin/login/", $( "#auth" ).serialize(), function( data ) {
           document.cookie = "sessionid=JWT "+data.token+"; path=/";
           window.location = "/";
         });

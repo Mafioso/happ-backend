@@ -7,14 +7,17 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
+from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework_jwt.settings import api_settings
 
+from happ.models import User
 from happ.serializers import UserSerializer, UserPayloadSerializer
 
 from .forms import HappPasswordResetForm, HappSetPasswordForm, PasswordChangeForm
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+jwt_response_payload_handler = api_settings.JWT_RESPONSE_PAYLOAD_HANDLER
 
 
 class UserRegister(CreateAPIView):
@@ -121,6 +124,7 @@ class PasswordResetConfirm(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+
 class PasswordChange(APIView):
     def post(self, request, format=None):
         """
@@ -138,3 +142,19 @@ class PasswordChange(APIView):
                 {'error_message': _('Invalid data.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class AdminLogin(ObtainJSONWebToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            user = serializer.object.get('user') or request.user
+            if user.role >= User.MODERATOR:
+                token = serializer.object.get('token')
+                response_data = jwt_response_payload_handler(token, user, request)
+
+                return Response(response_data)
+            return Response({'error_message': _('Cannot authenticate')}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
