@@ -9,7 +9,7 @@ from happ.models import Currency
 from happ.serializers import CurrencySerializer
 
 
-class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = CurrencySerializer
     queryset = Currency.objects.all()
 
