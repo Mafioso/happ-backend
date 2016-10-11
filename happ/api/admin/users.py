@@ -58,3 +58,10 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         return super(UserViewSet, self).destroy(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).list(request, *args, **kwargs)
+        response.data['page'] = int(request.GET.get('page', 1))
+        response.template_name = 'admin/users/list.html'
+
+        return response

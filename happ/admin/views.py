@@ -72,3 +72,6 @@ class InterestListView(JWTAuthRequiredMixin, TemplateView):
         context = super(InterestListView, self).get_context_data(**kwargs)
 
         return context
+
+class UserListView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/users_list.html'
