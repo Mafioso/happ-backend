@@ -156,6 +156,7 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
 
 class UserSerializer(serializers.DocumentSerializer):
     # read only fields
+    fn = drf_serializers.CharField(read_only=True)
     interests = InterestSerializer(source='current_interests', many=True, read_only=True)
     settings = UserSettingsSerializer(read_only=True)
 

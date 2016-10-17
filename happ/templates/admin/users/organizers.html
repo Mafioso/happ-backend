@@ -6,6 +6,7 @@
       <th>Полное имя</th>
       <th>Ник</th>
       <th>E-mail</th>
+      <th>Телефон</th>
       <th style="width: 30%">Действия</th>
     </tr>
   </thead>
@@ -15,10 +16,10 @@
       <th scope="row">{{forloop.counter|page_counter:page}}</th>
       <td>{{item.fn}}</td>
       <td>{{item.username}}</td>
-      <td>{{item.email}}</td>
+      <td>{{item.email|default_if_none:""}}</td>
+      <td>{{item.phone|default_if_none:""}}</td>
       <td>
-        <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="/api/v1/admin/users/{{item.id}}.html" ic-target="#create-form" ic-indicator="indicator-update"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
-        <a ic-delete-from="/api/v1/admin/users/{{item.id}}/" ic-indicator="delete_indicator" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Удалить <i id="delete_indicator" class="ic-indicator fa fa-spinner fa-spin" style="display: none"></i> </a>
+        {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-users-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-users-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}<a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-users-detail' id=item.id %}?format=html" ic-target="#create-form" ic-indicator="indicator-update"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
   {% endfor %}

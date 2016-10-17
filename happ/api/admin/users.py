@@ -68,6 +68,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return response
 
+    def retrieve(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).retrieve(request, *args, **kwargs)
+        print response.data
+        response.template_name = 'admin/users/edit.html'
+        return response
+
     @list_route(methods=['get'], url_path='organizers')
     @patch_queryset(lambda self, x: x.filter(role__in=[User.ORGANIZER]))
     def organizers(self, request, *args, **kwargs):
