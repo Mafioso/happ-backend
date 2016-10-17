@@ -42,7 +42,8 @@
           {{item.date_created}}
         </td>
         <td>
-          <button type="button" class="btn btn-success btn-xs">{{item.status}}</button>
+          {{item.status | event_status }}
+          {% if item.status == 0 %}<a href="#" class="btn btn-success btn-xs" ic-post-to="{% url 'admin-events-approve' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-check"></i> Утвердить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a><a href="#" class="btn btn-danger btn-xs" ic-post-to="{% url 'admin-events-reject' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-close"></i> Отклонить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
         </td>
         <td>
           <a href="/admin/event/{{item.id}}" class="btn btn-primary btn-xs"><i class="fa fa-eye"></i> Просмотр </a>

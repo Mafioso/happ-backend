@@ -229,6 +229,14 @@ class Event(HappBaseDocument):
         self.update(pull__in_favourites=user)
         return True
 
+    def approve(self):
+        self.status = Event.APPROVED
+        self.save()
+
+    def reject(self):
+        self.status = Event.REJECTED
+        self.save()
+
 
 class Localized(Document):
     language = StringField(default=settings.HAPP_LANGUAGES[0])

@@ -11,10 +11,13 @@ from rest_framework_mongoengine import viewsets
 
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
+from happ.policies import StaffPolicy
+from happ.decorators import patch_queryset
 from happ.serializers import EventSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
+    permission_classes = (StaffPolicy, )
     serializer_class = EventSerializer
     queryset = Event.objects.all()
 
@@ -148,71 +151,28 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @detail_route(methods=['get'], url_path='copy')
-    def copy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        new_instance = instance.copy()
-        serializer = self.get_serializer(new_instance)
-        new_instance.translate()
-        return Response(serializer.data)
-
     @list_route(methods=['post'], url_path='upload')
     def upload(self, request, *args, **kwargs):
         return Response(request.data.getlist('images', []))
 
-    @detail_route(methods=['get'], url_path='upvote')
-    def upvote(self, request, *args, **kwargs):
+    @list_route(methods=['get'], url_path='moderation')
+    @patch_queryset(lambda self, x: x.filter(status=Event.MODERATION))
+    def moderation(self, request, *args, **kwargs):
+        response = super(EventViewSet, self).list(request, *args, **kwargs)
+        response.template_name = 'admin/events/list.html'
+        response.data['page'] = request.GET.get('page', 1)
+        return response
+
+    @detail_route(methods=['post'], url_path='approve')
+    def approve(self, request, *args, **kwargs):
         instance = self.get_object()
-        flag = instance.upvote(self.request.user)
-        if not flag:
-            return Response(
-                {'error_message': _('User has already upvoted this event.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(status=status.HTTP_200_OK)
+        instance.approve()
 
-    @detail_route(methods=['get'], url_path='downvote')
-    def downvote(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['post'], url_path='reject')
+    def reject(self, request, *args, **kwargs):
         instance = self.get_object()
-        flag = instance.downvote(self.request.user)
-        if not flag:
-            return Response(
-                {'error_message': _('User should upvote this event first.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(status=status.HTTP_200_OK)
+        instance.reject()
 
-    @detail_route(methods=['get'], url_path='fav')
-    def fav(self, request, *args, **kwargs):
-        instance = self.get_object()
-        flag = instance.add_to_favourites(self.request.user)
-        if not flag:
-            return Response(
-                {'error_message': _('User has already added this event to favourites.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(status=status.HTTP_200_OK)
-
-    @detail_route(methods=['get'], url_path='unfav')
-    def unfav(self, request, *args, **kwargs):
-        instance = self.get_object()
-        flag = instance.remove_from_favourites(self.request.user)
-        if not flag:
-            return Response(
-                {'error_message': _('User should add this event to favourites first.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return Response(status=status.HTTP_200_OK)
-
-    @list_route(methods=['get'], url_path='favourites')
-    def favourites(self, request, *args, **kwargs):
-        queryset = self.request.user.get_favourites()
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-
-        return Response(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)

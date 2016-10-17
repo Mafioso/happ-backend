@@ -19,6 +19,10 @@ class EventListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/event_list.html'
 
 
+class EventModerationListView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/event_moderation_list.html'
+
+
 class EventCreateView(TemplateView):
     template_name = 'admin/events/create.html'
 

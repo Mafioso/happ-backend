@@ -118,3 +118,23 @@ class Tests(SimpleTestCase):
         self.assertTrue(e.remove_from_favourites(u))
         e = Event.objects.get(id=e.id)
         self.assertEqual(len(e.in_favourites), count)
+
+    def test_approve(self):
+        """
+        we can approve event
+        """
+        e = EventFactory()
+        self.assertEqual(e.status, Event.MODERATION)
+
+        e.approve()
+        self.assertEqual(e.status, Event.APPROVED)
+
+    def test_reject(self):
+        """
+        we can reject event
+        """
+        e = EventFactory()
+        self.assertEqual(e.status, Event.MODERATION)
+
+        e.reject()
+        self.assertEqual(e.status, Event.REJECTED)
