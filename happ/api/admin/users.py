@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.decorators import list_route
+from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 
@@ -76,3 +76,17 @@ class UserViewSet(viewsets.ModelViewSet):
         response.template_name = 'admin/users/organizers.html'
 
         return response
+
+    @detail_route(methods=['post'], url_path='activate')
+    def activate(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.activate()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['post'], url_path='deactivate')
+    def deactivate(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.deactivate()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

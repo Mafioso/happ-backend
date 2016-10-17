@@ -106,6 +106,14 @@ class User(AbstractUser, HappBaseDocument):
     def get_featured(self):
         return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.FEATURED])
 
+    def activate(self):
+        self.is_active = True
+        self.save()
+
+    def deactivate(self):
+        self.is_active = False
+        self.save()
+
 
 class Interest(HappBaseDocument):
     title = StringField()

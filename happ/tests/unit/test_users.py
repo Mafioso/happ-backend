@@ -125,3 +125,23 @@ class Tests(SimpleTestCase):
             EventFactory(city=c2, interests=[random.choice(ins_set3)])
 
         self.assertEqual(len(u.get_featured()), 1)
+
+    def test_activate(self):
+        """
+        we can activate user
+        """
+        u = UserFactory(is_active=False)
+        self.assertFalse(u.is_active)
+
+        u.activate()
+        self.assertTrue(u.is_active)
+
+    def test_deactivate(self):
+        """
+        we can deactivate user
+        """
+        u = UserFactory()
+        self.assertTrue(u.is_active)
+
+        u.deactivate()
+        self.assertFalse(u.is_active)
