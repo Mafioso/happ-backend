@@ -1,0 +1,35 @@
+<a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+  <i class="fa fa-bell-o"></i>
+  {% if count > 0 %}<span class="badge bg-green">{{ count }}</span>{% endif %}
+</a>
+<ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+{% for event in results|slice:":5" %}
+  <li>
+    <a>
+      <span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span>
+      <span>
+        <span>{{ event.title }}</span>
+      </span>
+      <span class="message">
+        {{ event.description|truncatechars:80}}
+      </span>
+    </a>
+  </li>
+{% empty %}
+  <li>
+    <div class="text-center">
+        <strong>Нет событий</strong>
+    </div>
+  </li>
+{% endfor %}
+{% if count > 0 %}
+  <li>
+    <div class="text-center">
+      <a href="{% url 'event_moderation_list' %}">
+        <strong>Посмотреть все события</strong>
+        <i class="fa fa-angle-right"></i>
+      </a>
+    </div>
+  </li>
+{% endif %}
+</ul>

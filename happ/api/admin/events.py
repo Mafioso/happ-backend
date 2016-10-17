@@ -160,6 +160,8 @@ class EventViewSet(viewsets.ModelViewSet):
     def moderation(self, request, *args, **kwargs):
         response = super(EventViewSet, self).list(request, *args, **kwargs)
         response.template_name = 'admin/events/list.html'
+        if request.GET.get('notification'):
+            response.template_name = 'admin/events/notification.html'
         response.data['page'] = request.GET.get('page', 1)
         return response
 
