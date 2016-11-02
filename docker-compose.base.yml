@@ -2,14 +2,13 @@ version: '2'
 services:
   media:
     image: busybox:ubuntu-14.04
-    command: mkdir -p /uploads && mkdir -p /uploads/tmp && mkdir -p /uploads/media
+    command: mkdir -p /uploads && mkdir -p /uploads/tmp && mkdir -p /uploads/media && mkdir -p /static
     volumes:
       - ./uploads:/uploads
+      - ./static:/static
 
   nginx:
     image: anguis/nginx:1.9.4
-    ports:
-      - "9000:80"
     restart: always
 
   rabbitmq:
@@ -29,7 +28,7 @@ services:
       - "27017:27017"
 
   app:
-    image: askhatomarov/happ:0.1
+    image: askhatomarov/happ:latest
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
@@ -37,15 +36,10 @@ services:
       - MONGODB_PORT=27017
       - MONGO_PORT_27017_TCP_ADDR=mongo
       - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
-    volumes:
-      - .:/happ
 
   celery:
-    image: askhatomarov/happ:0.1
-    working_dir: /happ
+    image: askhatomarov/happ:latest
     command: celery -A happ worker -l debug --concurrency=2
-    volumes:
-      - .:/happ
     environment:
       - C_FORCE_ROOT='true'
       - MONGODB_PORT=27017

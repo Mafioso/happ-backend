@@ -5,16 +5,33 @@ services:
       file: docker-compose.base.yml
       service: media
 
-  nginx:
+  nginx-media:
     extends:
       file: docker-compose.base.yml
       service: nginx
     volumes:
-      - /happ/conf/nginx/prod:/etc/nginx/sites-enabled
+      - ./conf/prod/nginx/media:/etc/nginx/sites-enabled
     volumes_from:
       - media
+      - app
     links:
       - app
+    ports:
+      - "9000:80"
+
+  nginx-static:
+    extends:
+      file: docker-compose.base.yml
+      service: nginx
+    volumes:
+      -  ./conf/prod/nginx/static:/etc/nginx/sites-enabled
+    volumes_from:
+      - media
+      - app
+    links:
+      - app
+    ports:
+      - "10000:80"
 
   rabbitmq:
     extends:
@@ -31,7 +48,7 @@ services:
       file: docker-compose.base.yml
       service: app
     image: askhatomarov/happ:latest
-    command: uwsgi --ini uwsgi.ini
+    command: bash -c "python manage.py collectstatic --no-input && uwsgi --ini uwsgi.ini"
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.prod
     links:
@@ -42,11 +59,14 @@ services:
       - /happ
     volumes_from:
       - media
+    ports:
+      - "8000:8000"
 
   celery:
     extends:
       file: docker-compose.base.yml
       service: celery
+    image: askhatomarov/happ:latest
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.prod
     links:

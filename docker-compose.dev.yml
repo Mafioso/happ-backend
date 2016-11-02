@@ -10,11 +10,13 @@ services:
       file: docker-compose.base.yml
       service: nginx
     volumes:
-      - ./conf/nginx/prod:/etc/nginx/sites-enabled
+      - ./conf/dev/nginx/happ.docker.conf:/etc/nginx/sites-enabled/happ.conf
     volumes_from:
       - media
     links:
       - app
+    ports:
+      - "9000:80"
 
   rabbitmq:
     extends:
@@ -41,6 +43,8 @@ services:
       - .:/happ
     volumes_from:
       - media
+    ports:
+      - "8000:8000"
 
   celery:
     extends:
