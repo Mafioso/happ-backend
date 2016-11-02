@@ -1,6 +1,7 @@
 amqp==1.4.9
 anyjson==0.3.3
 billiard==3.3.0.23
+bumpversion==0.5.3
 celery==3.1.23
 Django==1.10
 django-anymail==0.5
