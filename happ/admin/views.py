@@ -50,6 +50,15 @@ class DashboardView(JWTAuthRequiredMixin, TemplateView):
             User.objects.filter(gender=User.FEMALE).count(),
         )
 
+        context['last_events'] = Event.objects.order_by('-date_created')[:5]
+
+        context['ads'] = {
+            'total': Event.objects.filter(type=Event.FEATURED).count(),
+            'moderation': Event.objects.filter(type=Event.FEATURED, status=Event.MODERATION).count(),
+            'approved': Event.objects.filter(type=Event.FEATURED, status=Event.APPROVED).count(),
+            'rejected': Event.objects.filter(type=Event.FEATURED, status=Event.REJECTED).count(),
+        }
+
         return context
 
 
