@@ -17,7 +17,7 @@ services:
     links:
       - app
     ports:
-      - "9000:80"
+      - "8000:80"
 
   nginx-static:
     extends:
@@ -31,7 +31,7 @@ services:
     links:
       - app
     ports:
-      - "10000:80"
+      - "9000:80"
 
   rabbitmq:
     extends:
@@ -60,7 +60,7 @@ services:
     volumes_from:
       - media
     ports:
-      - "8000:8000"
+      - "8000"
 
   celery:
     extends:
