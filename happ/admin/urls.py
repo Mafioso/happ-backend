@@ -5,8 +5,7 @@ from . import views
 
 urlpatterns = [
     #url(r'^admin/', admin.site.urls),
-    url(r'^$', views.IndexView.as_view(), name="index"),
-    url(r'^statisctic/$', views.StatiscticView.as_view(), name="statisctic"),
+    url(r'^$', views.DashboardView.as_view(), name="dashboard"),
     url(r'^login/$', views.LoginView.as_view(), name="admin-login"),
     url(r'^event/list/$', views.EventListView.as_view(), name="event_list"),
     url(r'^event/moderation/$', views.EventModerationListView.as_view(), name="event_moderation_list"),

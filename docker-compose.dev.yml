@@ -10,7 +10,7 @@ services:
       file: docker-compose.base.yml
       service: nginx
     volumes:
-      - ./conf/dev/nginx/happ.docker.conf:/etc/nginx/sites-enabled/happ.conf
+      - ./conf/dev/nginx/docker:/etc/nginx/sites-enabled
     volumes_from:
       - media
     links:

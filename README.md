@@ -46,6 +46,6 @@ Create cities and currencies first, then interests and users, and after that - e
 ## dev version
 
 1. add `127.0.0.1	happ.dev` to `/etc/hosts`
-2. copy `conf/nginx/dev/happ.host.conf` to `/etc/nginx/sites-available/` and create symlink
+2. copy `conf/dev/nginx/host/happ.conf` to `/etc/nginx/sites-available/` and create symlink to sites-enabled
 3. restart nginx on host machine
 4. run `docker-compose -f docker-compose.dev.yml up`

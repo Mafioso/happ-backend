@@ -42,3 +42,13 @@ def event_status(status):
         return u"Утвержден"
     if status == Event.REJECTED:
         return u"Отклонен"
+
+@register.filter(name='div')
+def div(a, b):
+    if b == 0:
+        return 0
+    return a / b
+
+@register.filter(name='mult')
+def mult(a, b):
+    return a * b
