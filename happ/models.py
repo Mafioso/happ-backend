@@ -129,10 +129,15 @@ class Interest(HappBaseDocument):
     local_cities = ListField(ReferenceField(City))
     parent = ReferenceField('self')
     color = StringField()
+    is_active = BooleanField(default=True)
 
     @property
     def children(self):
         return Interest.objects.filter(parent=self)
+
+    def deactivate(self):
+        self.is_active = False
+        self.save()
 
 
 class Upvote(EmbeddedDocument):

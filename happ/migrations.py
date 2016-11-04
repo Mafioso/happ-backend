@@ -30,12 +30,10 @@ def migration__user__change_interests_schema__0001():
                     user_interests[_idx]['ins'].append(interest_id)
         user_coll.update({'_id': user_data['_id']}, {'$set': {'interests': user_interests}})
 
-
 def migration__user__add_multikey_index_on_interests__0002():
     # CAREFUL: probably we do not need it because we always do search queries by user_id and there is always index by _id. Fetch by user_id locates a single document so index is utilized fully.
     user_coll = get_db()['user']
     user_coll.create_index([("interests.c", pymongo.ASCENDING), ("interests.ins", pymongo.ASCENDING)], background=True)
-
 
 def migration__event__upvotes_is_embed__0003():
     event_coll = get_db()['event']
@@ -49,7 +47,6 @@ def migration__event__upvotes_is_embed__0003():
         uidx = random.randint(1, ucount) - 1
         upvotes = [{'user': users[uidx]['_id'], 'ts': _now} for _ in xrange(ev['votes'] % 4)]
         event_coll.update({'_id': ev['_id']}, {'$set': {'votes': upvotes, 'votes_num': len(upvotes)}})
-
 
 def migration__event__compound_index_by_world__0004():
     event_coll = get_db()['event']
@@ -90,11 +87,9 @@ def migration__event__compound_index_by_interests_and_end_date_and_votes_or_time
         ('end_date', pymongo.ASCENDING),
         ('votes_num', pymongo.DESCENDING)], background=True)
 
-
 def migration__user__remove_field_favourites__0006():
     user_coll = get_db()['user']
     user_coll.update({}, {'$unset': {'favorites': ''}}, multi=True)
-
 
 def migration__event__add_index_by_infavourites__0007():
     event_coll = get_db()['event']
@@ -107,7 +102,6 @@ def migration__event__add_index_by_infavourites__0007():
         ('end_date', pymongo.ASCENDING),
         ('votes_num', pymongo.DESCENDING)], background=True)
 
-
 def migration__user__set_default_role__0008():
     user_coll = get_db()['user']
     for user_data in user_coll.find({}):
@@ -116,4 +110,8 @@ def migration__user__set_default_role__0008():
 
 def migration__city__set_is_active__0009():
     user_coll = get_db()['city']
+    user_coll.update({}, {'$set': {'is_active': True}}, multi=True)
+
+def migration__interest__set_is_active__0010():
+    user_coll = get_db()['interest']
     user_coll.update({}, {'$set': {'is_active': True}}, multi=True)
