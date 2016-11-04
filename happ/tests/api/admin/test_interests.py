@@ -269,6 +269,31 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['count'], 1)
         self.assertNotEqual(response.data['results'][0]['parent'], None)
 
+    def test_activate(self):
+        """
+        we can activate interest through API
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = InterestFactory(is_active=False)
+
+        url = prepare_url('admin-interests-activate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        i = Interest.objects.get(id=i.id)
+        self.assertTrue(i.is_active)
+
     def test_deactivate(self):
         """
         we can deactivate interest through API
