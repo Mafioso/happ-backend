@@ -59,6 +59,9 @@ class DashboardView(JWTAuthRequiredMixin, TemplateView):
             'rejected': Event.objects.filter(type=Event.FEATURED, status=Event.REJECTED).count(),
         }
 
+        context['top_liked'] = Event.objects.order_by('-votes_num')[:5]
+        context['top_favourited'] = Event.objects.order_by('-in_favourites')[:5]
+
         return context
 
 

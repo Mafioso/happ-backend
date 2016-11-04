@@ -163,6 +163,9 @@ class Event(HappBaseDocument):
     end_date = DateStringField()
     end_time = TimeStringField()
 
+    ## TEMP
+    _random = IntField()
+
     # ATTENTION: add `organizator` field soon
 
     @property
