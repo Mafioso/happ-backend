@@ -27,6 +27,6 @@
 </table>
 <div class="btn-group pull-right">
   {% for item in count|paginate %}
-  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/users/organizers.html?page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="{% url 'admin-users-organizers' %}?format=html&page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
   {% endfor %}
 </div>

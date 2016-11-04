@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load static %}
 {% block main %}
 <div class="">
             <div class="page-title">
@@ -171,13 +172,13 @@
 
 {% block javascript %}
 <!-- jQuery -->
-    <script src="/static/js/jquery.min.js"></script>
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
     <!-- Custom -->
-    <script src="/static/js/custom.js"></script>
+    <script src="{% get_static_prefix %}js/custom.js"></script>
 
-    <script src="/static/js/moment/moment.min.js"></script>
+    <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
     <script type="text/javascript" src="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
 
 

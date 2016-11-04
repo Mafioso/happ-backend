@@ -19,7 +19,7 @@
       <td>
         <a href="#" class="btn btn-warning btn-xs"><i class="fa fa-power-off"></i> Деактивировать </a>
         <a href="#" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/cities/{{item.id}}/" ic-indicator="indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="fa fa-spinner fa-spin" style="display: none;"></i></a>
+        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-cities-detail' id=item.id %}" ic-indicator="indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
   {% endfor %}
@@ -29,9 +29,9 @@
 <div class="btn-group pull-right">
   <!-- <button class="btn btn-default" type="button"><i class="fa fa-angle-double-left"></i></button> -->
   {% for item in count|paginate %}
-  <button class="btn btn-default" type="button" ic-get-from="/api/v1/admin/cities.html?page={{forloop.counter}}" ic-target="#city-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  <button class="btn btn-default" type="button" ic-get-from="{% url 'admin-cities-list' %}?format=html&page={{forloop.counter}}" ic-target="#city-table" ic-indicator="#indicator">{{forloop.counter}}</button>
   {% endfor %}
-<!--   <button class="btn btn-default active" type="button" ic-get-from="/api/v1/admin/cities.html?page=2" ic-target="#city-table" ic-indicator="#indicator">2</button>
+<!--   <button class="btn btn-default active" type="button" ic-get-from="{% url 'admin-cities-list' %}?format=html&page=2" ic-target="#city-table" ic-indicator="#indicator">2</button>
   <button class="btn btn-default" type="button">3</button>
   <button class="btn btn-default" type="button"><i class="fa fa-angle-double-right"></i></button> -->
 </div>

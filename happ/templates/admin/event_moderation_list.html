@@ -1,5 +1,6 @@
 {% extends 'admin/base.html' %}
 {% load happ %}
+{% load static %}
 
 {% block title %}
 Список мероприятий
@@ -69,7 +70,7 @@
           </div>
 
           <!-- start project list -->
-          <div id="event-table" ic-get-from="/api/v1/admin/events/moderation.html?page={{page|default:1}}&{{ request.GET.urlencode }}"  ic-src="/api/v1/admin/events/moderation.html?page={{page|default:1}}&{{ request.GET.urlencode }}" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="event-table" ic-get-from="{% url 'admin-events-moderation' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}"  ic-src="{% url 'admin-events-moderation' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
 
@@ -94,16 +95,16 @@
 
 {% block javascript %}
 <!-- jQuery -->
-<script src="/static/js/jquery.min.js"></script>
+<script src="{% get_static_prefix %}js/jquery.min.js"></script>
 <!-- Intercooler js -->
-<script src="/static/js/intercooler-0.9.7.min.js"></script>
+<script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
 <!-- Bootstrap -->
-<script src="/static/js/bootstrap.min.js"></script>
+<script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
 <!-- Custom -->
-<script src="/static/js/custom.js"></script>
+<script src="{% get_static_prefix %}js/custom.js"></script>
 <!-- bootstrap-daterangepicker -->
-<script src="/static/js/moment/moment.min.js"></script>
-<script src="/static/js/datepicker/daterangepicker.js"></script>
+<script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
+<script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
 
 <script>
   $(document).ready(function() {

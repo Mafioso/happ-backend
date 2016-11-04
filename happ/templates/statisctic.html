@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load static %}
 {% block main %}
 <div class="">
   <div class="page-title">
@@ -192,18 +193,18 @@
 
 {% block javascript %}
 <!-- jQuery -->
-    <script src="/static/vendors/jquery/dist/jquery.min.js"></script>
+    <script src="{% get_static_prefix %}vendors/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap -->
-    <script src="/static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="{% get_static_prefix %}vendors/bootstrap/dist/js/bootstrap.min.js"></script>
     <!-- FastClick -->
-    <script src="/static/vendors/fastclick/lib/fastclick.js"></script>
+    <script src="{% get_static_prefix %}vendors/fastclick/lib/fastclick.js"></script>
     <!-- NProgress -->
-    <script src="/static/vendors/nprogress/nprogress.js"></script>
+    <script src="{% get_static_prefix %}vendors/nprogress/nprogress.js"></script>
     <!-- Chart.js -->
-    <script src="/static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <script src="{% get_static_prefix %}vendors/Chart.js/dist/Chart.min.js"></script>
 
     <!-- Custom Theme Scripts -->
-    <script src="/static/js/custom.js"></script>
+    <script src="{% get_static_prefix %}js/custom.js"></script>
 
     <!-- Chart.js -->
     <script>

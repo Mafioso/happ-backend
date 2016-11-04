@@ -13,8 +13,8 @@
       <th scope="row">{{forloop.counter|page_counter:page}}</th>
       <td>{{ item.title }}</td>
       <td>
-        <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="/api/v1/admin/interests/{{item.id}}.html?category=true" ic-target="#create-form"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
-        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/interests/{{item.id}}/" indicator="#indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-interests-detail' id=item.id %}?format=html&category=true" ic-target="#create-form"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-interests-detail' id=item.id %}" indicator="#indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
     {% endfor %}
@@ -22,6 +22,6 @@
 </table>
 <div class="btn-group pull-right">
   {% for item in count|paginate %}
-  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/interests/categories.html?page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="{% url 'admin-interests-categories' %}?format=html&page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
   {% endfor %}
 </div>

@@ -1,4 +1,5 @@
 {% load happ %}
+{% load static %}
 <table id="events_table" class="table table-striped projects">
   <thead>
     <tr>
@@ -25,7 +26,7 @@
           <a>{{item.title}}</a>
         </td>
         <td>
-          <img src="/static/images/marat.jpeg" class="avatar" alt="Avatar">
+          <img src="{% get_static_prefix %}images/marat.jpeg" class="avatar" alt="Avatar">
           <br/><br/>
           <a>{{item.author.fn}}</a>
         </td>
@@ -48,7 +49,7 @@
         <td>
           <a href="/admin/event/{{item.id}}" class="btn btn-primary btn-xs"><i class="fa fa-eye"></i> Просмотр </a>
           <a href="/admin/event/edit/{{item.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-          <a href="#" class="btn btn-danger btn-xs" ic-delete-from="/api/v1/admin/events/{{item.id}}/" indicator="#indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+          <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-events-detail' id=item.id %}" indicator="#indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
         </td>
       </tr>
     {% endfor %}
@@ -56,7 +57,7 @@
 </table>
 <div class="btn-group pull-right">
   {% for item in count|paginate %}
-  <button class="btn btn-default {% if forloop.counter == page|to_int %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/events.html?page={{forloop.counter}}&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  <button class="btn btn-default {% if forloop.counter == page|to_int %}active{% endif %}" type="button" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{forloop.counter}}&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator">{{forloop.counter}}</button>
   {% endfor %}
 </div>
 

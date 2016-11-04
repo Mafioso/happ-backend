@@ -20,7 +20,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-      <button type="button" class="btn btn-primary" ic-patch-to="/api/v1/admin/interests/{{id}}/" ic-include="#category-form" ic-target="#success" ic-on-success="$('#create-form').modal('hide');"  ic-indicator="#indicator3">Сохранить <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
+      <button type="button" class="btn btn-primary" ic-patch-to="{% url 'admin-interests-detail' id=id %}" ic-include="#category-form" ic-target="#success" ic-on-success="$('#create-form').modal('hide');"  ic-indicator="#indicator3">Сохранить <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
     </div>
     <div id="success" style="display:none;">
 

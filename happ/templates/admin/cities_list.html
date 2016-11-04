@@ -40,7 +40,7 @@
                     </button>
                     <h4 class="modal-title" id="myModalLabel">Добавить новый город</h4>
                   </div>
-                  <form id="city-add-form" ic-post-to="/api/v1/admin/cities.html" ic-verb="POST" class="form-horizontal form-label-left">
+                  <form id="city-add-form" ic-post-to="{% url 'admin-cities-list' %}?format=html" ic-verb="POST" class="form-horizontal form-label-left">
                   <div class="modal-body">
 
 
@@ -54,8 +54,7 @@
                       <div class="form-group">
                         <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Страна</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="country_id" class="form-control col-md-7 col-xs-12" name="country_id" ic-get-from="/api/v1/admin/countries.html" ic-target="#country_id" ic-trigger-on="load">
-
+                          <select id="country_id" class="form-control col-md-7 col-xs-12" name="country_id" ic-get-from="{% url 'admin-countries-list' %}?format=html" ic-target="#country_id" ic-trigger-on="load">
                           </select>
                         </div>
                       </div>
