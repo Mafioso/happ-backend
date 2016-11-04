@@ -9,8 +9,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
+from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
+from happ.filters import EventFilter
 from happ.policies import StaffPolicy
 from happ.decorators import patch_queryset
 from happ.serializers import EventSerializer
@@ -19,6 +21,9 @@ from happ.serializers import EventSerializer
 class EventViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffPolicy, )
     serializer_class = EventSerializer
+    filter_backends = (filters.MongoSearchFilter, filters.MongoFilterBackend,)
+    search_fields = ('title', )
+    filter_class = EventFilter
     queryset = Event.objects.all()
 
     def retrieve(self, request, *args, **kwargs):

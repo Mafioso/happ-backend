@@ -9,7 +9,18 @@ class EventFilter(filtersets.ModelFilterset):
     end_time = filters.CharFilter('lte')
     min_price = filters.IntegerFilter('gte')
     max_price = filters.IntegerFilter('lte')
+    status = filters.ListFilter('in')
+    type = filters.ListFilter('in')
 
     class Meta:
         model = Event
-        fields = ['start_date', 'start_time', 'end_date', 'end_time', 'min_price', 'max_price']
+        fields = [
+            'start_date',
+            'start_time',
+            'end_date',
+            'end_time',
+            'min_price',
+            'max_price',
+            'status',
+            'type',
+        ]

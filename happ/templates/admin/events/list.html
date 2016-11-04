@@ -6,10 +6,10 @@
       <th>Фото</th>
       <th style="width: 20%">Название мероприятия</th>
       <th>Автор</th>
-      <th>Город</th>
       <th>Место проведения</th>
-      <th>Дата</th>
-      <th>Дата создания</th>
+      <th>Тип события</th>
+      <th>Дата проведения</th>
+      <th>Интересы</th>
       <th>Статус</th>
       <th style="width: 20%">Действия</th>
     </tr>
@@ -30,16 +30,16 @@
           <a>{{item.author.fn}}</a>
         </td>
         <td>
-          {{item.city.title}}
+          {{item.city.name}} ({{item.city.country_name}}) {{item.address}}
         </td>
         <td>
-          {{item.address}}
+          {{item.type | event_type }}
         </td>
         <td>
-          {{item.start_datetime}}
+          <span class="date_span">{{item.start_datetime}}</span>
         </td>
         <td>
-          {{item.date_created}}
+          {% join_by_attr item.interests "title" ", " %}
         </td>
         <td>
           {{item.status | event_status }}
@@ -56,6 +56,16 @@
 </table>
 <div class="btn-group pull-right">
   {% for item in count|paginate %}
-  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/events.html?page={{forloop.counter}}" ic-target="#event-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  <button class="btn btn-default {% if forloop.counter == page|to_int %}active{% endif %}" type="button" ic-get-from="/api/v1/admin/events.html?page={{forloop.counter}}&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator">{{forloop.counter}}</button>
   {% endfor %}
 </div>
+
+{% block javascript %}
+<script>
+  $(document).ready(function() {
+    $('.date_span').text(function(i, oldText) {
+        return moment(oldText).format('DD/MM/YYYY hh:mm');
+    });
+  });
+</script>
+{% endblock %}

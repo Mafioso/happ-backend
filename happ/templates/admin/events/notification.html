@@ -6,7 +6,7 @@
 {% for event in results|slice:":5" %}
   <li>
     <a>
-      <span class="image"><img src="/static/images/img.jpg" alt="Profile Image" /></span>
+      <span class="image"><img src="{{item.images.0}}" class="Profile Image" /></span>
       <span>
         <span>{{ event.title }}</span>
       </span>

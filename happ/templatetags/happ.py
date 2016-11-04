@@ -43,6 +43,31 @@ def event_status(status):
     if status == Event.REJECTED:
         return u"Отклонен"
 
+@register.filter(name='event_type')
+def event_type(type):
+    if type == Event.NORMAL:
+        return u"Стандартное"
+    if type == Event.FEATURED:
+        return u"Featured"
+    if type == Event.ADS:
+        return u"Ads"
+
+@register.filter(name='get')
+def get(d, attr):
+    return d.get(attr, None)
+
+@register.filter(name='getlist')
+def getlist(d, attr):
+    return d.getlist(attr, [])
+
+@register.filter(name='split')
+def split(s, delimeter=' '):
+    return s.split(delimeter)
+
+@register.simple_tag
+def join_by_attr(the_list, attr_name, separator=', '):
+    return separator.join(unicode(i[attr_name]) for i in the_list)
+
 @register.filter(name='div')
 def div(a, b):
     if b == 0:

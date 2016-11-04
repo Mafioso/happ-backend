@@ -199,6 +199,7 @@ class AuthorSerializer(serializers.DocumentSerializer):
 class EventSerializer(LocalizedSerializer):
     # read only fields
     interests = InterestChildSerializer(many=True, read_only=True)
+    city = CitySerializer(read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
