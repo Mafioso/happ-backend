@@ -17,9 +17,8 @@
       <td>{{item.country_name}}</td>
       <td>{{item.is_active}}</td>
       <td>
-        <a href="#" class="btn btn-warning btn-xs"><i class="fa fa-power-off"></i> Деактивировать </a>
+        {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
         <a href="#" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-cities-detail' id=item.id %}" ic-indicator="indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
   {% endfor %}

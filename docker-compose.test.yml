@@ -10,11 +10,13 @@ services:
       file: docker-compose.base.yml
       service: nginx
     volumes:
-      - ./conf/nginx/dev:/etc/nginx/sites-enabled
+      - ./conf/dev/nginx/docker:/etc/nginx/sites-enabled
     volumes_from:
       - media
     links:
       - app
+    ports:
+      - "9000:80"
 
   rabbitmq:
     extends:
@@ -30,20 +32,29 @@ services:
     extends:
       file: docker-compose.base.yml
       service: app
+    image: askhatomarov/happ:latest
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.test
     links:
       - mongo
       - rabbitmq
+    working_dir: /happ
+    volumes:
+      - .:/happ
     volumes_from:
       - media
+    ports:
+      - "8000:8000"
 
   celery:
     extends:
       file: docker-compose.base.yml
       service: celery
+    image: askhatomarov/happ:latest
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.test
+    volumes:
+      - .:/happ
     links:
       - mongo
       - rabbitmq
