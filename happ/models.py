@@ -49,6 +49,10 @@ class City(HappBaseDocument):
         self.is_active = True
         self.save()
 
+    def deactivate(self):
+        self.is_active = False
+        self.save()
+
 
 class Currency(HappBaseDocument):
     name = StringField(required=True)
