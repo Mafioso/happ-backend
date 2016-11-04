@@ -203,3 +203,28 @@ class Tests(APISimpleTestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(City.objects.count(), n-1)
+
+    def test_activate(self):
+        """
+        we can activate city through API
+        """
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        c = CityFactory(is_active=False)
+
+        url = prepare_url('admin-cities-activate', kwargs={'id': str(c.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        c = City.objects.get(id=c.id)
+        self.assertTrue(c.is_active)

@@ -113,3 +113,7 @@ def migration__user__set_default_role__0008():
     for user_data in user_coll.find({}):
         if 'role' not in user_data:
             user_coll.update({'_id': user_data['_id']}, {'$set': {'role': 0}})
+
+def migration__city__set_is_active__0009():
+    user_coll = get_db()['city']
+    user_coll.update({}, {'$set': {'is_active': True}}, multi=True)

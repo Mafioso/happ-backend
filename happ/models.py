@@ -45,6 +45,10 @@ class City(HappBaseDocument):
             return self.country.name
         return ''
 
+    def activate(self):
+        self.is_active = True
+        self.save()
+
 
 class Currency(HappBaseDocument):
     name = StringField(required=True)
