@@ -23,6 +23,7 @@
         {% endfor %}
       </td>
       <td>
+        {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-interests-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-interests-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
         <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-interests-detail' id=item.id %}?format=html" ic-target="#create-form" ic-indicator="indicator-update"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
