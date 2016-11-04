@@ -24,7 +24,6 @@
       </td>
       <td>
         <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-interests-detail' id=item.id %}?format=html" ic-target="#create-form" ic-indicator="indicator-update"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
-        <a ic-delete-from="{% url 'admin-interests-detail' id=item.id %}" ic-indicator="delete_indicator" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Удалить <i id="delete_indicator" class="ic-indicator fa fa-spinner fa-spin" style="display: none"></i> </a>
       </td>
     </tr>
   {% endfor %}
