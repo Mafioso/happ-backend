@@ -80,7 +80,7 @@ class CurrencySerializer(serializers.DocumentSerializer):
 
 class InterestSerializer(serializers.DocumentSerializer):
     # read only fields
-    parent = serializers.ObjectIdField(read_only=True)
+    parent = serializers.ReferenceField(read_only=True)
 
     # write only fields
     is_global = drf_serializers.BooleanField(write_only=True)
