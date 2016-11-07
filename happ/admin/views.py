@@ -2,7 +2,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from django.views.generic import TemplateView
 
-from ..models import User, Event, Interest
+from ..models import User, Event, Interest, City, Currency
 from .mixins import JWTAuthRequiredMixin
 
 
@@ -75,6 +75,15 @@ class EventModerationListView(JWTAuthRequiredMixin, TemplateView):
 
 class EventCreateView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/events/create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EventCreateView, self).get_context_data(**kwargs)
+
+        context['cities'] = City.objects.filter(is_active=True)
+        context['currencies'] = Currency.objects.all()
+        context['interests'] = Interest.objects.filter(is_active=True, parent=None)
+
+        return context
 
 
 class CityListView(JWTAuthRequiredMixin, TemplateView):

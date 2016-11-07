@@ -13,19 +13,20 @@
                 <div class="x_panel">
                   <div class="x_content">
                     <br />
-                    <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left">
+                    <form id="event-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-events-list' %}" ic-on-success="window.location.replace('{% url 'event_list' %}');" ic-indicator="#indicator3">
 
                       <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="event-name">Название события <span class="required">*</span>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">Название события <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="event-name" name="event-name" required="required" class="form-control col-md-7 col-xs-12">
+                          <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Тип проведения мероприятия</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="event-type" class="form-control col-md-7 col-xs-12" name="event-type">
+                          <select id="event-type" class="form-control col-md-7 col-xs-12">
+                            <option></option>
                             <option>Мастер-класс</option>
                             <option>Лекция</option>
                             <option>Семинар</option>
@@ -38,130 +39,117 @@
                         </div>
                       </div>
                       <div class="form-group">
-                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="city-name">Город проведения <span class="required">*</span>
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="city_id">Город проведения <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="city-name" name="city-name" required="required" class="form-control col-md-7 col-xs-12">
-                            <option>Алматы</option>
-                            <option>Астана</option>
-                            <option>Нью Йорк</option>
-                            <option>Лондон</option>
-                            <option>Париж</option>
-                            <option>Пекин</option>
+                          <select id="city_id" class="form-control col-md-7 col-xs-12 selectpicker" name="city_id" data-live-search="true">
+                            {% for item in cities %}
+                              <option value="{{item.id}}" data-subtext="{{item.country_name}}">{{item.name}}</option>
+                            {% endfor%}
                           </select>
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="date" class="control-label col-md-3 col-sm-3 col-xs-12">Дата проведения мероприятия</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="date" class="date-picker form-control col-md-7 col-xs-12" type="text" name="date">
+                          <input id="date" class="date-picker form-control col-md-7 col-xs-12" type="text" name="">
                         </div>
+                        <input type="hidden" name="start_datetime" id="start_datetime" />
+                        <input type="hidden" name="end_datetime" id="end_datetime" />
                       </div>
                       <div class="form-group">
-                        <label for="end-on-start" class="control-label col-md-3 col-sm-3 col-xs-12">Можно посетить в любое время?</label>
+                        <label for="close_on_start" class="control-label col-md-3 col-sm-3 col-xs-12">Можно посетить в любое время?</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="checkbox" class="form-control flat" name="end-on-start">
+                          <input type="checkbox" class="checkbox flat" name="close_on_start" id="close_on_start" checked="checked" value="1">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Стоимость билета</label>
                         <div class="col-md-2 col-sm-3 col-xs-6">
-                          <label for="from-price" class="control-label col-md-1 col-sm-3 col-xs-12">От</label>
-                          <input id="from-price" class="form-control col-md-7 col-xs-12" type="text" name="from-price">
+                          <label for="min_price" class="control-label col-md-1 col-sm-3 col-xs-12">От</label>
+                          <input id="min_price" class="form-control col-md-7 col-xs-12" type="text" name="min_price" value="0">
                         </div>
                         <div class="col-md-2 col-sm-3 col-xs-6">
-                          <label for="to-price" class="control-label col-md-1 col-sm-3 col-xs-12">До</label>
-                          <input id="to-price" class="form-control col-md-7 col-xs-12" type="text" name="to-price">
+                          <label for="max_price" class="control-label col-md-1 col-sm-3 col-xs-12">До</label>
+                          <input id="max_price" class="form-control col-md-7 col-xs-12" type="text" name="max_price">
                         </div>
                         <div class="col-md-2 col-sm-3 col-xs-6">
                           <label for="currency-price" class="control-label col-md-1 col-sm-3 col-xs-12">Валюта</label>
-                          <select id="currency-price" class="form-control col-md-7 col-xs-12" name="currency-price">
-                            <option>Тенге</option>
-                            <option>Доллар</option>
-                            <option>Евро</option>
-                            <option>Рубли</option>
+                          <select id="currency_id" class="form-control col-md-7 col-xs-12 selectpicker" name="currency_id">
+                            {% for item in currencies %}
+                              <option value="{{item.id}}">{{item.name}}</option>
+                            {% endfor%}
                           </select>
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Интерес</label>
+                        <label for="interest_ids" class="control-label col-md-3 col-sm-3 col-xs-12">Интерес</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select class="select2_group form-control">
-                            <optgroup label="Спорт">
-                              <option value="AK">Футбол</option>
-                              <option value="HI">Баскетбол</option>
-                            </optgroup>
-                            <optgroup label="Театр">
-                              <option value="CA">Спектакли</option>
-                              <option value="NV">Показы</option>
-                              <option value="OR">Опера</option>
-                              <option value="WA">Блабла</option>
-                            </optgroup>
+                          <select id="interest_ids" class="form-control col-md-7 col-xs-12 selectpicker" name="interest_ids" data-live-search="true">
+                            {% for item in interests %}
+                              <option value="{{item.id}}" style="font-weight: bold">{{item.title}}</option>
+                              {% for child in item.children %}
+                                <option value="{{child.id}}" style="padding-left: 40px;">{{child.title}}</option>
+                              {% endfor%}
+                            {% endfor%}
                           </select>
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
+                        <label for="address" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                          <input id="address" class="form-control col-md-7 col-xs-12" type="text" name="address">
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Описание</label>
+                        <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Описание</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name" rows="10"></textarea>
+                          <textarea id="description" class="form-control col-md-7 col-xs-12" type="text" name="description" rows="10"></textarea>
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Телефоны организаторов</label>
+                        <label for="phones" class="control-label col-md-3 col-sm-3 col-xs-12">Телефоны организаторов <span class="required">*</span>
+                        </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                          <input id="phones" class="form-control col-md-7 col-xs-12" type="text" name="phones" required="required">
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Email</label>
+                        <label for="email" class="control-label col-md-3 col-sm-3 col-xs-12">Email</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                          <input id="email" class="form-control col-md-7 col-xs-12" type="email" name="email">
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Веб сайт мероприятия или организатора</label>
+                        <label for="web_site" class="control-label col-md-3 col-sm-3 col-xs-12">Веб сайт мероприятия или организатора</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                          <input id="web_site" class="form-control col-md-7 col-xs-12" type="text" name="web_site">
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Ссылка на регистрацию</label>
+                        <label for="registration_link" class="control-label col-md-3 col-sm-3 col-xs-12">Ссылка на регистрацию</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
+                          <input id="registration_link" class="form-control col-md-7 col-xs-12" type="text" name="registration_link">
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
+                        <label for="age_restriction" class="control-label col-md-3 col-sm-3 col-xs-12">Возрастные ограничения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="middle-name" class="form-control col-md-7 col-xs-12" type="text" name="middle-name">
-                        </div>
-                      </div>
-                      <div class="form-group">
-                        <label for="age-restriction" class="control-label col-md-3 col-sm-3 col-xs-12">Возрастные ограничения</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="age-restriction" class="form-control col-md-7 col-xs-12" name="age-restriction">
-                            <option>0+</option>
-                            <option>5+</option>
-                            <option>12+</option>
-                            <option>18+</option>
-                            <option>21+</option>
+                          <select id="age_restriction" class="form-control col-md-7 col-xs-12" name="age_restriction">
+                            <option value="0">0+</option>
+                            <option value="5">5+</option>
+                            <option value="12">12+</option>
+                            <option value="18">18+</option>
+                            <option value="21">21+</option>
                           </select>
                         </div>
                       </div>
                       <div class="ln_solid"></div>
-                      <div class="form-group">
-                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                          <button type="submit" class="btn btn-primary">Отменить</button>
-                          <button type="submit" class="btn btn-success">Создать</button>
-                        </div>
+                    <div class="form-group">
+                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        <button type="submit" class="btn btn-success"  ic-include="#event-form">Создать <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
                       </div>
-
+                    </div>
                     </form>
                   </div>
                 </div>
@@ -171,16 +159,19 @@
 {% endblock%}
 
 {% block javascript %}
-<!-- jQuery -->
+    <!-- jQuery -->
     <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Intercooler js -->
+    <script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
     <!-- Bootstrap -->
     <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
     <!-- Custom -->
     <script src="{% get_static_prefix %}js/custom.js"></script>
-
+    <!-- bootstrap-daterangepicker -->
     <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
-    <script type="text/javascript" src="http://cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
-
+    <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
 
     <script>
       $(document).ready(function() {
@@ -189,11 +180,13 @@
             timePicker: true,
             timePicker24Hour: true,
             timePickerIncrement: 10,
-            locale: {
-              format: 'MM/DD/YYYY hh:mm'
-            }
         }, function(start, end, label) {
-          console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+          $('#start_datetime').val(start);
+          $('#end_datetime').val(end);
+        });
+
+        $('#event-type').change(function() {
+          $('#title').val($(this).val() + ' «' + $('#title').val() + '»');
         });
       });
     </script>

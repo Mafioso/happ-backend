@@ -24,7 +24,7 @@ class EventViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.MongoSearchFilter, filters.MongoFilterBackend,)
     search_fields = ('title', )
     filter_class = EventFilter
-    queryset = Event.objects.all()
+    queryset = Event.objects.all().order_by('-date_created')
 
     def retrieve(self, request, *args, **kwargs):
         response = super(EventViewSet, self).retrieve(request, *args, **kwargs)
@@ -47,40 +47,42 @@ class EventViewSet(viewsets.ModelViewSet):
         divides end_datetime into end_date and end_time
         - launches celery tasks for translation
         """
-        if 'title' not in request.data:
+        request.data._mutable = True # needs to be refined
+        if 'title' not in request.data or request.data['title'] == '':
             return Response(
                 {'error_message': _('No title provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'city_id' not in request.data:
+        if 'city_id' not in request.data or request.data['city_id'] == '':
             return Response(
                 {'error_message': _('No city provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'currency_id' not in request.data:
+        if 'currency_id' not in request.data or request.data['currency_id'] == '':
             return Response(
                 {'error_message': _('No currency provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'start_datetime' not in request.data:
+        if 'start_datetime' not in request.data or request.data['start_datetime'] == '':
             return Response(
                 {'error_message': _('No start_datetime provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'end_datetime' not in request.data:
+        if 'end_datetime' not in request.data or request.data['end_datetime'] == '':
             return Response(
                 {'error_message': _('No end_datetime provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'min_price' not in request.data and 'max_price' not in request.data:
+        if ('min_price' not in request.data or request.data['min_price'] == '') and \
+           ('max_price' not in request.data or request.data['max_price'] == ''):
             return Response(
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
-        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
+        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0])
+        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0])
 
-        request.data['images'] = map(lambda x: store_file(x), request.data.pop('images'))
+        # request.data['images'] = map(lambda x: store_file(x), request.data.pop('images'))
         request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
         request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
         request.data['end_date'] = string_to_date(datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)

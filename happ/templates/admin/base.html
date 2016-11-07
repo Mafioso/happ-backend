@@ -14,6 +14,8 @@
     {% block stylesheets %}
       <!-- Bootstrap -->
       <link href="{% get_static_prefix %}css/bootstrap.min.css" rel="stylesheet">
+      <!-- Bootstrap-select -->
+      <link href="{% get_static_prefix %}css/bootstrap-select.min.css" rel="stylesheet">
       <!-- Font Awesome -->
       <link href="{% get_static_prefix %}css/font-awesome.min.css" rel="stylesheet">
 
@@ -140,7 +142,7 @@
                   </ul>
                 </li>
 
-                <li role="presentation" class="dropdown" ic-src="{% url 'admin-events-moderation' %}?format=html&notification=1" ic-poll="2s">
+                <li role="presentation" class="dropdown" ic-src="{% url 'admin-events-moderation' %}?format=html&notification=1" ic-poll="30s">
                   <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-bell-o"></i>
                   </a>
@@ -177,6 +179,8 @@
     <script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
     <!-- Bootstrap -->
     <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
     <!-- Custom -->
     <script src="{% get_static_prefix %}js/custom.js"></script>
     {% endblock %}

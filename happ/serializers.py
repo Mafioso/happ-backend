@@ -263,15 +263,15 @@ class EventSerializer(LocalizedSerializer):
 
         event.city = city
         event.currency = currency
-        event.author
+        event.author = author
         event.interests = Interest.objects.filter(id__in=interest_ids)
         event.save()
-        event.translate()
+        # event.translate()
         return event
 
     def update(self, instance, validated_data):
         event = super(EventSerializer, self).update(instance, validated_data)
-        event.translate()
+        # event.translate()
         return event
 
     def get_is_upvoted(self, obj):
