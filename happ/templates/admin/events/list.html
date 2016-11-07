@@ -44,12 +44,12 @@
         </td>
         <td>
           {{item.status | event_status }}
-          {% if item.status == 0 %}<a href="#" class="btn btn-success btn-xs" ic-post-to="{% url 'admin-events-approve' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-check"></i> Утвердить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a><a href="#" class="btn btn-danger btn-xs" ic-post-to="{% url 'admin-events-reject' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-close"></i> Отклонить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
+          {% if item.status == 0 %}<a href="#" class="btn btn-success btn-xs" ic-post-to="{% url 'admin-events-approve' id=item.id %}" ic-indicator="indicator-update" ic-confirm="Вы уверены, что хотите утвердить?"><i class="fa fa-check"></i> Утвердить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a><a href="#" class="btn btn-danger btn-xs" ic-post-to="{% url 'admin-events-reject' id=item.id %}" ic-indicator="indicator-update" ic-confirm="Вы уверены, что хотите отклонить?"><i class="fa fa-close"></i> Отклонить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
         </td>
         <td>
           <a href="/admin/event/{{item.id}}" class="btn btn-primary btn-xs"><i class="fa fa-eye"></i> Просмотр </a>
           <a href="/admin/event/edit/{{item.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
-          <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-events-detail' id=item.id %}" indicator="#indicator-delete"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+          <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-events-detail' id=item.id %}" indicator="#indicator-delete" ic-confirm="Вы уверены, что хотите удалить?"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
         </td>
       </tr>
     {% endfor %}
