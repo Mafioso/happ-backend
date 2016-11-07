@@ -86,6 +86,20 @@ class EventCreateView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
+class EventEditView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/events/edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EventEditView, self).get_context_data(**kwargs)
+
+        context['object'] = Event.objects.get(id=kwargs['id'])
+        context['cities'] = City.objects.filter(is_active=True)
+        context['currencies'] = Currency.objects.all()
+        context['interests'] = Interest.objects.filter(is_active=True, parent=None)
+
+        return context
+
+
 class CityListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/cities_list.html'
 

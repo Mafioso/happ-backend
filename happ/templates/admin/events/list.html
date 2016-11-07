@@ -48,7 +48,7 @@
         </td>
         <td>
           <a href="/admin/event/{{item.id}}" class="btn btn-primary btn-xs"><i class="fa fa-eye"></i> Просмотр </a>
-          <a href="/admin/event/edit/{{item.id}}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
+          <a href="{% url 'event_edit' id=item.id %}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Редактировать </a>
           <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-events-detail' id=item.id %}" indicator="#indicator-delete" ic-confirm="Вы уверены, что хотите удалить?"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
         </td>
       </tr>
@@ -65,7 +65,7 @@
 <script>
   $(document).ready(function() {
     $('.date_span').text(function(i, oldText) {
-        return moment(oldText).format('DD/MM/YYYY hh:mm');
+        return moment(oldText).format('DD/MM/YYYY HH:mm');
     });
   });
 </script>

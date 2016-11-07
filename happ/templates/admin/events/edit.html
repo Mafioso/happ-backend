@@ -13,13 +13,13 @@
                 <div class="x_panel">
                   <div class="x_content">
                     <br />
-                    <form id="event-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-events-list' %}" ic-on-success="window.location.replace('{% url 'event_list' %}');" ic-indicator="#indicator3">
+                    <form id="event-form" data-parsley-validate class="form-horizontal form-label-left" ic-patch-to="{% url 'admin-events-detail' id=object.id %}" ic-on-success="window.location.replace('{% url 'event_list' %}');" ic-verb='PATCH' ic-indicator="#indicator3">
 
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">Название события <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12">
+                          <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12" value="{{ object.title|default:'' }}">
                         </div>
                       </div>
                       <div class="form-group">
@@ -42,9 +42,9 @@
                         <label for="type" class="control-label col-md-3 col-sm-3 col-xs-12">Тип</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="type" class="form-control col-md-7 col-xs-12" name="type">
-                            <option value="0">Стандартное</option>
-                            <option value="1">Featured</option>
-                            <option value="2">Ads</option>
+                            <option {% if object.type == 0 %}selected="selected"{% endif %} value="0">Стандартное</option>
+                            <option {% if object.type == 1 %}selected="selected"{% endif %} value="1">Featured</option>
+                            <option {% if object.type == 2 %}selected="selected"{% endif %} value="2">Ads</option>
                           </select>
                         </div>
                       </div>
@@ -54,7 +54,7 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="city_id" class="form-control col-md-7 col-xs-12 selectpicker" name="city_id" data-live-search="true">
                             {% for item in cities %}
-                              <option value="{{item.id}}" data-subtext="{{item.country_name}}">{{item.name}}</option>
+                              <option value="{{item.id}}" data-subtext="{{item.country_name}}" {% if object.city.id == item.id %}selected="selected"{% endif %}>{{item.name}}</option>
                             {% endfor%}
                           </select>
                         </div>
@@ -62,7 +62,7 @@
                       <div class="form-group">
                         <label for="date" class="control-label col-md-3 col-sm-3 col-xs-12">Дата проведения мероприятия</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="date" class="date-picker form-control col-md-7 col-xs-12" type="text" name="">
+                          <input id="date" class="date-picker form-control col-md-7 col-xs-12" type="text" name="" value="">
                         </div>
                         <input type="hidden" name="start_datetime" id="start_datetime" />
                         <input type="hidden" name="end_datetime" id="end_datetime" />
@@ -70,24 +70,24 @@
                       <div class="form-group">
                         <label for="close_on_start" class="control-label col-md-3 col-sm-3 col-xs-12">Можно посетить в любое время?</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input type="checkbox" class="checkbox flat" name="close_on_start" id="close_on_start" checked="checked" value="1">
+                          <input type="checkbox" class="checkbox flat" name="close_on_start" id="close_on_start" {% if object.close_on_start %}checked="checked" value="1"{% endif %}>
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Стоимость билета</label>
                         <div class="col-md-2 col-sm-3 col-xs-6">
                           <label for="min_price" class="control-label col-md-1 col-sm-3 col-xs-12">От</label>
-                          <input id="min_price" class="form-control col-md-7 col-xs-12" type="text" name="min_price" value="0">
+                          <input id="min_price" class="form-control col-md-7 col-xs-12" type="text" name="min_price" value="{{ object.min_price|default:0 }}">
                         </div>
                         <div class="col-md-2 col-sm-3 col-xs-6">
                           <label for="max_price" class="control-label col-md-1 col-sm-3 col-xs-12">До</label>
-                          <input id="max_price" class="form-control col-md-7 col-xs-12" type="text" name="max_price">
+                          <input id="max_price" class="form-control col-md-7 col-xs-12" type="text" name="max_price" value="{{ object.max_price|default:'' }}">
                         </div>
                         <div class="col-md-2 col-sm-3 col-xs-6">
                           <label for="currency-price" class="control-label col-md-1 col-sm-3 col-xs-12">Валюта</label>
                           <select id="currency_id" class="form-control col-md-7 col-xs-12 selectpicker" name="currency_id">
                             {% for item in currencies %}
-                              <option value="{{item.id}}">{{item.name}}</option>
+                              <option value="{{item.id}}" {% if object.currency.id == item.id %}selected="selected"{% endif %}>{{item.name}}</option>
                             {% endfor%}
                           </select>
                         </div>
@@ -97,9 +97,9 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="interest_ids" class="form-control col-md-7 col-xs-12 selectpicker" name="interest_ids" data-live-search="true">
                             {% for item in interests %}
-                              <option value="{{item.id}}" style="font-weight: bold">{{item.title}}</option>
+                              <option value="{{item.id}}" style="font-weight: bold" {% if object.interests.0.id == item.id %}selected="selected"{% endif %}>{{item.title}}</option>
                               {% for child in item.children %}
-                                <option value="{{child.id}}" style="padding-left: 40px;">{{child.title}}</option>
+                                <option value="{{child.id}}" style="padding-left: 40px;" {% if object.interests.0.id == child.id %}selected="selected"{% endif %}>{{child.title}}</option>
                               {% endfor%}
                             {% endfor%}
                           </select>
@@ -108,56 +108,56 @@
                       <div class="form-group">
                         <label for="address" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="address" class="form-control col-md-7 col-xs-12" type="text" name="address">
+                          <input id="address" class="form-control col-md-7 col-xs-12" type="text" name="address" value="{{ object.address|default:'' }}">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Описание</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <textarea id="description" class="form-control col-md-7 col-xs-12" type="text" name="description" rows="10"></textarea>
+                          <textarea id="description" class="form-control col-md-7 col-xs-12" type="text" name="description" rows="10">{{ object.description|default:'' }}</textarea>
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="phones" class="control-label col-md-3 col-sm-3 col-xs-12">Телефоны организаторов <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="phones" class="form-control col-md-7 col-xs-12" type="text" name="phones" required="required">
+                          <input id="phones" class="form-control col-md-7 col-xs-12" type="text" name="phones" required="required" value="{{ object.phones.0 }}">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="email" class="control-label col-md-3 col-sm-3 col-xs-12">Email</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="email" class="form-control col-md-7 col-xs-12" type="email" name="email">
+                          <input id="email" class="form-control col-md-7 col-xs-12" type="email" name="email" value="{{ object.email|default:'' }}">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="web_site" class="control-label col-md-3 col-sm-3 col-xs-12">Веб сайт мероприятия или организатора</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="web_site" class="form-control col-md-7 col-xs-12" type="text" name="web_site">
+                          <input id="web_site" class="form-control col-md-7 col-xs-12" type="text" name="web_site" value="{{ object.web_site|default:'' }}">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="registration_link" class="control-label col-md-3 col-sm-3 col-xs-12">Ссылка на регистрацию</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="registration_link" class="form-control col-md-7 col-xs-12" type="text" name="registration_link">
+                          <input id="registration_link" class="form-control col-md-7 col-xs-12" type="text" name="registration_link" value="{{ object.registration_link|default:'' }}">
                         </div>
                       </div>
                       <div class="form-group">
                         <label for="age_restriction" class="control-label col-md-3 col-sm-3 col-xs-12">Возрастные ограничения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="age_restriction" class="form-control col-md-7 col-xs-12" name="age_restriction">
-                            <option value="0">0+</option>
-                            <option value="5">5+</option>
-                            <option value="12">12+</option>
-                            <option value="18">18+</option>
-                            <option value="21">21+</option>
+                            <option value="0" {% if object.age_restriction == 0 %}selected="selected"{% endif %}>0+</option>
+                            <option value="5" {% if object.age_restriction == 5 %}selected="selected"{% endif %}>5+</option>
+                            <option value="12" {% if object.age_restriction == 12 %}selected="selected"{% endif %}>12+</option>
+                            <option value="18" {% if object.age_restriction == 18 %}selected="selected"{% endif %}>18+</option>
+                            <option value="21" {% if object.age_restriction == 21 %}selected="selected"{% endif %}>21+</option>
                           </select>
                         </div>
                       </div>
                       <div class="ln_solid"></div>
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                        <button type="submit" class="btn btn-success"  ic-include="#event-form">Создать <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
+                        <button type="submit" class="btn btn-success"  ic-include="#event-form">Сохранить <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
                       </div>
                     </div>
                     </form>
@@ -185,15 +185,23 @@
 
     <script>
       $(document).ready(function() {
+        $('#date').val(moment('{{object.start_datetime}}').format('DD/MM/YYYY HH:mm') + ' - ' + moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm'));
+
         $('#date').daterangepicker({
+            format: 'DD/MM/YYYY HH:mm',
             showDropdowns: true,
             timePicker: true,
             timePicker24Hour: true,
             timePickerIncrement: 10,
+            startDate: moment('{{object.start_datetime}}').format('DD/MM/YYYY HH:mm'),
+            endDate: moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm')
         }, function(start, end, label) {
           $('#start_datetime').val(start);
           $('#end_datetime').val(end);
         });
+
+        $('#start_datetime').val(moment('{{object.start_datetime}}').format('DD/MM/YYYY HH:mm'));
+        $('#end_datetime').val(moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm'));
 
         $('#event-type').change(function() {
           $('#title').val($(this).val() + ' «' + $('#title').val() + '»');

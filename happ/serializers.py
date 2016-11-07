@@ -270,7 +270,16 @@ class EventSerializer(LocalizedSerializer):
         return event
 
     def update(self, instance, validated_data):
+        city = validated_data.pop('city_id')
+        currency = validated_data.pop('currency_id')
+        interest_ids = validated_data.pop('interest_ids')
+        print city, currency, interest_ids
+
         event = super(EventSerializer, self).update(instance, validated_data)
+        event.city = city
+        event.currency = currency
+        event.interests = Interest.objects.filter(id__in=interest_ids)
+        event.save()
         # event.translate()
         return event
 
