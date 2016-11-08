@@ -5,7 +5,7 @@ from django.conf import settings
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-from .integrations import translate
+from .integrations import google
 from .models import Localized
 
 
@@ -17,7 +17,7 @@ def translate_entity(cls, id, target):
     entity = cls.objects.get(id=id)
     data = {}
     for field in cls.localized_fields:
-        tmp = translate.translate(string=getattr(entity, field), target=target)
+        tmp = google.translate(string=getattr(entity, field), target=target)
         data[field] = tmp['data']['translations'][0]['translatedText']
     try:
         l = Localized.objects.get(entity=entity, language=target)

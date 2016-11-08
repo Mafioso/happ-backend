@@ -193,8 +193,9 @@ HAPP_LANGUAGES = map(lambda x: x['code'], HAPP_LANGUAGES_VERBOSE)
 DATE_STRING_FIELD_FORMAT = "%Y%m%d"
 TIME_STRING_FIELD_FORMAT = "%H%M%S"
 
-GOOGLE_TRANSLATE_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
+GOOGLE_API_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
 GOOGLE_TRANSLATE_LINK = 'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
+GOOGLE_URL_SHORTENER_LINK = 'https://www.googleapis.com/urlshortener/v1/url?key={}'
 
 BROKER_USER_PASSWORD = os.getenv('RABBITMQ_ENV_RABBITMQ_USER_PASSWD', 'guest:guest')
 # BROKER_VHOST = os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
