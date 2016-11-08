@@ -141,6 +141,9 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input id="registration_link" class="form-control col-md-7 col-xs-12" type="text" name="registration_link">
                         </div>
+                        <div class="col-md-2 col-sm-2 col-xs-12" style="padding-top: 8px">
+                          <span class="glyphicon glyphicon-refresh" aria-hidden="true" id="registration_link_shortener" title="Укоротить ссылку" style="cursor:pointer" data-toggle="tooltip"></span>
+                        </div>
                       </div>
                       <div class="form-group">
                         <label for="age_restriction" class="control-label col-md-3 col-sm-3 col-xs-12">Возрастные ограничения</label>
@@ -197,6 +200,14 @@
 
         $('#event-type').change(function() {
           $('#title').val($(this).val() + ' «' + $('#title').val() + '»');
+        });
+
+        $('#registration_link_shortener').click(function(){
+          var url = "{% url 'admin-shorten-url' %}?url=" + $('#registration_link').val();
+          $.get( url, function( data ) {
+              $('#registration_link').val(data.shorten_url);
+            }
+          )
         });
       });
     </script>

@@ -1,3 +1,6 @@
+from django.utils.translation import ugettext_lazy as _
+
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -11,9 +14,12 @@ class UrlShortenerView(APIView):
     """
     permission_classes = (StaffPolicy, )
 
-    def get(self, request, format=None):
+    def get(self, request):
         url = request.GET.get('url', None)
         if not url:
-            return Response()
+            return Response(
+                {'error_message': _('No url provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         shorten_url = google.url_shortener(url)['id']
-        return Response(shorten_url, content_type='text/plain')
+        return Response({'shorten_url': shorten_url})
