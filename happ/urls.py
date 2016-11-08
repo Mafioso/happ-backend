@@ -17,11 +17,11 @@ from django.conf.urls import include, url
 
 from .auth.urls import urlpatterns as auth_urlpatterns
 from .api.regular.urls import router as regular_router
-from .api.admin.urls import router as admin_router
+from .api.admin.urls import urlpatterns as api_admin_urlpatterns
 from .admin.urls import urlpatterns as admin_urlpatterns
 
 urlpatterns = [
-    url(r'^api/v1/admin/', include(admin_router.urls)),
+    url(r'^api/v1/admin/', include(api_admin_urlpatterns)),
     url(r'^api/v1/auth/', include(auth_urlpatterns)),
     url(r'^api/v1/', include(regular_router.urls)),
     url(r'^', include(admin_urlpatterns)),
