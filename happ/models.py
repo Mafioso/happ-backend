@@ -182,6 +182,7 @@ class Event(HappBaseDocument):
     close_on_start = BooleanField(default=False)
     registration_link = StringField()
     age_restriction = IntField()
+    color = StringField()
 
     ## TEMP
     _random = IntField()
