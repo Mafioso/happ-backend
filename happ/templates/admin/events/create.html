@@ -157,6 +157,16 @@
                           </select>
                         </div>
                       </div>
+                      <div class="form-group">
+                        <label for="images" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <div id="current_images"></div>
+                          <input id="images" class="form-control col-md-7 col-xs-12" type="hidden" name="images" value="[]">
+                          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#imageModal">
+                            Добавить изображение
+                          </button>
+                        </div>
+                      </div>
                       <div class="ln_solid"></div>
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
@@ -165,6 +175,30 @@
                     </div>
                     </form>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="imageModalLabel">Добавить изображение</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="text-center">
+                    <label class="btn btn-default btn-file">
+                      Выбрать <input id="image_input" type="file" style="display: none;" name="files">
+                    </label>
+                  </div>
+                  <div style="display: none;">
+                    <img id="tempImage" class="croppingImg" />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                  <button type="button" class="btn btn-primary" id="cropButton">Сохранить</button>
                 </div>
               </div>
             </div>
@@ -182,12 +216,15 @@
     <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
     <!-- Custom -->
     <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- Cropper -->
+    <script src="{% get_static_prefix %}js/cropper.min.js"></script>
     <!-- bootstrap-daterangepicker -->
     <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
     <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
 
     <script>
       $(document).ready(function() {
+        var cropp;
         $('#date').daterangepicker({
             showDropdowns: true,
             timePicker: true,
@@ -209,6 +246,68 @@
             }
           )
         });
+        $('#imageModal').on('hidden.bs.modal', function () {
+          var img_tag = $('#tempImage');
+          img_tag.attr('src', '');
+          img_tag.parent().hide();
+          img_tag.cropper('destroy');
+          cropp = null;
+        });
+        $('#imageModal').on('show.bs.modal', function () {
+          $('#image_input').parent().show();
+        });
+        $('#cropButton').on('click', function() {
+          cropp.cropper('getCroppedCanvas').toBlob(function (blob) {
+          var formData = new FormData();
+
+          formData.append('files', blob);
+
+          $.ajax('/upload/', {
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data, response) {
+              var current_images = JSON.parse($('#images').val());
+              current_images = current_images.concat(data);
+              $('#current_images').empty();
+              $.each(current_images, function(i, val) {
+                $('#current_images').append("<img width='160' src='" + val + "' />")
+              });
+              $('#images').val(JSON.stringify(current_images));
+              $('#imageModal').modal('hide');
+            },
+            error: function () {
+            }
+          });
+        });
+        });
+
+      });
+
+      $(document).on('change', '#image_input', function() {
+          var input = $(this);
+          if (input.val()) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+              input.parent().hide();
+              var img_tag = $('#tempImage');
+              img_tag.attr('src', e.target.result);
+              img_tag.parent().show();
+              cropp = img_tag.cropper({
+                aspectRatio: 1 / 1,
+                viewMode: 1,
+                background: true,
+                movable: false,
+                rotatable: false,
+                scalable: false,
+                zoomable: false,
+              })
+            }
+
+            reader.readAsDataURL(input.get(0).files[0]);
+          }
       });
     </script>
 {% endblock %}

@@ -18,10 +18,17 @@
       <link href="{% get_static_prefix %}css/bootstrap-select.min.css" rel="stylesheet">
       <!-- Font Awesome -->
       <link href="{% get_static_prefix %}css/font-awesome.min.css" rel="stylesheet">
+      <!-- Cropper Style -->
+      <link href="{% get_static_prefix %}css/cropper.min.css" rel="stylesheet">
 
       <!-- Custom Theme Style -->
       <link href="{% get_static_prefix %}css/custom.css" rel="stylesheet">
     {% endblock %}
+    <style>
+    img.croppingImg {
+      max-width: 100%;
+    }
+    </style>
   </head>
 
   <body class="nav-md">

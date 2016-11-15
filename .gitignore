@@ -16,3 +16,4 @@ uploads/
 nohup*
 logs/
 static/
+!happ/static/
