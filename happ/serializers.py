@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django.utils.translation import ugettext_lazy as _
@@ -6,7 +7,7 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
-from .models import Country, City, Currency, User, UserSettings, Interest, Event
+from .models import Country, City, Currency, User, UserSettings, Interest, Event, FileObject
 
 
 class LocalizedSerializer(serializers.DocumentSerializer):
@@ -206,11 +207,13 @@ class EventSerializer(LocalizedSerializer):
     end_datetime = drf_serializers.CharField(read_only=True)
     is_upvoted = drf_serializers.SerializerMethodField()
     is_in_favourites = drf_serializers.SerializerMethodField()
+    images = drf_serializers.SerializerMethodField()
 
     # write only fields
     interest_ids = drf_serializers.ListField(write_only=True, required=False)
     currency_id = serializers.ObjectIdField(write_only=True, required=False)
     city_id = serializers.ObjectIdField(write_only=True, required=False)
+    image_ids = drf_serializers.CharField(write_only=True, required=False)
     start_date = drf_serializers.DateField(write_only=True, required=False)
     start_time = drf_serializers.TimeField(write_only=True, required=False)
     end_date = drf_serializers.DateField(write_only=True, required=False)
@@ -258,6 +261,7 @@ class EventSerializer(LocalizedSerializer):
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
         interest_ids = validated_data.pop('interest_ids')
+        image_ids = json.loads(validated_data.pop('image_ids'))
         author = validated_data.pop('author')
         event = super(EventSerializer, self).create(validated_data)
 
@@ -266,6 +270,8 @@ class EventSerializer(LocalizedSerializer):
         event.author = author
         event.interests = Interest.objects.filter(id__in=interest_ids)
         event.save()
+
+        map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
         # event.translate()
         return event
 
@@ -295,3 +301,16 @@ class EventSerializer(LocalizedSerializer):
         if 'request' not in self.context:
             return False
         return obj.is_in_favourites(self.context['request'].user)
+
+    def get_images(self, obj):
+        return FileObjectSerializer(obj.images, many=True).data
+
+
+class FileObjectSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = FileObject
+        fields = (
+            'id',
+            'path',
+        )

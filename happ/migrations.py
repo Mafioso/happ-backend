@@ -109,9 +109,13 @@ def migration__user__set_default_role__0008():
             user_coll.update({'_id': user_data['_id']}, {'$set': {'role': 0}})
 
 def migration__city__set_is_active__0009():
-    user_coll = get_db()['city']
-    user_coll.update({}, {'$set': {'is_active': True}}, multi=True)
+    coll = get_db()['city']
+    coll.update({}, {'$set': {'is_active': True}}, multi=True)
 
 def migration__interest__set_is_active__0010():
-    user_coll = get_db()['interest']
-    user_coll.update({}, {'$set': {'is_active': True}}, multi=True)
+    coll = get_db()['interest']
+    coll.update({}, {'$set': {'is_active': True}}, multi=True)
+
+def migration__event__remove_field_images__0011():
+    coll = get_db()['event']
+    coll.update({}, {'$unset': {'images': ''}}, multi=True)

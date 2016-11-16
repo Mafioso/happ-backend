@@ -158,14 +158,14 @@
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="images" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
+                        <label for="image_ids" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <div class="row">
                             <div id="current_images"></div>
                           </div>
                           <div class="row">
                             <div class="col-md-6 col-sm-6 col-xs-12">
-                              <input id="images" class="form-control col-md-7 col-xs-12" type="hidden" name="images" value="[]">
+                              <input id="image_ids" class="form-control col-md-7 col-xs-12" type="hidden" name="image_ids" value="[]">
                               <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#imageModal">
                                 Добавить изображение
                               </button>
@@ -287,13 +287,12 @@
               processData: false,
               contentType: false,
               success: function (data, response) {
-                var current_images = JSON.parse($('#images').val());
-                current_images = current_images.concat(data);
-                $('#current_images').empty();
-                $.each(current_images, function(i, val) {
-                  $('#current_images').append("<div class='col-md-6 col-sm-6 col-xs-12'><div class='event_image' index=" + i + " data-toggle='modal' data-target='#confirm-image-delete'><img width='100%' src='" + val + "' /><span class='event_image_hover'>Удалить</span></div></div>")
+                var current_images = JSON.parse($('#image_ids').val());
+                $.each(data, function(i, val) {
+                  $('#current_images').append("<div class='col-md-6 col-sm-6 col-xs-12'><div class='event_image' index=" + (current_images.length + i) + " data-toggle='modal' data-target='#confirm-image-delete'><img width='100%' src='" + val.path + "' /><span class='event_image_hover'>Удалить</span></div></div>")
                 });
-                $('#images').val(JSON.stringify(current_images));
+                current_images = current_images.concat(data.map(function(d){return d.id}));
+                $('#image_ids').val(JSON.stringify(current_images));
                 $('#imageModal').modal('hide');
               },
               error: function () {
@@ -307,9 +306,9 @@
         });
         $('.confirm-image-delete-yes').on('click', function(e) {
           var index = $(this).attr('index');
-          var current_images = JSON.parse($('#images').val());
+          var current_images = JSON.parse($('#image_ids').val());
           current_images.splice(index, 1);
-          $('#images').val(JSON.stringify(current_images));
+          $('#image_ids').val(JSON.stringify(current_images));
           var el = $('.event_image[index='+index+']');
           el.parent().remove();
           $('#confirm-image-delete').modal('hide');

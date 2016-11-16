@@ -8,6 +8,7 @@ from mongoengine import *
 from mongoengine.connection import _get_db
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
+from .utils import store_file
 
 
 conn = connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
@@ -174,7 +175,6 @@ class Event(HappBaseDocument):
     web_site = URLField()
     votes = EmbeddedDocumentListField('Upvote')  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
-    images = ListField(StringField())
     start_date = DateStringField()
     start_time = TimeStringField()
     end_date = DateStringField()
@@ -196,6 +196,10 @@ class Event(HappBaseDocument):
     @property
     def end_datetime(self):
         return datetime.combine(self.end_date, self.end_time).isoformat()
+
+    @property
+    def images(self):
+        return FileObject.objects.filter(entity=self)
 
     def localized(self, language=settings.HAPP_LANGUAGES[0]):
         try:
@@ -259,6 +263,21 @@ class Event(HappBaseDocument):
 
     def reject(self):
         self.status = Event.REJECTED
+        self.save()
+
+
+class FileObject(HappBaseDocument):
+    path = StringField()
+    entity = GenericReferenceField()
+
+    def move_to_media(self, entity):
+        self.entity = entity
+        self.path = store_file(self.path, settings.NGINX_UPLOAD_ROOT)
+        self.save()
+
+    def move_to_avatar(self, entity):
+        self.entity = entity
+        self.path = store_file(self.path, settings.NGINX_AVATAR_ROOT)
         self.save()
 
 

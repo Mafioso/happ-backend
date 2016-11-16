@@ -82,7 +82,6 @@ class EventViewSet(viewsets.ModelViewSet):
         start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0])
         end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0])
 
-        # request.data['images'] = map(lambda x: store_file(x), request.data.pop('images'))
         request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
         request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
         request.data['end_date'] = string_to_date(datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
