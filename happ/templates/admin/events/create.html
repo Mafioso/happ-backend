@@ -160,11 +160,17 @@
                       <div class="form-group">
                         <label for="images" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <div id="current_images"></div>
-                          <input id="images" class="form-control col-md-7 col-xs-12" type="hidden" name="images" value="[]">
-                          <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#imageModal">
-                            Добавить изображение
-                          </button>
+                          <div class="row">
+                            <div id="current_images"></div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <input id="images" class="form-control col-md-7 col-xs-12" type="hidden" name="images" value="[]">
+                              <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#imageModal">
+                                Добавить изображение
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div class="ln_solid"></div>
@@ -203,6 +209,19 @@
               </div>
             </div>
           </div>
+          <div class="modal fade" id="confirm-image-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Вы действительно хотите удалить изображение
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Нет</button>
+                        <a class="btn btn-danger btn-ok confirm-image-delete-yes">Да</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 {% endblock%}
 
 {% block javascript %}
@@ -224,7 +243,7 @@
 
     <script>
       $(document).ready(function() {
-        var cropp;
+        window.cropp = null;
         $('#date').daterangepicker({
             showDropdowns: true,
             timePicker: true,
@@ -251,36 +270,49 @@
           img_tag.attr('src', '');
           img_tag.parent().hide();
           img_tag.cropper('destroy');
-          cropp = null;
+          window.cropp = null;
         });
         $('#imageModal').on('show.bs.modal', function () {
           $('#image_input').parent().show();
         });
         $('#cropButton').on('click', function() {
-          cropp.cropper('getCroppedCanvas').toBlob(function (blob) {
-          var formData = new FormData();
+          window.cropp.cropper('getCroppedCanvas').toBlob(function (blob) {
+            var formData = new FormData();
 
-          formData.append('files', blob);
+            formData.append('files', blob);
 
-          $.ajax('/upload/', {
-            method: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (data, response) {
-              var current_images = JSON.parse($('#images').val());
-              current_images = current_images.concat(data);
-              $('#current_images').empty();
-              $.each(current_images, function(i, val) {
-                $('#current_images').append("<img width='160' src='" + val + "' />")
-              });
-              $('#images').val(JSON.stringify(current_images));
-              $('#imageModal').modal('hide');
-            },
-            error: function () {
-            }
+            $.ajax('/upload/', {
+              method: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (data, response) {
+                var current_images = JSON.parse($('#images').val());
+                current_images = current_images.concat(data);
+                $('#current_images').empty();
+                $.each(current_images, function(i, val) {
+                  $('#current_images').append("<div class='col-md-6 col-sm-6 col-xs-12'><div class='event_image' index=" + i + " data-toggle='modal' data-target='#confirm-image-delete'><img width='100%' src='" + val + "' /><span class='event_image_hover'>Удалить</span></div></div>")
+                });
+                $('#images').val(JSON.stringify(current_images));
+                $('#imageModal').modal('hide');
+              },
+              error: function () {
+              }
+            });
           });
         });
+        $('#confirm-image-delete').on('show.bs.modal', function(e) {
+          $(this).find('.btn-ok').attr('index', $(e.relatedTarget).attr('index'));
+
+        });
+        $('.confirm-image-delete-yes').on('click', function(e) {
+          var index = $(this).attr('index');
+          var current_images = JSON.parse($('#images').val());
+          current_images.splice(index, 1);
+          $('#images').val(JSON.stringify(current_images));
+          var el = $('.event_image[index='+index+']');
+          el.parent().remove();
+          $('#confirm-image-delete').modal('hide');
         });
 
       });
@@ -295,7 +327,7 @@
               var img_tag = $('#tempImage');
               img_tag.attr('src', e.target.result);
               img_tag.parent().show();
-              cropp = img_tag.cropper({
+              window.cropp = img_tag.cropper({
                 aspectRatio: 1 / 1,
                 viewMode: 1,
                 background: true,
