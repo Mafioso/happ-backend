@@ -137,6 +137,8 @@ NGINX_AVATAR_ROOT = os.path.join(MEDIA_ROOT, 'avatars')
 NGINX_MISC_ROOT = os.path.join(MEDIA_ROOT, 'misc')
 NGINX_TMP_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'tmp')
 
+TEMPLATES_DIR_ROOT = os.path.join(BASE_DIR, 'happ/templates')
+
 MONGODB_PORT = 27017
 MONGODB_HOST_NAME = os.getenv('MONGO_PORT_27017_TCP_ADDR', '127.0.0.1')
 MONGODB_HOST = 'mongodb://{host}:{port}'.format(host=MONGODB_HOST_NAME, port=MONGODB_PORT)

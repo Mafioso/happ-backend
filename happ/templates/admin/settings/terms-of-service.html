@@ -25,6 +25,7 @@
           </div>
           <div class="row" style="margin-top:20px">
             <a class="btn btn-primary" id="save_editor">Сохранить</a>
+            <a href="{% url 'terms_of_service_api' %}" target="_blank" class="btn btn-default">Просмотр</a>
           </div>
         </div>
       </div>
@@ -50,6 +51,15 @@
     <script type="text/javascript">
       $(document).ready(function() {
         $('#editor').wysihtml5({
+          toolbar: {
+            "font-styles": true,
+            "emphasis": true,
+            "lists": true,
+            "html": true,
+            "link": true,
+            "image": false,
+            "blockquote": true,
+          },
           "events": {
             "load": function() {
                 $("#editor").data("wysihtml5").editor.setValue($('#initial').html(), true)
@@ -65,7 +75,7 @@
               processData: false,
               contentType: 'application/json',
               success: function (data, response) {
-
+                alert('Сохранено')
               },
               error: function () {
               }
