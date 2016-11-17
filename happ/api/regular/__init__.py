@@ -48,3 +48,10 @@ class PrivacyPolicyView(EditableHTMLView):
     API endpoint for setting and getting privacy policy
     """
     template_name = 'texts/privacy_policy.html'
+
+
+class OrganizerRulesView(EditableHTMLView):
+    """
+    API endpoint for setting and getting organizer rules
+    """
+    template_name = 'texts/organizer_rules.html'

@@ -18,4 +18,5 @@ urlpatterns = [
     url(r'^users/organizers/$', views.OrganizersListView.as_view(), name="users_organizers"),
     url(r'^settings/terms-of-service/$', views.TermsOfServiceView.as_view(), name="terms_of_service"),
     url(r'^settings/privacy-policy/$', views.PrivacyPolicyView.as_view(), name="privacy_policy"),
+    url(r'^settings/organizer-rules/$', views.OrganizerRulesView.as_view(), name="organizer_rules"),
 ]

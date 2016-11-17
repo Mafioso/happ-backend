@@ -1,0 +1,86 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}
+Правила организатора события
+{% endblock %}
+
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Правила организатора события</h3>
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">
+          <div class="row">
+            <div style="display:none" id="initial">{% include "texts/organizer_rules.html" %}</div>
+            <textarea id="editor" style="width:100%; height: 500px"></textarea>
+          </div>
+          <div class="row" style="margin-top:20px">
+            <a class="btn btn-primary" id="save_editor">Сохранить</a>
+            <a href="{% url 'organizer_rules_api' %}" target="_blank" class="btn btn-default">Просмотр</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Intercooler js -->
+    <script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
+    <!-- Custom -->
+    <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- Bootstrap-wysiwyg -->
+    <script src="{% get_static_prefix %}js/bootstrap3-wysihtml5.all.min.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#editor').wysihtml5({
+          toolbar: {
+            "font-styles": true,
+            "emphasis": true,
+            "lists": true,
+            "html": true,
+            "link": true,
+            "image": false,
+            "blockquote": true,
+          },
+          "events": {
+            "load": function() {
+                $("#editor").data("wysihtml5").editor.setValue($('#initial').html(), true)
+            },
+          }
+        });
+
+        $('#save_editor').on('click', function() {
+          var value = $("#editor").val();
+          $.ajax("{% url 'organizer_rules_api' %}", {
+              method: "POST",
+              data: JSON.stringify({'text': value}),
+              processData: false,
+              contentType: 'application/json',
+              success: function (data, response) {
+                alert('Сохранено')
+              },
+              error: function () {
+              }
+            });
+        });
+      });
+    </script>
+{% endblock %}
