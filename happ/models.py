@@ -3,12 +3,13 @@ from copy import deepcopy
 from datetime import datetime
 
 from django.conf import settings
-import pymongo
 from mongoengine import *
 from mongoengine.connection import _get_db
+from PIL import Image
+
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
-from .utils import store_file
+from .utils import store_file, average_color
 
 
 conn = connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
@@ -206,6 +207,14 @@ class Event(HappBaseDocument):
             return Localized.objects.get(entity=self, language=language)
         except:
             return None
+
+    def recalculate_color(self):
+        try:
+            image = self.images.order_by('date_created')[0]
+        except IndexError:
+            return
+        self.color = average_color(Image.open(image.path))
+        self.save()
 
     def copy(self):
         new_instance = deepcopy(self)

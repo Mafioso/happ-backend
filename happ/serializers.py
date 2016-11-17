@@ -272,6 +272,7 @@ class EventSerializer(LocalizedSerializer):
         event.save()
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
+        event.recalculate_color()
         # event.translate()
         return event
 

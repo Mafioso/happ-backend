@@ -93,3 +93,18 @@ def string_to_time(s, format):
     if isinstance(s, datetime.datetime):
         return s.time()
     return datetime.datetime.strptime(s, format).time()
+
+def average_color(image):
+
+    w, h = image.size
+    pixels = image.getcolors(w * h)
+
+    most_frequent_pixel = pixels[0]
+
+    for count, colour in pixels:
+        if count > most_frequent_pixel[0]:
+            most_frequent_pixel = (count, colour)
+
+    rgb_color = most_frequent_pixel[1][:3]
+    # hex value
+    return '#{:02x}{:02x}{:02x}'.format(*rgb_color)

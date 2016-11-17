@@ -1,6 +1,7 @@
 import datetime
 import random
-from .models import get_db, pymongo, User
+import pymongo
+from .models import get_db, User
 
 
 def migration__user__change_interests_schema__0001():
