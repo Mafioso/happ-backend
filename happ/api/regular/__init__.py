@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from happ.models import FileObject
+from happ.integrations import google
 from happ.serializers import FileObjectSerializer
 
 
@@ -55,3 +56,13 @@ class OrganizerRulesView(EditableHTMLView):
     API endpoint for setting and getting organizer rules
     """
     template_name = 'texts/organizer_rules.html'
+
+
+class GooglePlacesView(APIView):
+    """
+    API endpoint for retranslating google places search results to user
+    """
+    def post(self, request):
+        text = request.data['text']
+        r = google.places(text)
+        return Response(r, status=status.HTTP_200_OK)
