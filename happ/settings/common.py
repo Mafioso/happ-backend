@@ -133,6 +133,8 @@ MEDIA_ROOT = '/uploads'
 PAGE_SIZE = 10
 
 NGINX_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'media')
+NGINX_AVATAR_ROOT = os.path.join(MEDIA_ROOT, 'avatars')
+NGINX_MISC_ROOT = os.path.join(MEDIA_ROOT, 'misc')
 NGINX_TMP_UPLOAD_ROOT = os.path.join(MEDIA_ROOT, 'tmp')
 
 MONGODB_PORT = 27017

@@ -35,7 +35,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         return response
 
     @list_route(methods=['get'], url_path='categories')
-    @patch_queryset(lambda self, x: x.filter(parent=None))
+    @patch_queryset(lambda self, x: x.filter(parent=None).order_by('-date_created'))
     @patch_serializer_class(InterestParentSerializer)
     def categories(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).list(request, *args, **kwargs)

@@ -127,7 +127,6 @@ def migration__event__fill_max_age_field__0012():
         if 'age_restriction' in data:
             coll.update({'_id': data['_id']}, {'$set': {'max_age': data['age_restriction']}})
 
-
-def migration__event__remove_age_restriction_images__0013():
+def migration__event__remove_field_age_restriction__0013():
     coll = get_db()['event']
     coll.update({}, {'$unset': {'age_restriction': ''}}, multi=True)

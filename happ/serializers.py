@@ -82,11 +82,13 @@ class CurrencySerializer(serializers.DocumentSerializer):
 class InterestSerializer(serializers.DocumentSerializer):
     # read only fields
     parent = serializers.ReferenceField(read_only=True)
+    image = drf_serializers.SerializerMethodField()
 
     # write only fields
     is_global = drf_serializers.BooleanField(write_only=True)
     parent_id = serializers.ObjectIdField(write_only=True, allow_null=True)
     local_cities = drf_serializers.ListField(write_only=True)
+    image_id = drf_serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Interest
@@ -98,6 +100,7 @@ class InterestSerializer(serializers.DocumentSerializer):
     def create(self, validated_data):
         parent_id = validated_data.pop('parent_id')
         local_cities = validated_data.pop('local_cities')
+        image_id = validated_data.pop('image_id')
         interest = Interest.objects.create(**validated_data)
         if parent_id:
             parent = Interest.objects.get(id=parent_id)
@@ -105,12 +108,17 @@ class InterestSerializer(serializers.DocumentSerializer):
         local_cities = City.objects.filter(id__in=local_cities)
         interest.local_cities = local_cities
         interest.save()
+        if image_id:
+            image = FileObject.objects.get(id=image_id)
+            image.move_to_misc(entity=interest)
+            interest.recalculate_color()
         return interest
 
     def update(self, instance, validated_data):
         parent_id = validated_data.pop('parent_id')
+        image_id = validated_data.pop('image_id')
         local_cities = None
-        if validated_data.get('local_cities') :
+        if validated_data.get('local_cities'):
             local_cities = validated_data.pop('local_cities')
         interest = super(InterestSerializer, self).update(instance, validated_data)
         if parent_id:
@@ -120,7 +128,18 @@ class InterestSerializer(serializers.DocumentSerializer):
             local_cities = City.objects.filter(id__in=local_cities)
             interest.local_cities = local_cities
         interest.save()
+        if image_id:
+            if interest.image:
+                interest.image.delete()
+            image = FileObject.objects.get(id=image_id)
+            image.move_to_misc(entity=interest)
+            interest.recalculate_color()
         return interest
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        return FileObjectSerializer(obj.image).data
 
 
 class InterestChildSerializer(serializers.DocumentSerializer):
@@ -139,6 +158,9 @@ class InterestParentSerializer(serializers.DocumentSerializer):
     # regular fields
     children = InterestSerializer(many=True)
 
+    # read only fields
+    image = drf_serializers.SerializerMethodField()
+
     class Meta:
         model = Interest
         exclude = (
@@ -147,6 +169,11 @@ class InterestParentSerializer(serializers.DocumentSerializer):
             'is_global',
             'local_cities',
         )
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        return FileObjectSerializer(obj.image).data
 
 
 class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):

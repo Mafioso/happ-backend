@@ -138,6 +138,20 @@ class Interest(HappBaseDocument):
     def children(self):
         return Interest.objects.filter(parent=self)
 
+    @property
+    def image(self):
+        try:
+            return FileObject.objects.get(entity=self)
+        except FileObject.DoesNotExist:
+            return None
+
+    def recalculate_color(self):
+        image = self.image
+        if not image:
+            return
+        self.color = average_color(Image.open(image.path))
+        self.save()
+
     def activate(self):
         self.is_active = True
         self.save()
@@ -293,6 +307,11 @@ class FileObject(HappBaseDocument):
     def move_to_avatar(self, entity):
         self.entity = entity
         self.path = store_file(self.path, settings.NGINX_AVATAR_ROOT)
+        self.save()
+
+    def move_to_misc(self, entity):
+        self.entity = entity
+        self.path = store_file(self.path, settings.NGINX_MISC_ROOT)
         self.save()
 
 

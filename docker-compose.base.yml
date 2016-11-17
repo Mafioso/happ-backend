@@ -2,7 +2,7 @@ version: '2'
 services:
   media:
     image: busybox:ubuntu-14.04
-    command: mkdir -p /uploads && mkdir -p /uploads/tmp && mkdir -p /uploads/media && mkdir -p /static
+    command: mkdir -p /uploads && mkdir -p /uploads/tmp && mkdir -p /uploads/media && mkdir -p /uploads/avatars && mkdir -p /uploads/misc && mkdir -p /static
     volumes:
       - ./uploads:/uploads
       - ./static:/static

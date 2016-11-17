@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load static %}
 
 {% block title %}
 Список Категорий
@@ -49,3 +50,86 @@
   </div>
 </div>
 {% endblock%}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Intercooler js -->
+    <script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
+    <!-- Custom -->
+    <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- Cropper -->
+    <script src="{% get_static_prefix %}js/cropper.min.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        window.cropp = null;
+
+        $('#imageModal').on('hidden.bs.modal', function () {
+          var img_tag = $('#tempImage');
+          img_tag.attr('src', '');
+          img_tag.parent().hide();
+          img_tag.cropper('destroy');
+          window.cropp = null;
+        });
+        $('#imageModal').on('show.bs.modal', function () {
+          $('#image_input').parent().show();
+        });
+        $('#cropButton').on('click', function() {
+          window.cropp.cropper('getCroppedCanvas').toBlob(function (blob) {
+            var formData = new FormData();
+
+            formData.append('files', blob);
+
+            $.ajax('/upload/', {
+              method: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (data, response) {
+                $('#current_image').empty()
+                $.each(data, function(i, val) {
+                  $('#current_image').append("<div class='col-md-6 col-sm-6 col-xs-12'><div class='event_image'><img width='100%' src='" + val.path + "' /></div></div>")
+                });
+                current_images = current_images.concat(data.map(function(d){return d.id}));
+                $('#image_id').val(data[0].id);
+                $('#imageModal').modal('hide');
+              },
+              error: function () {
+              }
+            });
+          });
+        });
+
+      });
+
+      $(document).on('change', '#image_input', function() {
+          var input = $(this);
+          if (input.val()) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+              input.parent().hide();
+              var img_tag = $('#tempImage');
+              img_tag.attr('src', e.target.result);
+              img_tag.parent().show();
+              window.cropp = img_tag.cropper({
+                aspectRatio: 1 / 1,
+                viewMode: 1,
+                background: true,
+                movable: false,
+                rotatable: false,
+                scalable: false,
+                zoomable: false,
+              })
+            }
+
+            reader.readAsDataURL(input.get(0).files[0]);
+          }
+      });
+    </script>
+{% endblock %}
