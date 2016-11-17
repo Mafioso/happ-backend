@@ -3,6 +3,7 @@
   <thead>
     <tr>
       <th style="width:1%;">#</th>
+      <th style="width:120px">Изображение</th>
       <th>Название Категории </th>
       <th style="width: 30%">Действия</th>
     </tr>
@@ -11,6 +12,9 @@
     {% for item in results %}
     <tr>
       <th scope="row">{{forloop.counter|page_counter:page}}</th>
+      <td>
+          <img src="{{item.image.path}}" style="width:100px" />
+      </td>
       <td>{{ item.title }}</td>
       <td>
         {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-interests-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-interests-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
