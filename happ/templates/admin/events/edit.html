@@ -148,14 +148,13 @@
                       </div>
                       <div class="form-group">
                         <label for="age_restriction" class="control-label col-md-3 col-sm-3 col-xs-12">Возрастные ограничения</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="age_restriction" class="form-control col-md-7 col-xs-12" name="age_restriction">
-                            <option value="0" {% if object.age_restriction == 0 %}selected="selected"{% endif %}>0+</option>
-                            <option value="5" {% if object.age_restriction == 5 %}selected="selected"{% endif %}>5+</option>
-                            <option value="12" {% if object.age_restriction == 12 %}selected="selected"{% endif %}>12+</option>
-                            <option value="18" {% if object.age_restriction == 18 %}selected="selected"{% endif %}>18+</option>
-                            <option value="21" {% if object.age_restriction == 21 %}selected="selected"{% endif %}>21+</option>
-                          </select>
+                        <div class="col-md-2 col-sm-3 col-xs-6">
+                          <label for="min_age" class="control-label col-md-1 col-sm-3 col-xs-12">От</label>
+                          <input id="min_age" class="form-control col-md-7 col-xs-12" type="text" name="min_age" value="{{ object.min_age }}">
+                        </div>
+                        <div class="col-md-2 col-sm-3 col-xs-6">
+                          <label for="max_age" class="control-label col-md-1 col-sm-3 col-xs-12">До</label>
+                          <input id="max_age" class="form-control col-md-7 col-xs-12" type="text" name="max_age" value="{{ object.max_age }}">
                         </div>
                       </div>
                       <div class="form-group">

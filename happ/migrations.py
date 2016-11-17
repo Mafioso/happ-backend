@@ -120,3 +120,14 @@ def migration__interest__set_is_active__0010():
 def migration__event__remove_field_images__0011():
     coll = get_db()['event']
     coll.update({}, {'$unset': {'images': ''}}, multi=True)
+
+def migration__event__fill_max_age_field__0012():
+    coll = get_db()['event']
+    for data in coll.find({}):
+        if 'age_restriction' in data:
+            coll.update({'_id': data['_id']}, {'$set': {'max_age': data['age_restriction']}})
+
+
+def migration__event__remove_age_restriction_images__0013():
+    coll = get_db()['event']
+    coll.update({}, {'$unset': {'age_restriction': ''}}, multi=True)
