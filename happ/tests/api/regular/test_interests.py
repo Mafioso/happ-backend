@@ -164,3 +164,40 @@ class Tests(APISimpleTestCase):
         u = User.objects.get(id=u.id)
         self.assertEqual(len(u.interests), 2)
         self.assertEqual(len(u.current_interests), 2)
+
+    def test_user_set_all_interests(self):
+        """
+        We can assign all interests to user
+        """
+        city = CityFactory()
+        u = UserFactory(interests=[])
+        u.set_password('123')
+        u.settings.city = city
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        self.assertEqual(len(u.interests), 0)
+
+        city2 = CityFactory()
+        InterestFactory(is_global=True,  is_active=True) # +
+        InterestFactory(is_global=True,  is_active=False) # -
+        InterestFactory(is_global=False, is_active=True,  local_cities=[city]) # +
+        InterestFactory(is_global=False, is_active=False, local_cities=[city]) # -
+        InterestFactory(is_global=False, is_active=True,  local_cities=[city2]) # +
+        InterestFactory(is_global=False, is_active=False, local_cities=[city2]) # -
+        InterestFactory(is_global=False, is_active=True,  local_cities=[city, city2]) # +
+        InterestFactory(is_global=False, is_active=False, local_cities=[city, city2]) # -
+
+        url = prepare_url('interests-set', query={'all':1})
+
+        response = self.client.post(url, data=[], format='json')
+        u = User.objects.get(id=u.id)
+        self.assertEqual(len(u.interests), 1)
+        self.assertEqual(len(u.current_interests), 3)

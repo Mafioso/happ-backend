@@ -238,7 +238,7 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
-        self.assertEqual(len(response.data['results'][2]['children']), 1)
+        self.assertEqual(len(response.data['results'][0]['children']), 1)
 
     def test_get_children(self):
         """

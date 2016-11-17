@@ -81,7 +81,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
             'interest_ids': map(lambda _: str(InterestFactory().id), range(3)),
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -104,7 +104,7 @@ class Tests(APISimpleTestCase):
             'start_datetime': datetime.now(),
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
-            'images': [],
+            'image_ids': [],
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -127,7 +127,7 @@ class Tests(APISimpleTestCase):
             'start_datetime': datetime.now(),
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -166,7 +166,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -200,7 +200,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -234,7 +234,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -267,7 +267,7 @@ class Tests(APISimpleTestCase):
             'currency_id': str(CurrencyFactory.create().id),
             'start_datetime': datetime.now(),
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
-            'images': [],
+            'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -302,7 +302,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 120,
             'max_price': 100,
-            'images': [],
+            'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
@@ -336,7 +336,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now(),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -352,7 +352,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now(),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -445,7 +445,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1),
             'min_price': 100,
             'max_price': 120,
-            'images': [],
+            'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')

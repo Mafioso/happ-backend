@@ -15,12 +15,12 @@ from happ.models import Event
 from happ.filters import EventFilter
 from happ.policies import StaffPolicy
 from happ.decorators import patch_queryset
-from happ.serializers import EventSerializer
+from happ.serializers import EventAdminSerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffPolicy, )
-    serializer_class = EventSerializer
+    serializer_class = EventAdminSerializer
     filter_backends = (filters.MongoSearchFilter, filters.MongoFilterBackend,)
     search_fields = ('title', )
     filter_class = EventFilter

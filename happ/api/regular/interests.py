@@ -4,6 +4,7 @@ from rest_framework import status, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import list_route
 from rest_framework_mongoengine import viewsets
+from mongoengine import Q
 
 from mongoextensions import filters
 from happ.models import Interest, CityInterests, User
@@ -26,12 +27,10 @@ class InterestViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            interests = Interest.objects.filter(id__in=data)
-        except Interest.DoesNotExist:
-            return Response(
-                {'error_message': _('Such city does not exist.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            if 'all' in request.query_params:
+                interests = Interest.objects.filter(Q(is_active=True) & (Q(is_global=True) | Q(local_cities=user.settings.city) ))
+            else:
+                interests = Interest.objects.filter(id__in=data)
         except Exception as e:
             return Response(
                 {'error_message': _('Invalid data.')},

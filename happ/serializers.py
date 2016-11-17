@@ -98,9 +98,9 @@ class InterestSerializer(serializers.DocumentSerializer):
         )
 
     def create(self, validated_data):
-        parent_id = validated_data.pop('parent_id')
-        local_cities = validated_data.pop('local_cities')
-        image_id = validated_data.pop('image_id')
+        parent_id = validated_data.pop('parent_id') if 'parent_id' in validated_data else None
+        local_cities = validated_data.pop('local_cities') if 'local_cities' in validated_data else []
+        image_id = validated_data.pop('image_id') if 'image_id' in validated_data else None
         interest = Interest.objects.create(**validated_data)
         if parent_id:
             parent = Interest.objects.get(id=parent_id)
@@ -115,11 +115,11 @@ class InterestSerializer(serializers.DocumentSerializer):
         return interest
 
     def update(self, instance, validated_data):
-        parent_id = validated_data.pop('parent_id')
-        image_id = validated_data.pop('image_id')
+        parent_id = validated_data.pop('parent_id') if 'parent_id' in validated_data else None
+        image_id = validated_data.pop('image_id') if 'image_id' in validated_data else None
         local_cities = None
         if validated_data.get('local_cities'):
-            local_cities = validated_data.pop('local_cities')
+            local_cities = validated_data.pop('local_cities') if 'local_cities' in validated_data else []
         interest = super(InterestSerializer, self).update(instance, validated_data)
         if parent_id:
             parent = Interest.objects.get(id=parent_id)
@@ -240,6 +240,120 @@ class EventSerializer(LocalizedSerializer):
     interest_ids = drf_serializers.ListField(write_only=True, required=False)
     currency_id = serializers.ObjectIdField(write_only=True, required=False)
     city_id = serializers.ObjectIdField(write_only=True, required=False)
+    image_ids = drf_serializers.ListField(write_only=True, required=False)
+    start_date = drf_serializers.DateField(write_only=True, required=False)
+    start_time = drf_serializers.TimeField(write_only=True, required=False)
+    end_date = drf_serializers.DateField(write_only=True, required=False)
+    end_time = drf_serializers.TimeField(write_only=True, required=False)
+
+    class Meta:
+        model = Event
+        extra_kwargs = {
+            'city': {'read_only': True},
+        }
+        exclude = (
+            'votes',
+            'in_favourites',
+        )
+
+    def validate_city_id(self, value):
+        try:
+            city = City.objects.get(id=value)
+        except City.DoesNotExist:
+            raise ValidationError(_('No city with this city_id'))
+        except City.MultipleObjectsReturned:
+            raise ValidationError(_('Too many cities with this city_id'))
+        return city
+
+    def validate_currency_id(self, value):
+        try:
+            currency = Currency.objects.get(id=value)
+        except Currency.DoesNotExist:
+            raise ValidationError(_('No currency with this currency_id'))
+        except Currency.MultipleObjectsReturned:
+            raise ValidationError(_('Too many currencies with this currency_id'))
+        return currency
+
+    def validate(self, data):
+        """
+        Min_price should be less than Max_price.
+        """
+        if 'min_price' in data and 'max_price' in data and data['min_price'] > data['max_price']:
+            raise ValidationError(_("Min_price should be less than Max_price"))
+        if datetime.combine(data['start_date'], data['start_time']) > datetime.combine(data['end_date'], data['end_time']):
+            raise ValidationError(_("Start date should be earlier than End date"))
+        return data
+
+    def create(self, validated_data):
+        city = validated_data.pop('city_id')
+        currency = validated_data.pop('currency_id')
+        interest_ids = validated_data.pop('interest_ids') if 'interest_ids' in validated_data else []
+        image_ids = validated_data.pop('image_ids') if 'image_ids' in validated_data else []
+        author = validated_data.pop('author')
+        event = super(EventSerializer, self).create(validated_data)
+
+        event.city = city
+        event.currency = currency
+        event.author = author
+        event.interests = Interest.objects.filter(id__in=interest_ids)
+        event.save()
+
+        map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
+        event.recalculate_color()
+        # event.translate()
+        return event
+
+    def update(self, instance, validated_data):
+        event = super(EventSerializer, self).update(instance, validated_data)
+
+        if 'city_id' in validated_data:
+            city = validated_data.pop('city_id')
+            event.city = city
+        if 'currency_id' in validated_data:
+            currency = validated_data.pop('currency_id')
+            event.currency = currency
+        if 'interest_ids' in validated_data:
+            interest_ids = validated_data.pop('interest_ids')
+            event.interests = Interest.objects.filter(id__in=interest_ids)
+        if 'image_ids' in validated_data:
+            image_ids = set(validated_data.pop('image_ids'))
+            old_ids = set(map(lambda x: str(x.id), instance.images))
+            FileObject.objects.filter(id__in=(old_ids-image_ids)).delete()
+            map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=(image_ids-old_ids)))
+            event.recalculate_color()
+
+        event.save()
+        # event.translate()
+        return event
+
+    def get_is_upvoted(self, obj):
+        if 'request' not in self.context:
+            return False
+        return bool(obj.is_upvoted(self.context['request'].user))
+
+    def get_is_in_favourites(self, obj):
+        if 'request' not in self.context:
+            return False
+        return obj.is_in_favourites(self.context['request'].user)
+
+    def get_images(self, obj):
+        return FileObjectSerializer(obj.images, many=True).data
+
+
+class EventAdminSerializer(LocalizedSerializer):
+    # read only fields
+    interests = InterestChildSerializer(many=True, read_only=True)
+    city = CitySerializer(read_only=True)
+    currency = CurrencySerializer(read_only=True)
+    author = AuthorSerializer(read_only=True)
+    start_datetime = drf_serializers.CharField(read_only=True)
+    end_datetime = drf_serializers.CharField(read_only=True)
+    images = drf_serializers.SerializerMethodField()
+
+    # write only fields
+    interest_ids = drf_serializers.ListField(write_only=True, required=False)
+    currency_id = serializers.ObjectIdField(write_only=True, required=False)
+    city_id = serializers.ObjectIdField(write_only=True, required=False)
     image_ids = drf_serializers.CharField(write_only=True, required=False)
     start_date = drf_serializers.DateField(write_only=True, required=False)
     start_time = drf_serializers.TimeField(write_only=True, required=False)
@@ -288,7 +402,7 @@ class EventSerializer(LocalizedSerializer):
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
         interest_ids = validated_data.pop('interest_ids')
-        image_ids = json.loads(validated_data.pop('image_ids'))
+        image_ids = json.loads(validated_data.pop('image_ids')) if 'image_ids' in validated_data else []
         author = validated_data.pop('author')
         event = super(EventSerializer, self).create(validated_data)
 
@@ -325,16 +439,6 @@ class EventSerializer(LocalizedSerializer):
         event.save()
         # event.translate()
         return event
-
-    def get_is_upvoted(self, obj):
-        if 'request' not in self.context:
-            return False
-        return bool(obj.is_upvoted(self.context['request'].user))
-
-    def get_is_in_favourites(self, obj):
-        if 'request' not in self.context:
-            return False
-        return obj.is_in_favourites(self.context['request'].user)
 
     def get_images(self, obj):
         return FileObjectSerializer(obj.images, many=True).data
