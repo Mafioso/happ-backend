@@ -16,3 +16,8 @@ def url_shortener(url):
     }
     response = requests.post(url, json=payload)
     return json.loads(response.content)
+
+def places(text):
+    url = settings.GOOGLE_PLACES_LINK.format(text, settings.GOOGLE_API_KEY)
+    response = requests.get(url)
+    return json.loads(response.content)

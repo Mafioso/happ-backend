@@ -26,3 +26,14 @@ class Tests(SimpleTestCase):
 
         r = google.url_shortener(url=url)
         self.assertIn('id', r)
+
+    def test_google_places(self):
+        """
+        ensure that google places integration works properly
+        """
+
+        text = "Restaurants in Almaty"
+
+        r = google.places(text=text)
+        self.assertIn('results', r)
+        self.assertEqual(r['status'], 'OK')
