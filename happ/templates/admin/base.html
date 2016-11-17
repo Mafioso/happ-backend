@@ -23,6 +23,7 @@
 
       <!-- Custom Theme Style -->
       <link href="{% get_static_prefix %}css/custom.css" rel="stylesheet">
+      <link href="{% get_static_prefix %}css/bootstrap3-wysihtml5.min.css" rel="stylesheet">
       <link href="{% get_static_prefix %}css/style.css" rel="stylesheet">
     {% endblock %}
   </head>
@@ -84,6 +85,7 @@
                   </li>
                   <li><a><i class="fa fa-gear"></i> Настройки <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
+                      <li><a href="{% url 'terms_of_service' %}">Правила пользования</a></li>
                       <li><a href="#">Пользователи</a></li>
                       <li><a href="#">Рассылки</a></li>
                     </ul>

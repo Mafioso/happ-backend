@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^interest/list/$', views.InterestListView.as_view(), name="interest_list"),
     url(r'^users/list/$', views.UserListView.as_view(), name="users_list"),
     url(r'^users/organizers/$', views.OrganizersListView.as_view(), name="users_organizers"),
+    url(r'^settings/terms-of-service/$', views.TermsOfServiceView.as_view(), name="terms_of_service"),
 ]

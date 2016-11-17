@@ -118,3 +118,6 @@ class UserListView(JWTAuthRequiredMixin, TemplateView):
 
 class OrganizersListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/users_organizers.html'
+
+class TermsOfServiceView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/settings/terms-of-service.html'
