@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load happ %}
 {% load static %}
 {% block main %}
 <div class="">
@@ -157,6 +158,31 @@
                           </select>
                         </div>
                       </div>
+                      <div class="form-group">
+                        <label for="image_ids" class="control-label col-md-3 col-sm-3 col-xs-12">Изображения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <div class="row">
+                            <div id="current_images">
+                              {% for image in object.images %}
+                                <div class='col-md-6 col-sm-6 col-xs-12'>
+                                  <div class='event_image' index="{{ forloop.counter0 }}" data-toggle="modal" data-target="#confirm-image-delete">
+                                    <img width="100%" src="{{image.path}}" />
+                                    <span class="event_image_hover">Удалить</span>
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                              <input id="image_ids" class="form-control col-md-7 col-xs-12" type="hidden" name="image_ids" value="[{% join_by_attr object.images 'id' ', ' '"' %}]">
+                              <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#imageModal">
+                                Добавить изображение
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <div class="ln_solid"></div>
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
@@ -169,6 +195,43 @@
               </div>
             </div>
           </div>
+          <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="imageModalLabel">Добавить изображение</h4>
+                </div>
+                <div class="modal-body">
+                  <div class="text-center">
+                    <label class="btn btn-default btn-file">
+                      Выбрать <input id="image_input" type="file" style="display: none;" name="files">
+                    </label>
+                  </div>
+                  <div style="display: none;">
+                    <img id="tempImage" class="croppingImg" />
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                  <button type="button" class="btn btn-primary" id="cropButton">Сохранить</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" id="confirm-image-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        Вы действительно хотите удалить изображение
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Нет</button>
+                        <a class="btn btn-danger btn-ok confirm-image-delete-yes">Да</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 {% endblock%}
 
 {% block javascript %}
@@ -182,12 +245,15 @@
     <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
     <!-- Custom -->
     <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- Cropper -->
+    <script src="{% get_static_prefix %}js/cropper.min.js"></script>
     <!-- bootstrap-daterangepicker -->
     <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
     <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
 
     <script>
       $(document).ready(function() {
+        window.cropp = null;
         $('#date').val(moment('{{object.start_datetime}}').format('DD/MM/YYYY HH:mm') + ' - ' + moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm'));
 
         $('#date').daterangepicker({
@@ -217,6 +283,78 @@
             }
           )
         });
+        $('#imageModal').on('hidden.bs.modal', function () {
+          var img_tag = $('#tempImage');
+          img_tag.attr('src', '');
+          img_tag.parent().hide();
+          img_tag.cropper('destroy');
+          window.cropp = null;
+        });
+        $('#imageModal').on('show.bs.modal', function () {
+          $('#image_input').parent().show();
+        });
+        $('#cropButton').on('click', function() {
+          window.cropp.cropper('getCroppedCanvas').toBlob(function (blob) {
+            var formData = new FormData();
+
+            formData.append('files', blob);
+
+            $.ajax('/upload/', {
+              method: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (data, response) {
+                var current_images = JSON.parse($('#image_ids').val());
+                $.each(data, function(i, val) {
+                  $('#current_images').append("<div class='col-md-6 col-sm-6 col-xs-12'><div class='event_image' index=" + (current_images.length + i) + " data-toggle='modal' data-target='#confirm-image-delete'><img width='100%' src='" + val.path + "' /><span class='event_image_hover'>Удалить</span></div></div>")
+                });
+                current_images = current_images.concat(data.map(function(d){return d.id}));
+                $('#image_ids').val(JSON.stringify(current_images));
+                $('#imageModal').modal('hide');
+              },
+              error: function () {
+              }
+            });
+          });
+        });
+        $('#confirm-image-delete').on('show.bs.modal', function(e) {
+          $(this).find('.btn-ok').attr('index', $(e.relatedTarget).attr('index'));
+
+        });
+        $('.confirm-image-delete-yes').on('click', function(e) {
+          var index = $(this).attr('index');
+          var current_images = JSON.parse($('#image_ids').val());
+          current_images.splice(index, 1);
+          $('#image_ids').val(JSON.stringify(current_images));
+          var el = $('.event_image[index='+index+']');
+          el.parent().remove();
+          $('#confirm-image-delete').modal('hide');
+        });
+      });
+      $(document).on('change', '#image_input', function() {
+          var input = $(this);
+          if (input.val()) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+              input.parent().hide();
+              var img_tag = $('#tempImage');
+              img_tag.attr('src', e.target.result);
+              img_tag.parent().show();
+              window.cropp = img_tag.cropper({
+                aspectRatio: 1 / 1,
+                viewMode: 1,
+                background: true,
+                movable: false,
+                rotatable: false,
+                scalable: false,
+                zoomable: false,
+              })
+            }
+
+            reader.readAsDataURL(input.get(0).files[0]);
+          }
       });
     </script>
 {% endblock %}

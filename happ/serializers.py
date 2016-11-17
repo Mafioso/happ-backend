@@ -288,6 +288,12 @@ class EventSerializer(LocalizedSerializer):
         if 'interest_ids' in validated_data:
             interest_ids = validated_data.pop('interest_ids')
             event.interests = Interest.objects.filter(id__in=interest_ids)
+        if 'image_ids' in validated_data:
+            image_ids = set(json.loads(validated_data.pop('image_ids')))
+            old_ids = set(map(lambda x: str(x.id), instance.images))
+            FileObject.objects.filter(id__in=(old_ids-image_ids)).delete()
+            map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=(image_ids-old_ids)))
+            event.recalculate_color()
 
         event.save()
         # event.translate()

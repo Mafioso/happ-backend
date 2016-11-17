@@ -65,8 +65,8 @@ def split(s, delimeter=' '):
     return s.split(delimeter)
 
 @register.simple_tag
-def join_by_attr(the_list, attr_name, separator=', '):
-    return separator.join(unicode(i[attr_name]) for i in the_list)
+def join_by_attr(the_list, attr_name, separator=', ', wrapper=''):
+    return separator.join(wrapper+unicode(i[attr_name])+wrapper for i in the_list)
 
 @register.filter(name='div')
 def div(a, b):

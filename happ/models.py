@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from copy import deepcopy
 from datetime import datetime
 
@@ -278,6 +279,10 @@ class Event(HappBaseDocument):
 class FileObject(HappBaseDocument):
     path = StringField()
     entity = GenericReferenceField()
+
+    @classmethod
+    def post_delete(cls, sender, document, **kwargs):
+        os.remove(document.path)
 
     def move_to_media(self, entity):
         self.entity = entity
