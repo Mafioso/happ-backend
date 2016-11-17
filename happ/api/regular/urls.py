@@ -3,7 +3,7 @@ from django.conf.urls import url
 from rest_framework_mongoengine.routers import DefaultRouter
 
 from . import cities, currencies, interests, events, users, languages
-from . import TempUploadView, TermsOfServiceView
+from . import TempUploadView, TermsOfServiceView, PrivacyPolicyView
 
 
 router = DefaultRouter()
@@ -17,6 +17,7 @@ router.register(r'languages', languages.LanguageViewSet, 'languages')
 urlpatterns = [
     url(r'^upload/$', TempUploadView.as_view(), name='temp-upload-url'),
     url(r'^terms-of-service/$', TermsOfServiceView.as_view(), name='terms_of_service_api'),
+    url(r'^privacy-policy/$', PrivacyPolicyView.as_view(), name='privacy_policy_api'),
 ]
 
 urlpatterns += router.urls

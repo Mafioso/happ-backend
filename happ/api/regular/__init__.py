@@ -22,12 +22,8 @@ class TempUploadView(APIView):
         return Response(FileObjectSerializer(file_objects, many=True).data, status=status.HTTP_200_OK)
 
 
-class TermsOfServiceView(APIView):
-    """
-    API endpoint for setting and getting terms of service
-    """
+class EditableHTMLView(APIView):
     renderer_classes = (TemplateHTMLRenderer, )
-    template_name = 'texts/terms_of_service.html'
 
     def get(self, request):
         return Response(template_name=self.template_name, status=status.HTTP_200_OK)
@@ -38,3 +34,17 @@ class TermsOfServiceView(APIView):
         with open(path, 'w') as f:
             f.write(text.encode('utf-8'))
         return Response(template_name=self.template_name, status=status.HTTP_200_OK)
+
+
+class TermsOfServiceView(EditableHTMLView):
+    """
+    API endpoint for setting and getting terms of service
+    """
+    template_name = 'texts/terms_of_service.html'
+
+
+class PrivacyPolicyView(EditableHTMLView):
+    """
+    API endpoint for setting and getting privacy policy
+    """
+    template_name = 'texts/privacy_policy.html'
