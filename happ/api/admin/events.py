@@ -159,10 +159,6 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @list_route(methods=['post'], url_path='upload')
-    def upload(self, request, *args, **kwargs):
-        return Response(request.data.getlist('images', []))
-
     @list_route(methods=['get'], url_path='moderation')
     @patch_queryset(lambda self, x: x.filter(status=Event.MODERATION))
     def moderation(self, request, *args, **kwargs):
