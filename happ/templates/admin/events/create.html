@@ -317,11 +317,12 @@
 
         $('#address').selectize({
           valueField: 'name',
+          labelField: 'name',
           render: {
               option: function(item, escape) {
                 console.log(item)
                   return '<div>' +
-                      '<img src="' + escape(item.icon) + '" alt="">' +
+                      (item.photos ? '<img src="{% url "google_photos_api" %}?photoreference=' + escape(item.photos[0].photo_reference) + '" alt="">' : '') +
                       '<span class="title">' +
                           '<span class="name">' + escape(item.name) + '</span>' +
                       '</span>' +
@@ -331,7 +332,7 @@
           },
           load: function(query, callback) {
               $.ajax({
-                  url: '{% url "places_api" %}',
+                  url: '{% url "google_places_api" %}',
                   type: 'POST',
                   data: {
                       text: query,

@@ -3,7 +3,14 @@ from django.conf.urls import url
 from rest_framework_mongoengine.routers import DefaultRouter
 
 from . import cities, currencies, interests, events, users, languages
-from . import TempUploadView, TermsOfServiceView, PrivacyPolicyView, OrganizerRulesView, GooglePlacesView
+from . import (
+    TempUploadView,
+    TermsOfServiceView,
+    PrivacyPolicyView,
+    OrganizerRulesView,
+    GooglePlacesView,
+    GooglePhotosView,
+)
 
 
 router = DefaultRouter()
@@ -19,7 +26,8 @@ urlpatterns = [
     url(r'^terms-of-service/$', TermsOfServiceView.as_view(), name='terms_of_service_api'),
     url(r'^privacy-policy/$', PrivacyPolicyView.as_view(), name='privacy_policy_api'),
     url(r'^organizer-rules/$', OrganizerRulesView.as_view(), name='organizer_rules_api'),
-    url(r'^places/$', GooglePlacesView.as_view(), name='places_api'),
+    url(r'^places/$', GooglePlacesView.as_view(), name='google_places_api'),
+    url(r'^photos/$', GooglePhotosView.as_view(), name='google_photos_api'),
 ]
 
 urlpatterns += router.urls

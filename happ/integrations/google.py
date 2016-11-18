@@ -21,3 +21,8 @@ def places(text):
     url = settings.GOOGLE_PLACES_LINK.format(text, settings.GOOGLE_API_KEY)
     response = requests.get(url)
     return json.loads(response.content)
+
+def photos(photoreference, max_width=100):
+    url = settings.GOOGLE_PHOTOS_LINK.format(max_width, photoreference, settings.GOOGLE_API_KEY)
+    response = requests.get(url)
+    return response.content

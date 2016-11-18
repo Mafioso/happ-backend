@@ -1,6 +1,7 @@
 import os
 
 from django.conf import settings
+from django.http.response import HttpResponse
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -67,6 +68,18 @@ class GooglePlacesView(APIView):
     API endpoint for retranslating google places search results to user
     """
     def post(self, request):
-        text = request.data['text']
+        text = request.data.get('text', None)
         r = google.places(text)
         return Response(r, status=status.HTTP_200_OK)
+
+
+class GooglePhotosView(APIView):
+    """
+    API endpoint for retranslating google photos results
+    """
+    def get(self, request):
+        photoreference = request.query_params.get('photoreference', None)
+        max_width = request.query_params.get('max_width', 100)
+        r = google.photos(photoreference, max_width)
+        return HttpResponse(r, content_type="image/png")
+        # Response(r, content_type='image/*', status=status.HTTP_200_OK)
