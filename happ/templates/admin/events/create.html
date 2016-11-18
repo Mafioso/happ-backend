@@ -108,7 +108,8 @@
                       <div class="form-group">
                         <label for="address" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="address" class="form-control col-md-7 col-xs-12" type="text" name="address">
+                          <select id="address" class="form-control col-md-7 col-xs-12 selectized" name="address">
+                          </select>
                         </div>
                       </div>
                       <div class="form-group">
@@ -239,6 +240,7 @@
     <!-- bootstrap-daterangepicker -->
     <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
     <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
+    <script src="{% get_static_prefix %}js/selectize.min.js"></script>
 
     <script>
       $(document).ready(function() {
@@ -311,6 +313,38 @@
           var el = $('.event_image[index='+index+']');
           el.parent().remove();
           $('#confirm-image-delete').modal('hide');
+        });
+
+        $('#address').selectize({
+          valueField: 'name',
+          render: {
+              option: function(item, escape) {
+                console.log(item)
+                  return '<div>' +
+                      '<img src="' + escape(item.icon) + '" alt="">' +
+                      '<span class="title">' +
+                          '<span class="name">' + escape(item.name) + '</span>' +
+                      '</span>' +
+                      '<span class="description">' + escape(item.formatted_address || 'No address available at this time.') + '</span>' +
+                  '</div>';
+              }
+          },
+          load: function(query, callback) {
+              $.ajax({
+                  url: '{% url "places_api" %}',
+                  type: 'POST',
+                  data: {
+                      text: query,
+                  },
+                  error: function() {
+                    callback();
+                  },
+                  success: function(res) {
+                    console.log(callback)
+                    callback(res.results);
+                  }
+              });
+          }
         });
 
       });
