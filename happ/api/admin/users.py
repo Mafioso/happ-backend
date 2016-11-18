@@ -70,7 +70,6 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         response = super(UserViewSet, self).retrieve(request, *args, **kwargs)
-        print response.data
         response.template_name = 'admin/users/edit.html'
         return response
 

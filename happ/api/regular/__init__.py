@@ -5,9 +5,11 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.renderers import TemplateHTMLRenderer
 
 from happ.models import FileObject
+from happ.decorators import patch_permission_classes
 from happ.integrations import google
 from happ.serializers import FileObjectSerializer
 
@@ -25,10 +27,12 @@ class TempUploadView(APIView):
 
 class EditableHTMLView(APIView):
     renderer_classes = (TemplateHTMLRenderer, )
+    permission_classes = ()
 
     def get(self, request):
         return Response(template_name=self.template_name, status=status.HTTP_200_OK)
 
+    @patch_permission_classes(api_settings.DEFAULT_PERMISSION_CLASSES)
     def post(self, request):
         text = request.data['text']
         path = os.path.join(settings.TEMPLATES_DIR_ROOT, self.template_name)
