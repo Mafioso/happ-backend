@@ -359,6 +359,8 @@ class EventAdminSerializer(LocalizedSerializer):
     start_time = drf_serializers.TimeField(write_only=True, required=False)
     end_date = drf_serializers.DateField(write_only=True, required=False)
     end_time = drf_serializers.TimeField(write_only=True, required=False)
+    geopoint_lng = drf_serializers.FloatField(write_only=True, required=False)
+    geopoint_lat = drf_serializers.FloatField(write_only=True, required=False)
 
     class Meta:
         model = Event
@@ -403,12 +405,16 @@ class EventAdminSerializer(LocalizedSerializer):
         currency = validated_data.pop('currency_id')
         interest_ids = validated_data.pop('interest_ids')
         image_ids = json.loads(validated_data.pop('image_ids')) if 'image_ids' in validated_data else []
+        geopoint_lng = validated_data.pop('geopoint_lng')
+        geopoint_lat = validated_data.pop('geopoint_lat')
         author = validated_data.pop('author')
-        event = super(EventSerializer, self).create(validated_data)
+        event = super(EventAdminSerializer, self).create(validated_data)
 
         event.city = city
         event.currency = currency
         event.author = author
+        if geopoint_lng and geopoint_lat:
+            event.geopoint = (geopoint_lng, geopoint_lat, )
         event.interests = Interest.objects.filter(id__in=interest_ids)
         event.save()
 
@@ -418,7 +424,7 @@ class EventAdminSerializer(LocalizedSerializer):
         return event
 
     def update(self, instance, validated_data):
-        event = super(EventSerializer, self).update(instance, validated_data)
+        event = super(EventAdminSerializer, self).update(instance, validated_data)
 
         if 'city_id' in validated_data:
             city = validated_data.pop('city_id')

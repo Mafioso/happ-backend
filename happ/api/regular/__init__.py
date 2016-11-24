@@ -69,7 +69,7 @@ class GooglePlacesView(APIView):
     """
     def post(self, request):
         text = request.data.get('text', None)
-        r = google.places(text)
+        r = google.places(text.encode('utf-8'))
         return Response(r, status=status.HTTP_200_OK)
 
 

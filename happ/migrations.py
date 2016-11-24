@@ -130,3 +130,7 @@ def migration__event__fill_max_age_field__0012():
 def migration__event__remove_field_age_restriction__0013():
     coll = get_db()['event']
     coll.update({}, {'$unset': {'age_restriction': ''}}, multi=True)
+
+def migration__event__fill_place_name_field__0014():
+    coll = get_db()['event']
+    coll.update({}, {'$set': {'place_name': ''}}, multi=True)

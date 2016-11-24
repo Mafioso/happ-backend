@@ -185,6 +185,7 @@ class Event(HappBaseDocument):
     interests = ListField(ReferenceField('Interest'))
     in_favourites = ListField(ReferenceField('User'))
     address = StringField()
+    place_name = StringField()
     geopoint = GeoPointField()
     phones = ListField(StringField())
     email = EmailField()
