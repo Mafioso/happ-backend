@@ -107,9 +107,14 @@
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="address" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
+                        <label for="place_name" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="address" class="form-control col-md-7 col-xs-12" type="text" name="address" value="{{ object.address|default:'' }}">
+                          <select id="place_name" class="form-control col-md-7 col-xs-12 place_name selectized" name="place_name">
+                            <option>{{ object.place_name }}</option>
+                          </select>
+                          <input type="hidden" name="geopoint_lng" id="geopoint_lng" value="{{ object.geopoint.0 }}" />
+                          <input type="hidden" name="geopoint_lat" id="geopoint_lat" value="{{ object.geopoint.1 }}" />
+                          <input type="hidden" name="address" id="address" value="{{ object.address }}" />
                         </div>
                       </div>
                       <div class="form-group">
@@ -249,6 +254,7 @@
     <!-- bootstrap-daterangepicker -->
     <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
     <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
+    <script src="{% get_static_prefix %}js/selectize.min.js"></script>
 
     <script>
       $(document).ready(function() {
@@ -329,6 +335,54 @@
           var el = $('.event_image[index='+index+']');
           el.parent().remove();
           $('#confirm-image-delete').modal('hide');
+        });
+
+        $('#place_name').selectize({
+          valueField: 'name',
+          labelField: 'name',
+          searchField: 'name',
+          render: {
+              option: function(item, escape) {
+                  return '<div>' +
+                      '<div class="col-md-2 col-sm-2 col-xs-12">' +
+                          (item.photos ? '<img class="img-circle" src="{% url "google_photos_api" %}?photoreference=' + escape(item.photos[0].photo_reference) + '&max_width=40" style="height:40px; width:40px" alt="">' : '') +
+                      '</div>' +
+                      '<div class="col-md-10 col-sm-10 col-xs-12">' +
+                        '<div class="text-primary">' + escape(item.name) + '</div>' +
+                        '<div class="text-muted">' + escape(item.formatted_address) + '</div>' +
+                      '</div>' +
+                  '</div>';
+              }
+          },
+          load: function(query, callback) {
+              if (!query.length) return callback();
+              $.ajax({
+                  url: '{% url "google_places_api" %}',
+                  type: 'POST',
+                  data: {
+                      text: query,
+                  },
+                  error: function() {
+                      callback();
+                  },
+                  success: function(res) {
+                      callback(res.results);
+                  }
+              });
+          },
+          onChange: function(value) {
+            var options = $(this)[0].options;
+            var item = options[value];
+            if (item !== undefined) {
+              $('#geopoint_lng').val(item.geometry.location.lng);
+              $('#geopoint_lat').val(item.geometry.location.lat);
+              $('#address').val(item.formatted_address);
+            } else {
+              $('#geopoint_lng').val('');
+              $('#geopoint_lat').val('');
+              $('#address').val('');
+            }
+          },
         });
       });
       $(document).on('change', '#image_input', function() {

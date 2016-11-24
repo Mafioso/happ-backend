@@ -79,8 +79,8 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0])
-        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0])
+        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0], dayfirst=True)
+        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0], dayfirst=True)
 
         request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
         request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
@@ -139,8 +139,8 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0])
-        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0])
+        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0], dayfirst=True)
+        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0], dayfirst=True)
 
         request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
         request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)

@@ -441,6 +441,10 @@ class EventAdminSerializer(LocalizedSerializer):
             FileObject.objects.filter(id__in=(old_ids-image_ids)).delete()
             map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=(image_ids-old_ids)))
             event.recalculate_color()
+        if 'geopoint_lng' in validated_data and 'geopoint_lat' in validated_data:
+            geopoint_lng = validated_data.pop('geopoint_lng')
+            geopoint_lat = validated_data.pop('geopoint_lat')
+            event.geopoint = (geopoint_lng, geopoint_lat, )
 
         event.save()
         # event.translate()
