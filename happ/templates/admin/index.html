@@ -21,13 +21,13 @@ Dashbord
   </div>
   <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
     <span class="count_top"><i class="fa fa-user"></i> Всего организаторов</span>
-    <div class="count">{{ total_users }}</div>
+    <div class="count">{{ total_organizers }}</div>
     <span class="count_bottom">
-      {% if total_users_delta >= 0 %}
+      {% if total_organizers_delta >= 0 %}
         <i class="green"><i class="fa fa-sort-asc"></i>
       {% else %}
         <i class="red"><i class="fa fa-sort-desc"></i>
-      {% endif %}{{ total_users_delta|floatformat:"0" }}% </i> с последней недели
+      {% endif %}{{ total_organizers_delta|floatformat:"0" }}% </i> с последней недели
     </span>
   </div>
   <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
