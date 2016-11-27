@@ -41,11 +41,13 @@ def jwt_payload_handler(user):
 
     return payload
 
-def store_file(temp_path, dest_root):
+def store_file(temp_path, dest_root, entity_id):
     if temp_path.find(dest_root) >= 0:
         return temp_path
     _, remaining_path = temp_path.split(settings.NGINX_TMP_UPLOAD_ROOT + '/')
-    file_path = os.path.join(dest_root, remaining_path)
+    if not os.path.exists(os.path.join(dest_root, entity_id)):
+        os.makedirs(os.path.join(dest_root, entity_id))
+    file_path = os.path.join(dest_root, entity_id, remaining_path)
     shutil.move(temp_path, file_path)
     return file_path
 

@@ -303,17 +303,17 @@ class FileObject(HappBaseDocument):
 
     def move_to_media(self, entity):
         self.entity = entity
-        self.path = store_file(self.path, settings.NGINX_UPLOAD_ROOT)
+        self.path = store_file(self.path, settings.NGINX_UPLOAD_ROOT, str(self.entity.id))
         self.save()
 
     def move_to_avatar(self, entity):
         self.entity = entity
-        self.path = store_file(self.path, settings.NGINX_AVATAR_ROOT)
+        self.path = store_file(self.path, settings.NGINX_AVATAR_ROOT, str(self.entity.id))
         self.save()
 
     def move_to_misc(self, entity):
         self.entity = entity
-        self.path = store_file(self.path, settings.NGINX_MISC_ROOT)
+        self.path = store_file(self.path, settings.NGINX_MISC_ROOT, str(self.entity.id))
         self.save()
 
 
