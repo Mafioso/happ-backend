@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
+import datetime
 from copy import deepcopy
-from datetime import datetime
 
 from django.conf import settings
 from mongoengine import *
@@ -24,12 +24,12 @@ class HappBaseDocument(Document):
     }
 
     date_created = DateTimeField()
-    date_edited = DateTimeField(default=datetime.now)
+    date_edited = DateTimeField(default=datetime.datetime.now)
 
     def save(self, *args, **kwargs):
         if not self.date_created:
-            self.date_created = datetime.now()
-        self.date_edited = datetime.now()
+            self.date_created = datetime.datetime.now()
+        self.date_edited = datetime.datetime.now()
         return super(HappBaseDocument, self).save(*args, **kwargs)
 
 
@@ -41,6 +41,7 @@ class City(HappBaseDocument):
     is_active = BooleanField(default=True)
     name = StringField(required=True)
     country = ReferenceField(Country, reverse_delete_rule=CASCADE)
+    geopoint = GeoPointField()
 
     @property
     def country_name(self):
@@ -163,7 +164,7 @@ class Interest(HappBaseDocument):
 
 class Upvote(EmbeddedDocument):
     user = ReferenceField('User')
-    ts = DateTimeField(default=datetime.now)
+    ts = DateTimeField(default=datetime.datetime.now)
 
 
 class Event(HappBaseDocument):
@@ -209,11 +210,11 @@ class Event(HappBaseDocument):
 
     @property
     def start_datetime(self):
-        return datetime.combine(self.start_date, self.start_time).isoformat()
+        return datetime.datetime.combine(self.start_date, self.start_time or datetime.time()).isoformat()
 
     @property
     def end_datetime(self):
-        return datetime.combine(self.end_date, self.end_time).isoformat()
+        return datetime.datetime.combine(self.end_date, self.end_time or datetime.time()).isoformat()
 
     @property
     def images(self):
