@@ -8,6 +8,7 @@ from mongoengine import Q
 
 from mongoextensions import filters
 from happ.models import Interest, CityInterests, User
+from happ.decorators import patch_queryset
 from happ.serializers import InterestParentSerializer
 
 
@@ -41,3 +42,8 @@ class InterestViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             city_interests = CityInterests(c=user.settings.city, ins=interests)
             user.update(push__interests=city_interests)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @list_route(methods=['get'], url_path='my')
+    @patch_queryset(lambda self, x: self.request.user.current_interests)
+    def my(self, request, *args, **kwargs):
+        return super(InterestViewSet, self).list(request, *args, **kwargs)

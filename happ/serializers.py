@@ -185,7 +185,6 @@ class UserSettingsSerializer(serializers.EmbeddedDocumentSerializer):
 class UserSerializer(serializers.DocumentSerializer):
     # read only fields
     fn = drf_serializers.CharField(read_only=True)
-    interests = InterestSerializer(source='current_interests', many=True, read_only=True)
     settings = UserSettingsSerializer(read_only=True)
 
     class Meta:
@@ -193,6 +192,9 @@ class UserSerializer(serializers.DocumentSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
+        exclude = (
+            'interests',
+        )
 
     def create(self, validated_data):
         user = User.objects.create(

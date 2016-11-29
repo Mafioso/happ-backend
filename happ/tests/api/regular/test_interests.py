@@ -7,6 +7,7 @@ from happ.factories import (
     UserFactory,
     InterestFactory,
     CityFactory,
+    CityInterestsFactory,
 )
 from happ.tests import *
 
@@ -69,6 +70,38 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
 
+    def test_get_my(self):
+        """
+            ensure that it returns only current interests
+        """
+
+        c1 = CityFactory()
+        c2 = CityFactory()
+        interests1 = CityInterestsFactory(c=c1)
+        interests2 = CityInterestsFactory(c=c2)
+
+        u = UserFactory()
+        u.set_password('123')
+        u.settings.city = c1
+        u.interests = [interests1, interests2]
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('interests-my')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        u.settings.city = c2
+        u.save()
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], len(interests2.ins))
 
     def test_search_interests(self):
         """
