@@ -118,6 +118,9 @@ class User(AbstractUser, HappBaseDocument):
     def get_featured(self):
         return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.FEATURED])
 
+    def get_organizer_feed(self):
+        return Event.objects(author=self)
+
     def activate(self):
         self.is_active = True
         self.save()

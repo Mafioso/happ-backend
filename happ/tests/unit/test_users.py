@@ -126,6 +126,23 @@ class Tests(SimpleTestCase):
 
         self.assertEqual(len(u.get_featured()), 1)
 
+    def test_get_organizer_feed(self):
+        """
+        we can take organizer feed for a particular user
+        """
+
+        u1 = UserFactory()
+        u2 = UserFactory()
+
+        for i in range(3):
+            if i % 2 == 1:
+                EventFactory(author=u1)
+            else:
+                EventFactory(author=u2)
+
+        self.assertEqual(len(u1.get_organizer_feed()), 1)
+        self.assertEqual(len(u2.get_organizer_feed()), 2)
+
     def test_activate(self):
         """
         we can activate user
