@@ -187,8 +187,9 @@ class Command(BaseCommand):
                     # get interest
                     with connection.cursor() as cursor_1:
                         interests = []
-                        if isinstance(r['interest_id'], list):
-                            for i_id in r['interest_id']:
+                        try:
+                            d = json.loads(r['interest_id'])
+                            for i_id in d:
                                 sql_1 = "SELECT * FROM `interests` WHERE `id`=%s"
                                 cursor_1.execute(sql_1, (i_id))
                                 r_1 = cursor_1.fetchone()
@@ -196,14 +197,8 @@ class Command(BaseCommand):
                                     print 'Interest !!!!', r['name'], i_id
                                 else:
                                     interests.append(Interest.objects.get(title=r_1['name']))
-                        elif isinstance(r['interest_id'], str):
-                            sql_1 = "SELECT * FROM `interests` WHERE `id`=%s"
-                            cursor_1.execute(sql_1, (r['interest_id']))
-                            r_1 = cursor_1.fetchone()
-                            if not r_1:
-                                print 'Interest !!!!', r['name'], i_id
-                            else:
-                                interests.append(Interest.objects.get(title=r_1['name']))
+                        except:
+                            pass
 
                     # get author
                     with connection.cursor() as cursor_1:

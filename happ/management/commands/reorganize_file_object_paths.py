@@ -14,6 +14,9 @@ from happ.models import FileObject
 class Command(BaseCommand):
     help = 'Changes file objects path scheme and move files'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--mv', type=bool, nargs='?')
+
     def path_leaf(self, path):
         head, tail = ntpath.split(path)
         return tail or ntpath.basename(head)
@@ -29,10 +32,10 @@ class Command(BaseCommand):
                 dest_folder = os.path.join(settings.NGINX_MISC_ROOT, str(f.entity.id))
             if not os.path.exists(dest_folder):
                 os.makedirs(dest_folder)
-            if os.path.exists(path):
+            if os.path.exists(path) and options['mv']:
                 shutil.move(path, os.path.join(dest_folder, filename))
-                f.path = os.path.join(dest_folder, filename)
-                f.save()
+            f.path = os.path.join(dest_folder, filename)
+            f.save()
             pbar.update(idx + 1)
         pbar.finish()
         self.stdout.write(
