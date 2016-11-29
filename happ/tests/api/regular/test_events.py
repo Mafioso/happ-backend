@@ -781,3 +781,35 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 5)
+
+    def test_get_events_organizer(self):
+        """
+        we can get organizer events
+        """
+
+        u1 = UserFactory()
+        u1.set_password('123')
+        u1.save()
+
+        u2 = UserFactory()
+
+        for i in range(5):
+            EventFactory(author=u1)
+
+        for i in range(3):
+            EventFactory(author=u2)
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u1.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-organizer')
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)

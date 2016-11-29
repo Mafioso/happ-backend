@@ -218,3 +218,9 @@ class EventViewSet(viewsets.ModelViewSet):
     @patch_order({'default': ('-start_date', '-start_time', ), 'popular': ('-start_date', '-votes_num')})
     def featured(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
+
+    @list_route(methods=['get'], url_path='organizer')
+    @patch_queryset(lambda self, x: self.request.user.get_organizer_feed())
+    @patch_order({'default': ('-start_date', '-start_time', ), 'popular': ('-start_date', '-votes_num')})
+    def organizer(self, request, *args, **kwargs):
+        return super(EventViewSet, self).list(request, *args, **kwargs)
