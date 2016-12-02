@@ -83,3 +83,13 @@ class GooglePhotosView(APIView):
         r = google.photos(photoreference, max_width)
         return HttpResponse(r, content_type="image/png")
         # Response(r, content_type='image/*', status=status.HTTP_200_OK)
+
+
+class VersionView(APIView):
+    """
+    API endpoint for gettings current backend version number
+    """
+    def get(self, request):
+        with open(os.path.join(settings.BASE_DIR, 'VERSION')) as f:
+            version = f.read().strip()
+        return Response({'version': version}, status=status.HTTP_200_OK)

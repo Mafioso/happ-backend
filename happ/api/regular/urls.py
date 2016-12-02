@@ -10,6 +10,7 @@ from . import (
     OrganizerRulesView,
     GooglePlacesView,
     GooglePhotosView,
+    VersionView,
 )
 
 
@@ -28,6 +29,7 @@ urlpatterns = [
     url(r'^organizer-rules/$', OrganizerRulesView.as_view(), name='organizer_rules_api'),
     url(r'^places/$', GooglePlacesView.as_view(), name='google_places_api'),
     url(r'^photos/$', GooglePhotosView.as_view(), name='google_photos_api'),
+    url(r'^version/$', VersionView.as_view(), name='version_api'),
 ]
 
 urlpatterns += router.urls
