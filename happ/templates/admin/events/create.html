@@ -124,8 +124,11 @@
                       <div class="form-group">
                         <label for="phones" class="control-label col-md-3 col-sm-3 col-xs-12">Телефоны организаторов <span class="required">*</span>
                         </label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="phones" class="form-control col-md-7 col-xs-12" type="text" name="phones" required="required">
+                        <div class="col-md-6 col-sm-6 col-xs-12 phone_input_fields_wrap">
+                          <div style="margin-bottom:10px">
+                            <input id="phones" class="form-control" type="text" name="phones[]" required="required">
+                          </div>
+                          <button class="btn btn-link add_phone_button">Добавить еще телефон</button>
                         </div>
                       </div>
                       <div class="form-group">
@@ -364,6 +367,20 @@
               $('#address').val('');
             }
           },
+        });
+
+        var phones_wrapper         = $('.phone_input_fields_wrap');
+        var phones_add_button      = $('.add_phone_button');
+
+        $(phones_add_button).click(function(e){
+            console.log('hi')
+            e.preventDefault();
+            $(this).before('<div class="input-group"><input id="phones" class="form-control" type="text" name="phones[]" required="required" aria-describedby="remove_phone"><span class="input-group-addon remove_phone_field" id="remove_phone" aria-hidden="true" title="Удалить телефон" style="cursor:pointer" data-toggle="tooltip">-</span></div>');
+        });
+
+        $(phones_wrapper).on('click','.remove_phone_field', function(e){
+            e.preventDefault();
+            $(this).parent('div').remove();
         });
 
       });
