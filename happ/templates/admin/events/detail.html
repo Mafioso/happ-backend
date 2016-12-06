@@ -1,4 +1,170 @@
-<div style="color: red">
-{{ id }}
-{{ title }}
+{% extends 'admin/base.html' %}
+{% load happ %}
+{% load static %}
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3><small>Просмотр события</small> {{ object.title }}</h3>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">
+          <dl class="dl-horizontal">
+            <dt>Название события</dt>
+            <dd>{{ object.title }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Тип</dt>
+            <dd>{{ object.type|event_type }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Название события</dt>
+            <dd>{{ object.title }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Город проведения</dt>
+            <dd>{{  object.city.name }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Дата проведения мероприятия</dt>
+            <dd>
+              <b>Начало: </b><span id="start_datetime"></span><br />
+              <b>Окончание: </b><span id="end_datetime"></span>
+            </dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Стоимость билета</dt>
+            <dd>
+              {% if object.min_price %}от {{ object.min_price }}{% endif %}
+              {% if object.max_price %} до {{ object.max_price }}{% endif %}
+              {{ object.currency.name }}
+            </dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Интерес</dt>
+            <dd>
+              {% if object.interests|length == 1 %}
+                {{ object.interests.0.title }}
+              {% else %}
+                <ol>
+                  {% for interest in object.interests %}
+                    <li>{{ interest.title }}</li>
+                  {% endfor %}
+                </ol>
+              {% endif %}
+            </dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Место проведения</dt>
+            <dd>{{ object.place_name|default:'' }}, {{ object.address|default:'' }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Описание</dt>
+            <dd>{{ object.description|default:'' }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Телефоны организаторов</dt>
+            <dd>
+              <ol>
+                {% for phone in object.phones %}
+                  <li>{{ phone }}</li>
+                {% endfor %}
+              </ol>
+            </dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Email</dt>
+            <dd>{{ object.email|default:'' }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Веб сайт</dt>
+            <dd>{{ object.web_site|default:'' }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Ссылка на регистрацию</dt>
+            <dd>{{ object.registration_link|default:'' }}</dd>
+          </dl>
+          <dl class="dl-horizontal">
+            <dt>Возрастные ограничения</dt>
+            <dd>
+              {% if object.min_age %}от {{ object.min_age }}{% endif %}
+              {% if object.max_age %} до {{ object.max_age }}{% endif %}
+            </dd>
+          </dl>
+          <div id="links" class="hidden">
+            {% if object.images|length > 0 %}
+              {% for image in object.images %}
+              <a href="{{ image.path }}" title="{{ object.title }}" data-gallery="#blueimp-gallery-carousel">
+                  <img src="{{ image.path }}" alt="{{ object.title }}">
+              </a>
+              {% endfor %}
+            {% endif %}
+          </div>
+          <div class="row">
+            <div class="col-md-8 col-sm-8 col-xs-12 col-md-offset-2 col-sm-offset-2 col-xs-offset-2">
+              <div id="blueimp-gallery-carousel" class="blueimp-gallery blueimp-gallery-carousel">
+                <div class="slides"></div>
+                <h3 class="title"></h3>
+                <a class="prev">‹</a>
+                <a class="next">›</a>
+                <a class="play-pause"></a>
+                <ol class="indicator"></ol>
+              </div>
+            </div>
+          </div>
+          {% if object.geopoint %}
+            <div id="map"></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+{% endblock%}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
+    <!-- Custom -->
+    <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
+    <!-- image gallery -->
+    <script src="{% get_static_prefix %}js/blueimp-gallery.min.js"></script>
+    <!-- google maps -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
+
+    <script>
+      $(document).ready(function() {
+        $('#start_datetime').text(moment('{{object.start_datetime}}').format('DD/MM/YYYY HH:mm'));
+        $('#end_datetime').text(moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm'));
+      });
+      blueimp.Gallery(
+          document.getElementById('links').getElementsByTagName('a'),
+          {
+              container: '#blueimp-gallery-carousel',
+              carousel: true
+          }
+      );
+      function initMap() {
+        var point = {lng: {{object.geopoint.0}}, lat: {{object.geopoint.1}}};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: point,
+        });
+        var marker = new google.maps.Marker({
+          position: point,
+          map: map
+        });
+      }
+    </script>
+{% endblock %}

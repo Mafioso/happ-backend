@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^event/moderation/$', views.EventModerationListView.as_view(), name="event_moderation_list"),
     url(r'^event/create/$', views.EventCreateView.as_view(), name="event_create"),
     url(r'^event/edit/(?P<id>[0-9a-z-]+)/$', views.EventEditView.as_view(), name="event_edit"),
+    url(r'^event/(?P<id>[0-9a-z-]+)/$', views.EventDetailView.as_view(), name="event_detail"),
     url(r'^city/list/$', views.CityListView.as_view(), name="city_list"),
     url(r'^category/list/$', views.CategoriesListView.as_view(), name="category_list"),
     url(r'^interest/list/$', views.InterestListView.as_view(), name="interest_list"),
