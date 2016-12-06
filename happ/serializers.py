@@ -407,8 +407,8 @@ class EventAdminSerializer(LocalizedSerializer):
         currency = validated_data.pop('currency_id')
         interest_ids = validated_data.pop('interest_ids')
         image_ids = json.loads(validated_data.pop('image_ids')) if 'image_ids' in validated_data else []
-        geopoint_lng = validated_data.pop('geopoint_lng')
-        geopoint_lat = validated_data.pop('geopoint_lat')
+        geopoint_lng = validated_data.pop('geopoint_lng') if 'geopoint_lng' in validated_data else None
+        geopoint_lat = validated_data.pop('geopoint_lat') if 'geopoint_lat' in validated_data else None
         author = validated_data.pop('author')
         event = super(EventAdminSerializer, self).create(validated_data)
 
