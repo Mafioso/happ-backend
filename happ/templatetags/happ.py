@@ -3,7 +3,7 @@
 from django.template.library import Library
 from django.conf import settings
 
-from ..models import Event
+from ..models import Event, User
 
 register = Library()
 
@@ -51,6 +51,23 @@ def event_type(type):
         return u"Featured"
     if type == Event.ADS:
         return u"Ads"
+
+@register.filter(name='gender')
+def gender(type):
+    return u"Мужской" if type == User.MALE else u"Женский"
+
+@register.filter(name='role')
+def role(role):
+    if role == User.REGULAR:
+        return u"Стандартный"
+    if role == User.ORGANIZER:
+        return u"Организатор"
+    if role == User.MODERATOR:
+        return u"Модератор"
+    if role == User.ADMINISTRATOR:
+        return u"Администратор"
+    if role == User.ROOT:
+        return u"Root"
 
 @register.filter(name='get')
 def get(d, attr):

@@ -1,0 +1,85 @@
+{% extends 'admin/base.html' %}
+{% load happ %}
+{% load static %}
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Профиль пользователя</h3>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">
+          <div class="row">
+            <div class="col-md-4 col-sm-4 col-xs-12">
+              {% if request.user.avatar %}
+                <img src="{{ request.user.avatar }}" class="img-thumbnail" />
+              {% else %}
+                <img src="{% get_static_prefix %}/images/noavatar.jpg" class="img-thumbnail" />
+              {% endif %}
+            </div>
+            <div class="col-md-8 col-sm-8 col-xs-12">
+              <dl class="dl-horizontal">
+                <dt>Логин</dt>
+                <dd>{{ request.user.username }}</dd>
+              </dl>
+              <dl class="dl-horizontal">
+                <dt>Полное имя</dt>
+                <dd>{{ request.user.fullname|default:'' }}</dd>
+              </dl>
+              <dl class="dl-horizontal">
+                <dt>E-mail</dt>
+                <dd>{{ request.user.email|default:'' }}</dd>
+              </dl>
+              <dl class="dl-horizontal">
+                <dt>Телефон</dt>
+                <dd>{{ request.user.phone|default:'' }}</dd>
+              </dl>
+              <dl class="dl-horizontal">
+                <dt>Дата рождения</dt>
+                <dd>
+                  <span id="date_of_birth"></span>
+                </dd>
+              </dl>
+              <dl class="dl-horizontal">
+                <dt>Пол</dt>
+                <dd>{{ request.user.gender|gender }}</dd>
+              </dl>
+              <dl class="dl-horizontal">
+                <dt>Роль</dt>
+                <dd>{{ request.user.role|role }}</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock%}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
+    <!-- Custom -->
+    <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        {% if request.user.date_of_birth %}
+          $('#date_of_birth').text(moment('{{request.user.date_of_birth}}').format('DD/MM/YYYY HH:mm'));
+        {% endif %}
+        }
+      });
+    </script>
+{% endblock %}

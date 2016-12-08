@@ -129,6 +129,12 @@ class User(AbstractUser, HappBaseDocument):
         self.is_active = False
         self.save()
 
+    def avatar(self):
+        try:
+            return FileObject.objects.get(entity=self)
+        except FileObject.DoesNotExist:
+            return None
+
 
 class Interest(HappBaseDocument):
     title = StringField()

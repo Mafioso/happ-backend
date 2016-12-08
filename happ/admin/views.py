@@ -107,6 +107,10 @@ class EventDetailView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
+class ProfileView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/profile/detail.html'
+
+
 class CityListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/cities_list.html'
 

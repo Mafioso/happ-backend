@@ -27,7 +27,7 @@
           </dl>
           <dl class="dl-horizontal">
             <dt>Город проведения</dt>
-            <dd>{{  object.city.name }}</dd>
+            <dd>{{ object.city.name }}</dd>
           </dl>
           <dl class="dl-horizontal">
             <dt>Дата проведения мероприятия</dt>
@@ -95,7 +95,7 @@
               {% if object.max_age %} до {{ object.max_age }}{% endif %}
             </dd>
           </dl>
-          <div id="links" class="hidden">
+          <div id="images" class="hidden">
             {% if object.images|length > 0 %}
               {% for image in object.images %}
               <a href="{{ image.path }}" title="{{ object.title }}" data-gallery="#blueimp-gallery-carousel">
@@ -149,7 +149,7 @@
         $('#end_datetime').text(moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm'));
       });
       blueimp.Gallery(
-          document.getElementById('links').getElementsByTagName('a'),
+          document.getElementById('images').getElementsByTagName('a'),
           {
               container: '#blueimp-gallery-carousel',
               carousel: true
