@@ -27,6 +27,16 @@ class LocalizedSerializer(serializers.DocumentSerializer):
         return data
 
 
+class FileObjectSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = FileObject
+        fields = (
+            'id',
+            'path',
+        )
+
+
 class CountrySerializer(serializers.DocumentSerializer):
 
     class Meta:
@@ -202,6 +212,49 @@ class UserSerializer(serializers.DocumentSerializer):
         )
         user.set_password(validated_data['password'])
         user.settings = UserSettings()
+        user.save()
+        return user
+
+
+class UserAdminSerializer(serializers.DocumentSerializer):
+    # read only fields
+    fn = drf_serializers.CharField(read_only=True)
+    settings = UserSettingsSerializer(read_only=True)
+    avatar = FileObjectSerializer(read_only=True)
+
+    # write only fields
+    avatar_id = drf_serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = User
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+        exclude = (
+            'interests',
+        )
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+        )
+        user.set_password(validated_data['password'])
+        user.settings = UserSettings()
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        user = super(UserAdminSerializer, self).update(instance, validated_data)
+
+        if 'avatar_id' in validated_data:
+            avatar_id = validated_data.pop('avatar_id')
+            if instance.avatar and instance.avatar.id:
+                FileObject.objects.filter(id__in=(instance.avatar.id,)).delete()
+            try:
+                FileObject.objects.get(id=avatar_id).move_to_avatar(entity=user)
+            except:
+                pass
+
         user.save()
         return user
 
@@ -454,13 +507,3 @@ class EventAdminSerializer(LocalizedSerializer):
 
     def get_images(self, obj):
         return FileObjectSerializer(obj.images, many=True).data
-
-
-class FileObjectSerializer(serializers.DocumentSerializer):
-
-    class Meta:
-        model = FileObject
-        fields = (
-            'id',
-            'path',
-        )

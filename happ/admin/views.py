@@ -111,6 +111,10 @@ class ProfileView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/profile/detail.html'
 
 
+class ProfileEditView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/profile/edit.html'
+
+
 class CityListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/cities_list.html'
 

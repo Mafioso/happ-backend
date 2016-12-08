@@ -109,6 +109,13 @@ class User(AbstractUser, HappBaseDocument):
         except:
             return []
 
+    @property
+    def avatar(self):
+        try:
+            return FileObject.objects.get(entity=self)
+        except FileObject.DoesNotExist:
+            return None
+
     def get_favourites(self):
         return Event.objects(in_favourites=self)
 
@@ -128,12 +135,6 @@ class User(AbstractUser, HappBaseDocument):
     def deactivate(self):
         self.is_active = False
         self.save()
-
-    def avatar(self):
-        try:
-            return FileObject.objects.get(entity=self)
-        except FileObject.DoesNotExist:
-            return None
 
 
 class Interest(HappBaseDocument):

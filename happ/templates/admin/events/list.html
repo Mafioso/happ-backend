@@ -26,7 +26,11 @@
           <a>{{item.title}}</a>
         </td>
         <td>
-          <img src="{% get_static_prefix %}images/marat.jpeg" class="avatar" alt="Avatar">
+          {% if item.author.avatar %}
+            <img src="{{ item.author.avatar }}" class="avatar" />
+          {% else %}
+            <img src="{% get_static_prefix %}images/noavatar.jpg" class="avatar" />
+          {% endif %}
           <br/><br/>
           <a>{{item.author.fn}}</a>
         </td>

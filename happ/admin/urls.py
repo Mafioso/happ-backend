@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^$', views.DashboardView.as_view(), name="dashboard"),
     url(r'^login/$', views.LoginView.as_view(), name="admin-login"),
     url(r'^profile/$', views.ProfileView.as_view(), name="admin-profile"),
+    url(r'^profile/edit/$', views.ProfileEditView.as_view(), name="admin-profile-edit"),
     url(r'^event/list/$', views.EventListView.as_view(), name="event_list"),
     url(r'^event/moderation/$', views.EventModerationListView.as_view(), name="event_moderation_list"),
     url(r'^event/create/$', views.EventCreateView.as_view(), name="event_create"),

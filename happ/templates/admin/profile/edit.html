@@ -1,0 +1,236 @@
+{% extends 'admin/base.html' %}
+{% load happ %}
+{% load static %}
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Редактирование профиля</h3>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_content">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <h4>Основные данные</h4>
+            </div>
+          </div>
+          <form id="profile-form" data-parsley-validate class="form-horizontal form-label-left" ic-patch-to="{% url 'admin-users-detail' id=request.user.id %}" ic-on-success="window.location.replace('{% url 'admin-profile' %}');" ic-verb='PATCH' ic-indicator="#indicator3">
+            <div class="row">
+              <div class="col-md-4 col-sm-4 col-xs-12">
+                <div id="avatar_wrapper">
+                  {% if request.user.avatar %}
+                    <div class="event_image" data-toggle="modal" data-target="#confirm-image-delete">
+                      <img src="{{ request.user.avatar.path }}" class="img-thumbnail" />
+                      <span class="event_image_hover">Удалить</span>
+                    </div>
+                  {% else %}
+                    <img src="{% get_static_prefix %}images/noavatar.jpg" class="img-thumbnail" />
+                  {% endif %}
+                </div>
+                <div class="text-center">
+                  <input id="avatar_id" class="form-control col-md-7 col-xs-12" type="hidden" name="avatar_id" value="{% if request.user.avatar %}{{ request.user.avatar.id }}{% endif %}">
+                  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#imageModal">
+                    Изменить изображение
+                  </button>
+                </div>
+              </div>
+              <div class="col-md-8 col-sm-8 col-xs-12">
+                <dl class="dl-horizontal">
+                  <dt>Логин</dt>
+                  <dd>{{ request.user.username }}</dd>
+                </dl>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="fullname">Полное имя</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="fullname" name="fullname" class="form-control col-md-7 col-xs-12" value="{{ request.user.fullname|default:'' }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="email">E-mail</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="email" name="email" class="form-control col-md-7 col-xs-12" value="{{ request.user.email|default:'' }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="phone">Телефон</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="phone" name="phone" class="form-control col-md-7 col-xs-12" value="{{ request.user.phone|default:'' }}">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="date_of_birth_raw">Дата рождения</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="text" id="date_of_birth_raw" class="form-control col-md-7 col-xs-12" value="">
+                    <input type="hidden" id="date_of_birth" name="date_of_birth" class="form-control col-md-7 col-xs-12" value="">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="gender" class="control-label col-md-3 col-sm-3 col-xs-12">Пол</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <select id="gender" class="form-control col-md-7 col-xs-12" name="gender">
+                      <option {% if request.user.gender == 0 %}selected="selected"{% endif %} value="0">Мужской</option>
+                      <option {% if request.user.gender == 1 %}selected="selected"{% endif %} value="1">Женский</option>
+                    </select>
+                  </div>
+                </div>
+                <dl class="dl-horizontal">
+                  <dt>Роль</dt>
+                  <dd>{{ request.user.role|role }}</dd>
+                </dl>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <button type="submit" class="btn btn-success">Сохранить <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
+                    <a href="{% url 'admin-profile' %}" class="btn btn-link">Назад</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="imageModalLabel">Изменить изображение</h4>
+          </div>
+          <div class="modal-body">
+            <div class="text-center">
+              <label class="btn btn-default btn-file">
+                Выбрать <input id="image_input" type="file" style="display: none;" name="files">
+              </label>
+            </div>
+            <div style="display: none;">
+              <img id="tempImage" class="croppingImg" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+            <button type="button" class="btn btn-primary" id="cropButton">Сохранить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="confirm-image-delete" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  Вы действительно хотите удалить изображение
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Нет</button>
+                  <a class="btn btn-danger btn-ok confirm-image-delete-yes">Да</a>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% endblock%}
+
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Intercooler js -->
+    <script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
+    <!-- Custom -->
+    <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
+    <!-- Cropper -->
+    <script src="{% get_static_prefix %}js/cropper.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
+    <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
+
+    <script>
+      $(document).ready(function() {
+        window.cropp = null;
+        $('#imageModal').on('hidden.bs.modal', function () {
+          var img_tag = $('#tempImage');
+          img_tag.attr('src', '');
+          img_tag.parent().hide();
+          img_tag.cropper('destroy');
+          window.cropp = null;
+        });
+        $('#imageModal').on('show.bs.modal', function () {
+          $('#image_input').parent().show();
+        });
+        $('#cropButton').on('click', function() {
+          window.cropp.cropper('getCroppedCanvas').toBlob(function (blob) {
+            var formData = new FormData();
+
+            formData.append('files', blob);
+
+            $.ajax('/upload/', {
+              method: "POST",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (data, response) {
+                $('#avatar_wrapper').empty();
+                $('#avatar_wrapper').append("<div class='event_image' data-toggle='modal' data-target='#confirm-image-delete'><img  class='img-thumbnail' src='" + data[0].path + "' /><span class='event_image_hover'>Удалить</span></div>");
+                $('#avatar_id').val(data[0].id);
+                $('#imageModal').modal('hide');
+              },
+              error: function () {
+              }
+            });
+          });
+        });
+        $('.confirm-image-delete-yes').on('click', function(e) {
+          $('#avatar_wrapper').empty();
+          $('#avatar_wrapper').append("<img src='{% get_static_prefix %}images/noavatar.jpg' class='img-thumbnail' />");
+          $('#avatar_id').val('');
+          $('#confirm-image-delete').modal('hide');
+        });
+        {% if request.user.date_of_birth %}
+          $('#date_of_birth_raw').val(moment('{{ request.user.date_of_birth.isoformat }}').format('DD/MM/YYYY'));
+          $('#date_of_birth').val('{{ request.user.date_of_birth.isoformat }}');
+        {% endif %}
+        $('#date_of_birth_raw').daterangepicker({
+          singleDatePicker: true,
+          calender_style: "picker_4",
+          format: 'DD/MM/YYYY',
+        }, function(start, end, label) {
+          $('#date_of_birth').val(moment(start).format('YYYY-MM-DDT00:00'));
+          console.log(start.toISOString(), end.toISOString(), label);
+        });
+      });
+      $(document).on('change', '#image_input', function() {
+        var input = $(this);
+        if (input.val()) {
+          var reader = new FileReader();
+
+          reader.onload = function (e) {
+            input.parent().hide();
+            var img_tag = $('#tempImage');
+            img_tag.attr('src', e.target.result);
+            img_tag.parent().show();
+            window.cropp = img_tag.cropper({
+              aspectRatio: 1 / 1,
+              viewMode: 1,
+              background: true,
+              movable: false,
+              rotatable: false,
+              scalable: false,
+              zoomable: false,
+            })
+          }
+
+          reader.readAsDataURL(input.get(0).files[0]);
+        }
+      });
+    </script>
+{% endblock %}

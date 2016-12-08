@@ -7,12 +7,12 @@ from mongoextensions import filters
 from happ.models import User
 from happ.policies import StaffPolicy, RootAdministratorPolicy
 from happ.decorators import patch_permission_classes, patch_queryset
-from happ.serializers import UserSerializer
+from happ.serializers import UserAdminSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffPolicy, )
-    serializer_class = UserSerializer
+    serializer_class = UserAdminSerializer
     queryset = User.objects.all()
 
     def create(self, request, *args, **kwargs):
