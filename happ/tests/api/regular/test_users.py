@@ -5,7 +5,7 @@ from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
 from happ.models import User, Currency
-from happ.factories import UserFactory
+from happ.factories import UserFactory, FileObjectFactory
 from happ.tests import *
 
 
@@ -151,3 +151,39 @@ class Tests(APISimpleTestCase):
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_edit_avatar(self):
+        """
+        We can edit avatar
+        """
+        u = UserFactory(**{
+            'fullname': 'Michael Brown',
+            'phone': '87015555555',
+            'gender': 0,
+            'date_of_birth': datetime(1991, 12, 23)
+        })
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('users-current/edit')
+        file_object = FileObjectFactory()
+
+        data = {
+            'avatar_id': str(file_object.id),
+        }
+
+        self.assertEqual(u.avatar, None)
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        u = User.objects.get(username=u.username)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(u.avatar, None)

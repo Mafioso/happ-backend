@@ -14,7 +14,8 @@ from models import (
     Interest,
     Event,
     Localized,
-    CityInterests
+    CityInterests,
+    FileObject,
 )
 
 ALL_CITIES = City.objects
@@ -141,3 +142,8 @@ class LocalizedFactory(factory.mongoengine.MongoEngineFactory):
 
     class Meta:
         model = Localized
+
+
+class FileObjectFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = FileObject

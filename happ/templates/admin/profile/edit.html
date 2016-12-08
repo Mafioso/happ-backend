@@ -99,7 +99,7 @@
             </div>
           </div>
           <div id="message"></div>
-          <form id="profile-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-users-change-password' %}" ic-on-success="show_message(xhr, true)" ic-on-error="show_message(xhr, false)" ic-verb='POST' ic-indicator="#indicator4">
+          <form id="profile-password-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-users-change-password' %}" ic-on-success="show_message(xhr, true)" ic-on-error="show_message(xhr, false)" ic-verb='POST' ic-indicator="#indicator4">
             <div class="row">
               <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="form-group">
