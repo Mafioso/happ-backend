@@ -90,6 +90,44 @@
               </div>
             </div>
           </form>
+
+          <div class="ln_solid"></div>
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <h4>Смена пароля</h4>
+            </div>
+          </div>
+          <div id="message"></div>
+          <form id="profile-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-users-change-password' %}" ic-on-success="show_message(xhr, true)" ic-on-error="show_message(xhr, false)" ic-verb='POST' ic-indicator="#indicator4">
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="old_password">Старый пароль</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="password" id="old_password" name="old_password" class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="new_password">Новый пароль</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="password" id="new_password" name="new_password" class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="control-label col-md-3 col-sm-3 col-xs-12" for="new_password2">Повторите пароль</label>
+                  <div class="col-md-6 col-sm-6 col-xs-12">
+                    <input type="password" id="new_password2" name="new_password2" class="form-control col-md-7 col-xs-12">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                    <button type="submit" class="btn btn-warning">Изменить <i id="indicator4" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -232,5 +270,14 @@
           reader.readAsDataURL(input.get(0).files[0]);
         }
       });
+
+      function show_message(xhr, ok) {
+        $('#message').empty();
+        if(ok) {
+          $('#message').append("<div class='alert alert-success alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>Пароль успешно изменен</div>");
+        } else {
+          $('#message').append("<div class='alert alert-danger alert-dismissible' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>" + JSON.parse(xhr.responseText).error_message + "</div>");
+        }
+      }
     </script>
 {% endblock %}

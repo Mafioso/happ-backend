@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import status
 from rest_framework.decorators import list_route, detail_route
 from rest_framework.response import Response
@@ -94,4 +96,28 @@ class UserViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.deactivate()
 
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @list_route(methods=['post'], url_path='change_password')
+    def change_password(self, request, *args, **kwargs):
+        instance = request.user
+
+        old_password = request.data.get('old_password', '')
+        new_password = request.data.get('new_password', '')
+        new_password2 = request.data.get('new_password2', '')
+
+        if new_password != new_password2:
+            return Response(
+                {'error_message': _("The two password fields didn't match.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if not instance.check_password(old_password):
+            return Response(
+                {'error_message': _("Your old password was entered incorrectly. Please enter it again.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        instance.set_password(new_password)
+        instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
