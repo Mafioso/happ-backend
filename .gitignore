@@ -17,3 +17,4 @@ nohup*
 logs/
 static/
 !happ/static/
+mongodb/
