@@ -30,9 +30,9 @@ release:
 
 deploy:
 	@echo "$(YELLOW)[ copying conf files ]$(WHITE)"
-	scp -r conf/prod $(USER)@$(HOST):/home/happ/conf
-	scp docker-compose.prod.yml $(USER)@$(HOST):/home/happ
-	scp docker-compose.base.yml $(USER)@$(HOST):/home/happ
+	scp -r conf/prod $(USER)@$(HOST):/root/project/happ/conf
+	scp docker-compose.prod.yml $(USER)@$(HOST):/root/project/happ
+	scp docker-compose.base.yml $(USER)@$(HOST):/root/project/happ
 	@echo "$(YELLOW)[ stoping server ]$(WHITE)"
 	ssh $(USER)@$(HOST) 'docker-compose -f docker-compose.prod.yml stop'
 	@echo "$(YELLOW)[ pulling new image ]$(WHITE)"
