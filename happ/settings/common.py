@@ -28,7 +28,11 @@ SECRET_KEY = '(e2%9phpj5%2z6z-i*20cj&f@1x#1l=ofn_v=k5rq*hs9^6fk#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['happ.westeurope.cloudapp.azure.com', 'happ.dev']
+ALLOWED_HOSTS = [
+    'happ.westeurope.cloudapp.azure.com',
+    'happ.dev',
+    'happ.skills.kz',
+]
 
 
 # Application definition
