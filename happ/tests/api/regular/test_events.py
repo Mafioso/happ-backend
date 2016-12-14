@@ -674,7 +674,21 @@ class Tests(APISimpleTestCase):
                 min_price=i,
                 max_price=i+10,
                 city=c1,
-                interests=[random.choice(ins_set)]
+                interests=[random.choice(ins_set)],
+                status=Event.APPROVED,
+            )
+
+        for i in range(3):
+            EventFactory(
+                title='t{}'.format(i),
+                votes_num=(5-i),
+                start_date='20170520',
+                start_time='0{}3000'.format(i),
+                min_price=i,
+                max_price=i+10,
+                city=c1,
+                interests=[random.choice(ins_set)],
+                status=random.choice([Event.MODERATION, Event.REJECTED]),
             )
 
         u = UserFactory()
@@ -759,6 +773,15 @@ class Tests(APISimpleTestCase):
                 city=c1,
                 interests=[random.choice(ins_set)],
                 type=Event.FEATURED,
+                status=Event.APPROVED,
+            )
+
+        for i in range(3):
+            EventFactory(
+                city=c1,
+                interests=[random.choice(ins_set)],
+                type=Event.FEATURED,
+                status=random.choice([Event.MODERATION, Event.REJECTED]),
             )
 
         u = UserFactory()
