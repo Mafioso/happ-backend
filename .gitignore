@@ -17,4 +17,5 @@ nohup*
 logs/
 static/
 !happ/static/
+!conf/prod/nginx/static/
 mongodb/
