@@ -34,7 +34,7 @@ deploy:
 	scp docker-compose.prod.yml $(USER)@$(HOST):/root/project/happ
 	scp docker-compose.base.yml $(USER)@$(HOST):/root/project/happ
 	@echo "$(YELLOW)[ stoping server ]$(WHITE)"
-	-ssh $(USER)@$(HOST) 'docker-compose -f docker-compose.prod.yml kill'
+	-ssh $(USER)@$(HOST) 'docker-compose -f /root/project/happ/docker-compose.prod.yml down'
 	@echo "$(YELLOW)[ pulling new image ]$(WHITE)"
 	ssh $(USER)@$(HOST) 'docker pull askhatomarov/happ:latest'
 	@echo "$(YELLOW)[ starting server ]$(WHITE)"

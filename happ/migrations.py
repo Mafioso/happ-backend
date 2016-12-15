@@ -146,6 +146,6 @@ def migration__event__remove_field_color__0016():
     coll = get_db()['event']
     coll.update({}, {'$unset': {'color': ''}}, multi=True)
 
-def migration__interest__remove_field_color__0016():
+def migration__interest__remove_field_color__0017():
     coll = get_db()['interest']
     coll.update({}, {'$unset': {'color': ''}}, multi=True)
