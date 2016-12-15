@@ -109,7 +109,6 @@ class Tests(APISimpleTestCase):
             'parent_id': None,
             'is_global': True,
             'local_cities': [],
-            'color': '000000',
         }
 
         auth_url = prepare_url('login')
@@ -135,7 +134,6 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Interest.objects.count(), n+1)
         self.assertEqual(response.data['title'], 'NewInterest name')
-        self.assertEqual(response.data['color'], '000000')
 
         # ok for root
         u.role = User.ROOT
@@ -147,7 +145,6 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Interest.objects.count(), n+2)
         self.assertEqual(response.data['title'], 'NewInterest name')
-        self.assertEqual(response.data['color'], '000000')
 
     def test_update_interest(self):
         """
@@ -173,7 +170,6 @@ class Tests(APISimpleTestCase):
             'parent_id': None,
             'is_global': False,
             'local_cities': cities,
-            'color': '00FF00',
         }
         n = Interest.objects.count()
 
@@ -182,7 +178,6 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Interest.objects.count(), n)
         self.assertEqual(response.data['title'], 'NewInterest name')
-        self.assertEqual(response.data['color'], '00FF00')
 
     def test_delete_interest(self):
         """

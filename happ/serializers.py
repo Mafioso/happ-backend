@@ -121,7 +121,6 @@ class InterestSerializer(serializers.DocumentSerializer):
         if image_id:
             image = FileObject.objects.get(id=image_id)
             image.move_to_misc(entity=interest)
-            interest.recalculate_color()
         return interest
 
     def update(self, instance, validated_data):
@@ -143,7 +142,6 @@ class InterestSerializer(serializers.DocumentSerializer):
                 interest.image.delete()
             image = FileObject.objects.get(id=image_id)
             image.move_to_misc(entity=interest)
-            interest.recalculate_color()
         return interest
 
     def get_image(self, obj):
@@ -374,7 +372,6 @@ class EventSerializer(LocalizedSerializer):
         event.save()
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
-        event.recalculate_color()
         # event.translate()
         return event
 
@@ -395,7 +392,6 @@ class EventSerializer(LocalizedSerializer):
             old_ids = set(map(lambda x: str(x.id), instance.images))
             FileObject.objects.filter(id__in=(old_ids-image_ids)).delete()
             map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=(image_ids-old_ids)))
-            event.recalculate_color()
 
         event.save()
         # event.translate()
@@ -494,7 +490,6 @@ class EventAdminSerializer(LocalizedSerializer):
         event.save()
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
-        event.recalculate_color()
         # event.translate()
         return event
 
@@ -515,7 +510,6 @@ class EventAdminSerializer(LocalizedSerializer):
             old_ids = set(map(lambda x: str(x.id), instance.images))
             FileObject.objects.filter(id__in=(old_ids-image_ids)).delete()
             map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=(image_ids-old_ids)))
-            event.recalculate_color()
         if 'geopoint_lng' in validated_data and 'geopoint_lat' in validated_data:
             geopoint_lng = validated_data.pop('geopoint_lng')
             geopoint_lat = validated_data.pop('geopoint_lat')

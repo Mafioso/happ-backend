@@ -6,7 +6,6 @@ from copy import deepcopy
 from django.conf import settings
 from mongoengine import *
 from mongoengine.connection import _get_db
-from PIL import Image
 
 from mongoextensions.fields import DateStringField, TimeStringField
 from happ.auth.models import AbstractUser, UserQuerySet
@@ -142,7 +141,6 @@ class Interest(HappBaseDocument):
     is_global = BooleanField(default=True)
     local_cities = ListField(ReferenceField(City))
     parent = ReferenceField('self')
-    color = StringField()
     is_active = BooleanField(default=True)
 
     @property
@@ -155,13 +153,6 @@ class Interest(HappBaseDocument):
             return FileObject.objects.get(entity=self)
         except FileObject.DoesNotExist:
             return None
-
-    def recalculate_color(self):
-        image = self.image
-        if not image:
-            return
-        self.color = average_color(Image.open(image.path))
-        self.save()
 
     def activate(self):
         self.is_active = True
@@ -209,7 +200,6 @@ class Event(HappBaseDocument):
     end_time = TimeStringField()
     close_on_start = BooleanField(default=False)
     registration_link = StringField()
-    color = StringField()
     min_age = IntField(default=0)
     max_age = IntField(default=200)
 
@@ -235,14 +225,6 @@ class Event(HappBaseDocument):
             return Localized.objects.get(entity=self, language=language)
         except:
             return None
-
-    def recalculate_color(self):
-        try:
-            image = self.images.order_by('date_created')[0]
-        except IndexError:
-            return
-        self.color = average_color(Image.open(image.path))
-        self.save()
 
     def copy(self):
         new_instance = deepcopy(self)
@@ -306,6 +288,7 @@ class Event(HappBaseDocument):
 class FileObject(HappBaseDocument):
     path = StringField()
     entity = GenericReferenceField()
+    color = StringField()
 
     @classmethod
     def post_delete(cls, sender, document, **kwargs):
@@ -314,16 +297,23 @@ class FileObject(HappBaseDocument):
     def move_to_media(self, entity):
         self.entity = entity
         self.path = store_file(self.path, settings.NGINX_UPLOAD_ROOT, str(self.entity.id))
+        self.recalculate_color()
         self.save()
 
     def move_to_avatar(self, entity):
         self.entity = entity
         self.path = store_file(self.path, settings.NGINX_AVATAR_ROOT, str(self.entity.id))
+        self.recalculate_color()
         self.save()
 
     def move_to_misc(self, entity):
         self.entity = entity
         self.path = store_file(self.path, settings.NGINX_MISC_ROOT, str(self.entity.id))
+        self.recalculate_color()
+        self.save()
+
+    def recalculate_color(self):
+        self.color = average_color(self.path)
         self.save()
 
 

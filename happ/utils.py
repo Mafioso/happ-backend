@@ -1,10 +1,12 @@
 import os
 import uuid
 import shutil
+import colorsys
 import dateutil
 import datetime
 import warnings
 from calendar import timegm
+from PIL import Image
 
 from django.conf import settings
 
@@ -101,7 +103,12 @@ def string_to_time(s, format):
         return s.time()
     return datetime.datetime.strptime(s, format).time()
 
-def average_color(image):
+def average_color(path):
+
+    try:
+        image = Image.open(path)
+    except IOError:
+        return None
 
     w, h = image.size
     pixels = image.getcolors(w * h)
@@ -112,6 +119,38 @@ def average_color(image):
         if count > most_frequent_pixel[0]:
             most_frequent_pixel = (count, colour)
 
-    rgb_color = most_frequent_pixel[1][:3]
+    rgb = most_frequent_pixel[1][:3]
+    rgb = make_contrast(rgb)
     # hex value
-    return '#{:02x}{:02x}{:02x}'.format(*rgb_color)
+    return '#{:02x}{:02x}{:02x}'.format(*rgb)
+
+def make_contrast(rgb):
+    while not is_contrast(rgb):
+        rgb = rgb_0_1(*rgb)
+        hls = colorsys.rgb_to_hls(*rgb)
+        hls = decrease_lightness(*hls)
+        rgb = colorsys.hls_to_rgb(*hls)
+        rgb = rgb_0_255(*rgb)
+    return rgb
+
+def is_contrast(value):
+    white = (255, 255, 255)
+    white_g = [x/3294.0 if x <= 10 else (x/269.0 + 0.0513)**2.4 for x in white]
+    value_g = [x/3294.0 if x <= 10 else (x/269.0 + 0.0513)**2.4 for x in value]
+    white_l = 0.2126 * white_g[0] + 0.7152 * white_g[1] + 0.0722 * white_g[2]
+    value_l = 0.2126 * value_g[0] + 0.7152 * value_g[1] + 0.0722 * value_g[2]
+    if white_l > value_l:
+        ratio = ((white_l + 0.05) / (value_l + 0.05))
+    else:
+        ratio = ((value_l + 0.05) / (white_l + 0.05))
+    return ratio >= 7
+
+def decrease_lightness(h, l, s):
+    l -= 0.001
+    return h, l, s
+
+def rgb_0_1(*rgb):
+    return [x/255.0 for x in rgb]
+
+def rgb_0_255(*rgb):
+    return [int(x*255) for x in rgb]

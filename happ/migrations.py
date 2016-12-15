@@ -1,7 +1,9 @@
 import datetime
 import random
 import pymongo
-from .models import get_db, User
+
+from .models import get_db
+from .utils import average_color
 
 
 def migration__user__change_interests_schema__0001():
@@ -134,3 +136,16 @@ def migration__event__remove_field_age_restriction__0013():
 def migration__event__fill_place_name_field__0014():
     coll = get_db()['event']
     coll.update({}, {'$set': {'place_name': ''}}, multi=True)
+
+def migration__file_object__fill_color_field__0015():
+    coll = get_db()['file_object']
+    for data in coll.find({}):
+        coll.update({'_id': data['_id']}, {'$set': {'color': average_color(data['path'])}})
+
+def migration__event__remove_field_color__0016():
+    coll = get_db()['event']
+    coll.update({}, {'$unset': {'color': ''}}, multi=True)
+
+def migration__interest__remove_field_color__0016():
+    coll = get_db()['interest']
+    coll.update({}, {'$unset': {'color': ''}}, multi=True)
