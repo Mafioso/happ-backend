@@ -76,12 +76,12 @@ class Tests(SimpleTestCase):
 
         for i in range(3):
             if i % 2 == 1:
-                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=Event.FEATURED)
+                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=Event.FEATURED, status=Event.APPROVED)
             else:
-                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]))
+                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
 
         for i in range(4):
-            EventFactory(city=c2, interests=[random.choice(ins_set3)])
+            EventFactory(city=c2, interests=[random.choice(ins_set3)], status=Event.APPROVED)
 
         self.assertEqual(len(u.get_feed()), 2)
 
@@ -112,17 +112,17 @@ class Tests(SimpleTestCase):
         for i in range(3):
             if i % 2 == 1:
                 # this event is going to be in final set because one of the interest matches
-                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=Event.FEATURED)
+                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=Event.FEATURED, status=Event.APPROVED)
 
                 # this event will be skipped because no one interest matches user's current set
-                EventFactory(city=c1, interests=[random.choice(ins_set3)], type=Event.FEATURED)
+                EventFactory(city=c1, interests=[random.choice(ins_set3)], type=Event.FEATURED, status=Event.APPROVED)
             else:
                 # this event is not featured
-                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=random.choice([Event.NORMAL, Event.ADS]))
+                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
 
         for i in range(4):
             # NORMAL events by default
-            EventFactory(city=c2, interests=[random.choice(ins_set3)])
+            EventFactory(city=c2, interests=[random.choice(ins_set3)], status=Event.APPROVED)
 
         self.assertEqual(len(u.get_featured()), 1)
 
