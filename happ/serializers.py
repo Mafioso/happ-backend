@@ -34,6 +34,7 @@ class FileObjectSerializer(serializers.DocumentSerializer):
         fields = (
             'id',
             'path',
+            'color',
         )
 
 
