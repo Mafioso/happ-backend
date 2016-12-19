@@ -20,8 +20,9 @@ from happ.serializers import EventSerializer
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
-    filter_backends = (filters.MongoFilterBackend,)
+    filter_backends = (filters.MongoSearchFilter, filters.MongoFilterBackend,)
     filter_class = EventFilter
+    search_fields = ('title', 'description', )
 
     def retrieve(self, request, *args, **kwargs):
         response = super(EventViewSet, self).retrieve(request, *args, **kwargs)

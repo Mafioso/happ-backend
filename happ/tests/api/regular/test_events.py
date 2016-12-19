@@ -668,6 +668,7 @@ class Tests(APISimpleTestCase):
         for i in range(5):
             EventFactory(
                 title='t{}'.format(i),
+                description='t{}_description'.format(i),
                 votes_num=(5-i),
                 start_date='20160520',
                 start_time='0{}3000'.format(i),
@@ -681,6 +682,7 @@ class Tests(APISimpleTestCase):
         for i in range(3):
             EventFactory(
                 title='t{}'.format(i),
+                description='dt{}'.format(i),
                 votes_num=(5-i),
                 start_date='20170520',
                 start_time='0{}3000'.format(i),
@@ -755,6 +757,20 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][1]['title'], 't1')
         # min_price and max_price
         url = prepare_url('events-feed', query={'min_price': 1, 'max_price': 11})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 't1')
+
+        ## searching
+        # title
+        url = prepare_url('events-feed', query={'search': 't1'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 't1')
+        # description
+        url = prepare_url('events-feed', query={'search': 't1_d'})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
