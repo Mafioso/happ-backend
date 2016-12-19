@@ -32,8 +32,14 @@ class HappBaseDocument(Document):
         return super(HappBaseDocument, self).save(*args, **kwargs)
 
 
+class Currency(HappBaseDocument):
+    name = StringField(required=True)
+    code = StringField(required=True)
+
+
 class Country(HappBaseDocument):
     name = StringField(required=True)
+    currency = ReferenceField(Currency, reverse_delete_rule=CASCADE)
 
 
 class City(HappBaseDocument):
@@ -55,10 +61,6 @@ class City(HappBaseDocument):
     def deactivate(self):
         self.is_active = False
         self.save()
-
-
-class Currency(HappBaseDocument):
-    name = StringField(required=True)
 
 
 class UserSettings(EmbeddedDocument):

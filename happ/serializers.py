@@ -38,7 +38,18 @@ class FileObjectSerializer(serializers.DocumentSerializer):
         )
 
 
+class CurrencySerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = Currency
+        exclude = (
+            'date_created',
+            'date_edited',
+        )
+
+
 class CountrySerializer(serializers.DocumentSerializer):
+    currency = CurrencySerializer()
 
     class Meta:
         model = Country
@@ -78,16 +89,6 @@ class CitySerializer(serializers.DocumentSerializer):
         city.country = country
         city.save()
         return city
-
-
-class CurrencySerializer(serializers.DocumentSerializer):
-
-    class Meta:
-        model = Currency
-        exclude = (
-            'date_created',
-            'date_edited',
-        )
 
 
 class InterestSerializer(serializers.DocumentSerializer):

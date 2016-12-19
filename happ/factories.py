@@ -40,6 +40,7 @@ class CityFactory(factory.mongoengine.MongoEngineFactory):
 
 class CurrencyFactory(factory.mongoengine.MongoEngineFactory):
     name = factory.Faker('word')
+    code = factory.Faker('word')
 
     class Meta:
         model = Currency

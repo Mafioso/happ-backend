@@ -1,6 +1,10 @@
+import os
+import json
 import datetime
 import random
 import pymongo
+
+from django.conf import settings
 
 from .models import get_db
 from .utils import average_color
@@ -149,3 +153,22 @@ def migration__event__remove_field_color__0016():
 def migration__interest__remove_field_color__0017():
     coll = get_db()['interest']
     coll.update({}, {'$unset': {'color': ''}}, multi=True)
+
+def migration__countries_and_currencies__0018():
+    coll = get_db()['country']
+    curr_coll = get_db()['currency']
+    with open(os.path.join(settings.BASE_DIR, 'happ/fixtures/countries.json'), 'r') as f:
+        s = json.loads(f.read())
+        for country in coll.find({}):
+            for item in s:
+                if country['name'] == item['country']:
+                    for currency in curr_coll.find({}):
+                        if currency['name'] == item['currency']:
+                            coll.update({'_id': country['_id']}, {'$set': {'currency': currency['_id']}})
+    for currency in curr_coll.find({}):
+        for item in s:
+            if currency['name'] == item['currency']:
+                curr_coll.update({'_id': currency['_id']}, {'$set': {'code': item['code']}})
+    for currency in curr_coll.find({}):
+        if 'code' not in currency:
+            curr_coll.remove({'_id': currency['_id']})
