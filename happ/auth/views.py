@@ -77,7 +77,7 @@ class PasswordReset(APIView):
                 'request': request,
             }
             form.save(**opts)
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
         return Response(
                 {'error_message': _('Invalid data.')},
@@ -113,7 +113,7 @@ class PasswordResetConfirm(APIView):
             form = HappSetPasswordForm(user, request.data)
             if form.is_valid():
                 form.save()
-                return Response(status=status.HTTP_200_OK)
+                return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(
                 {'error_message': _('Invalid data.')},
                 status=status.HTTP_400_BAD_REQUEST
@@ -134,7 +134,7 @@ class PasswordChange(APIView):
         form = PasswordChangeForm(user=request.user, data=request.data)
         if form.is_valid():
             form.save()
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             print form._errors
 

@@ -153,7 +153,7 @@ class Tests(APISimpleTestCase):
             'email': u.email,
         }
         response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_password_reset_confirm(self):
         """
@@ -171,7 +171,7 @@ class Tests(APISimpleTestCase):
             'new_password': '1234567a',
         }
         response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_password_reset_confirm_no_uidb64(self):
         """
@@ -277,7 +277,7 @@ class Tests(APISimpleTestCase):
             'new_password': '1234qwerASDF!@#$',
         }
         response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
         data = {
             'username': u.username,

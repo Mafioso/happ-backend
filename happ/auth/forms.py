@@ -44,7 +44,7 @@ class HappPasswordResetForm(forms.Form):
              subject_template_name='happ/password_reset_subject.txt',
              email_template_name='happ/password_reset_email.html',
              use_https=False, token_generator=default_token_generator,
-             from_email=None, request=None, html_email_template_name=None,
+             from_email=None, request=None, html_email_template_name='happ/password_reset_email.html',
              extra_email_context=None):
         """
         Generates a one-use only link for resetting password and sends to the
@@ -59,6 +59,7 @@ class HappPasswordResetForm(forms.Form):
             else:
                 site_name = domain = domain_override
             context = {
+                'schema': 'happapp',
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
