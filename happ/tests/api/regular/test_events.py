@@ -938,15 +938,23 @@ class Tests(APISimpleTestCase):
         }
         response = self.client.post(auth_url, data=data, format='json')
         token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
 
         url = prepare_url('events-map')
+
+        data = {
+            'radius': radius,
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 0)
 
         data = {
             'center': center,
             'radius': radius,
         }
 
-        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 5)

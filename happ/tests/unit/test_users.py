@@ -215,6 +215,7 @@ class Tests(SimpleTestCase):
                 geopoint=generate_geopoint(center, radius, inside=False),
             )
 
+        self.assertEqual(len(u.get_map_feed(None, radius)), 0)
         self.assertEqual(len(u.get_map_feed(center, radius)), 5)
 
     def test_activate(self):

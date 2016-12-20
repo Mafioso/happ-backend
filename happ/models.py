@@ -158,8 +158,9 @@ class User(AbstractUser, HappBaseDocument):
         i = random.randint(0, all_events.count() - django_settings.HAPP_EXPLORE_PAGE_SIZE)
         return all_events[i:i + django_settings.HAPP_EXPLORE_PAGE_SIZE]
 
-    def get_map_feed(self, center, radius=django_settings.MAP_VIEW_DEFAULT_DISTANCE):
-        print center, radius
+    def get_map_feed(self, center=None, radius=django_settings.MAP_VIEW_DEFAULT_DISTANCE):
+        if center is None:
+            return Event.objects.none()
         return Event.objects(
             city=self.settings.city,
             interests__in=self.current_interests,
