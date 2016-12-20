@@ -33,10 +33,10 @@ deploy:
 	scp -r conf/prod $(USER)@$(HOST):/root/project/happ/conf
 	scp docker-compose.prod.yml $(USER)@$(HOST):/root/project/happ
 	scp docker-compose.base.yml $(USER)@$(HOST):/root/project/happ
-	@echo "$(YELLOW)[ stoping server ]$(WHITE)"
-	-ssh $(USER)@$(HOST) 'docker-compose -f /root/project/happ/docker-compose.prod.yml down'
 	@echo "$(YELLOW)[ pulling new image ]$(WHITE)"
 	ssh $(USER)@$(HOST) 'docker pull askhatomarov/happ:latest'
+	@echo "$(YELLOW)[ stoping server ]$(WHITE)"
+	-ssh $(USER)@$(HOST) 'docker-compose -f /root/project/happ/docker-compose.prod.yml down'
 	@echo "$(YELLOW)[ starting server ]$(WHITE)"
 	ssh $(USER)@$(HOST) 'docker-compose -f /root/project/happ/docker-compose.prod.yml up -d'
 	@echo "$(GREEN)[ everything is OK ]$(WHITE)"
