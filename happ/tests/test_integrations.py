@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from ..integrations import google
+from ..integrations import google, yahoo
 from . import *
 
 
@@ -37,3 +37,22 @@ class Tests(SimpleTestCase):
         r = google.places(text=text)
         self.assertIn('results', r)
         self.assertEqual(r['status'], 'OK')
+
+    def test_yahoo_exchange(self):
+        """
+        ensure that google places integration works properly
+        """
+
+        amount = 100
+        source = "USD"
+        target = "KZT"
+
+        r = yahoo.exchange(source=source, target=target, amount=amount)
+        self.assertTrue(r)
+        self.assertTrue(isinstance(r, float))
+
+        amount = 100
+        source = "USD"
+        target = "NONE" # something that does not exist
+        r = yahoo.exchange(source=source, target=target, amount=amount)
+        self.assertFalse(r)

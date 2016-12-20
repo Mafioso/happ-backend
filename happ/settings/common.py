@@ -207,6 +207,8 @@ GOOGLE_URL_SHORTENER_LINK = 'https://www.googleapis.com/urlshortener/v1/url?key=
 GOOGLE_PLACES_LINK = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key={}'
 GOOGLE_PHOTOS_LINK = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth={}&photoreference={}&key={}'
 
+YAHOO_EXCHANGE_API = 'https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair = \"{}{}\"&format=json&env=store://datatables.org/alltableswithkeys'
+
 BROKER_USER_PASSWORD = os.getenv('RABBITMQ_ENV_RABBITMQ_USER_PASSWD', 'guest:guest')
 # BROKER_VHOST = os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
 
