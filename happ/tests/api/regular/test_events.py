@@ -852,3 +852,48 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 5)
+
+    def test_get_events_explore(self):
+        """
+        we can get explore events
+        """
+
+        c = CityFactory()
+
+        parent_interest1 = InterestFactory(parent=None)
+        parent_interest2 = InterestFactory(parent=None)
+
+        # this set is not used
+        ins_set1 = map(lambda _: InterestFactory(parent=parent_interest1), range(5))
+
+        # this set is assigned to user for current city
+        ins_set2 = map(lambda _: InterestFactory(parent=parent_interest2), range(3))
+
+        ci = CityInterestsFactory(c=c, ins=[parent_interest1])
+
+        for i in range(3):
+            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+
+        for i in range(4):
+            EventFactory(city=c, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+
+        u = UserFactory()
+        u.interests = [ci]
+        u.settings.city = c
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-explore')
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
