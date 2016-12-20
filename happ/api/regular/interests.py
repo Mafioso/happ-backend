@@ -9,12 +9,13 @@ from mongoengine import Q
 from mongoextensions import filters
 from happ.models import Interest, CityInterests, User
 from happ.decorators import patch_queryset
+from happ.pagination import SolidPagination
 from happ.serializers import InterestParentSerializer
 
 
 class InterestViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = InterestParentSerializer
-    pagination_class = None
+    pagination_class = SolidPagination
     queryset = Interest.objects.filter(is_active=True, parent=None).order_by('title')
     filter_backends = (filters.MongoSearchFilter, )
     search_fields = ('title', )
