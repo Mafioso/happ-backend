@@ -13,6 +13,7 @@ from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time
 from happ.models import Event
 from happ.filters import EventFilter
+from happ.pagination import SolidPagination
 from happ.decorators import patch_queryset, patch_order, patch_pagination_class
 from happ.serializers import EventSerializer
 
@@ -228,6 +229,6 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'], url_path='explore')
     @patch_queryset(lambda self, x: self.request.user.get_explore())
-    @patch_pagination_class(None)
+    @patch_pagination_class(SolidPagination)
     def explore(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
