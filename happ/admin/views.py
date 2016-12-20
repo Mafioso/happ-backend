@@ -149,3 +149,7 @@ class FAQView(JWTAuthRequiredMixin, TemplateView):
 
 class OrganizerRulesView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/settings/organizer-rules.html'
+
+
+class ComplaintOpenView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/complaints_open_list.html'

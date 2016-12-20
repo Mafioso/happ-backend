@@ -526,6 +526,8 @@ class EventAdminSerializer(LocalizedSerializer):
 
 
 class ComplaintSerializer(serializers.DocumentSerializer):
+    author = AuthorSerializer(read_only=True)
+    event = EventSerializer(read_only=True)
 
     class Meta:
         model = Complaint
