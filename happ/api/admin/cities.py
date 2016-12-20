@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
@@ -24,10 +24,22 @@ class CityViewSet(viewsets.ModelViewSet):
             response.template_name = 'admin/city/select_city.html'
         return response
 
+    def retrieve(self, request, *args, **kwargs):
+        response = super(CityViewSet, self).retrieve(request, *args, **kwargs)
+        response.template_name = 'admin/city/edit.html'
+        return response
+
     @patch_permission_classes(( RootPolicy, ))
     def create(self, request, *args, **kwargs):
         response = super(CityViewSet, self).create(request, *args, **kwargs)
         response.template_name = 'admin/city/success.html'
+        return response
+
+    @list_route(methods=['get'], url_path='create')
+    @patch_permission_classes(( RootPolicy, ))
+    def create_city_form(self, request, *args, **kwargs):
+        response = super(CityViewSet, self).list(request, *args, **kwargs)
+        response.template_name = 'admin/city/create.html'
         return response
 
     @detail_route(methods=['post'], url_path='activate')
