@@ -40,7 +40,7 @@ class Tests(SimpleTestCase):
 
     def test_yahoo_exchange(self):
         """
-        ensure that google places integration works properly
+        ensure that yahoo exchange integration works properly
         """
 
         amount = 100
