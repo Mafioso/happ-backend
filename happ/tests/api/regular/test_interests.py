@@ -68,7 +68,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(len(response.data), 3)
 
     def test_get_my(self):
         """
@@ -101,7 +101,7 @@ class Tests(APISimpleTestCase):
         u.save()
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], len(interests2.ins))
+        self.assertEqual(len(response.data), len(interests2.ins))
 
     def test_search_interests(self):
         """
@@ -131,7 +131,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(len(response.data), 3)
 
     def test_user_set_interests(self):
         """
