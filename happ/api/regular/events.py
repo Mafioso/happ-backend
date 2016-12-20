@@ -232,3 +232,9 @@ class EventViewSet(viewsets.ModelViewSet):
     @patch_pagination_class(SolidPagination)
     def explore(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
+
+    @list_route(methods=['post'], url_path='map')
+    @patch_queryset(lambda self, x: self.request.user.get_map_feed(self.request.data.get('center', None), self.request.data.get('radius', None)))
+    @patch_pagination_class(SolidPagination)
+    def map(self, request, *args, **kwargs):
+        return super(EventViewSet, self).list(request, *args, **kwargs)

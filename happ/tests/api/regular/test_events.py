@@ -897,3 +897,56 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 3)
+
+    def test_get_events_map(self):
+        """
+        we can get events for map view
+        """
+        c = CityFactory()
+        ins_set = map(lambda _: InterestFactory(), range(3))
+        ci = CityInterestsFactory(c=c, ins=ins_set)
+
+        u = UserFactory()
+        u.interests = [ci]
+        u.settings.city = c
+        u.set_password('123')
+        u.save()
+
+        center = [random.uniform(-180, 180), random.uniform(-90, 90)]
+        radius = 500
+
+        for i in range(5):
+            EventFactory(city=c,
+                         interests=[random.choice(ins_set)],
+                         type=Event.NORMAL,
+                         status=Event.APPROVED,
+                         geopoint=generate_geopoint(center, radius)
+            )
+
+        for i in range(10):
+            EventFactory(city=c,
+                         interests=[random.choice(ins_set)],
+                         type=Event.NORMAL,
+                         status=Event.APPROVED,
+                         geopoint=generate_geopoint(center, radius, inside=False)
+            )
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-map')
+
+        data = {
+            'center': center,
+            'radius': radius,
+        }
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 5)
