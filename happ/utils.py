@@ -109,7 +109,7 @@ def average_color(path):
 
     try:
         image = Image.open(path)
-    except IOError:
+    except:
         return None
 
     w, h = image.size
