@@ -202,6 +202,7 @@ class Tests(SimpleTestCase):
                 city=c,
                 interests=[random.choice(ins_set)],
                 type=Event.NORMAL,
+                status=Event.APPROVED,
                 geopoint=generate_geopoint(center, radius),
             )
 
@@ -210,6 +211,7 @@ class Tests(SimpleTestCase):
                 city=c,
                 interests=[random.choice(ins_set)],
                 type=Event.NORMAL,
+                status=Event.APPROVED,
                 geopoint=generate_geopoint(center, radius, inside=False),
             )
 
