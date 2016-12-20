@@ -222,3 +222,6 @@ BROKER_URL = 'amqp://{user_passwd}@{host}/{vhost}'.format(**{
     'port': os.getenv('RABBITMQ_PORT_5672_TCP_PORT', 5672),
     'vhost': os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
 })
+
+EARTH_RADIUS = 6378100.0 # Earth radius in meters
+MAP_VIEW_DEFAULT_DISTANCE = 10000 # default radius in meters

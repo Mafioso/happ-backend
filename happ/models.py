@@ -4,7 +4,7 @@ import random
 import datetime
 from copy import deepcopy
 
-from django.conf import settings
+from django.conf import settings as django_settings
 from mongoengine import *
 from mongoengine.connection import _get_db
 
@@ -13,7 +13,7 @@ from happ.auth.models import AbstractUser, UserQuerySet
 from .utils import store_file, average_color
 
 
-conn = connect(settings.MONGODB_NAME, host=settings.MONGODB_HOST)
+conn = connect(django_settings.MONGODB_NAME, host=django_settings.MONGODB_HOST)
 
 def get_db():
     return _get_db('default', reconnect=True)
@@ -68,7 +68,7 @@ class UserSettings(EmbeddedDocument):
     city = ReferenceField('City')
     currency = ReferenceField('Currency')
     notifications = DictField()
-    language = StringField(default=settings.HAPP_LANGUAGES[0])
+    language = StringField(default=django_settings.HAPP_LANGUAGES[0])
 
 
 class CityInterests(EmbeddedDocument):
@@ -124,10 +124,20 @@ class User(AbstractUser, HappBaseDocument):
         return Event.objects(in_favourites=self)
 
     def get_feed(self):
-        return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.NORMAL, Event.ADS], status=Event.APPROVED)
+        return Event.objects(
+            city=self.settings.city,
+            interests__in=self.current_interests,
+            type__in=[Event.NORMAL, Event.ADS],
+            status=Event.APPROVED
+        )
 
     def get_featured(self):
-        return Event.objects(city=self.settings.city, interests__in=self.current_interests, type__in=[Event.FEATURED], status=Event.APPROVED)
+        return Event.objects(
+            city=self.settings.city,
+            interests__in=self.current_interests,
+            type__in=[Event.FEATURED],
+            status=Event.APPROVED
+        )
 
     def get_organizer_feed(self):
         return Event.objects(author=self)
@@ -147,6 +157,16 @@ class User(AbstractUser, HappBaseDocument):
             return all_events
         i = random.randint(0, all_events.count() - settings.HAPP_EXPLORE_PAGE_SIZE)
         return all_events[i:i+settings.HAPP_EXPLORE_PAGE_SIZE]
+
+    def get_map_feed(self, center, radius=django_settings.MAP_VIEW_DEFAULT_DISTANCE):
+        print center, radius
+        return Event.objects(
+            city=self.settings.city,
+            interests__in=self.current_interests,
+            type__in=[Event.NORMAL, Event.ADS],
+            status=Event.APPROVED,
+            geopoint__geo_within_sphere=[center, radius / django_settings.EARTH_RADIUS],
+        )
 
     def activate(self):
         self.is_active = True
@@ -210,7 +230,7 @@ class Event(HappBaseDocument):
 
     title = StringField()
     description = StringField()
-    language = StringField(default=settings.HAPP_LANGUAGES[0]) # en ru fr it es de
+    language = StringField(default=django_settings.HAPP_LANGUAGES[0]) # en ru fr it es de
     type = IntField(choices=TYPES, default=NORMAL)
     status = IntField(choices=STATUSES, default=MODERATION)
     author = ReferenceField(User, reverse_delete_rule=CASCADE)
@@ -222,7 +242,7 @@ class Event(HappBaseDocument):
     in_favourites = ListField(ReferenceField('User'))
     address = StringField()
     place_name = StringField()
-    geopoint = GeoPointField()
+    geopoint = PointField()
     phones = ListField(StringField())
     email = EmailField()
     web_site = URLField()
@@ -242,6 +262,10 @@ class Event(HappBaseDocument):
 
     # ATTENTION: add `organizator` field soon
 
+    # meta = {
+    #     'indexes': [("geopoint", "2dsphere")]
+    # }
+
     @property
     def start_datetime(self):
         return datetime.datetime.combine(self.start_date, self.start_time or datetime.time()).isoformat()
@@ -254,7 +278,7 @@ class Event(HappBaseDocument):
     def images(self):
         return FileObject.objects.filter(entity=self)
 
-    def localized(self, language=settings.HAPP_LANGUAGES[0]):
+    def localized(self, language=django_settings.HAPP_LANGUAGES[0]):
         try:
             return Localized.objects.get(entity=self, language=language)
         except:
@@ -271,7 +295,7 @@ class Event(HappBaseDocument):
         if language:
             translate_entity.delay(cls=self.__class__, id=self.id, target=language)
         else:
-            for language in settings.HAPP_LANGUAGES:
+            for language in django_settings.HAPP_LANGUAGES:
                 translate_entity.delay(cls=self.__class__, id=self.id, target=language)
 
     def is_upvoted(self, user):
@@ -330,19 +354,19 @@ class FileObject(HappBaseDocument):
 
     def move_to_media(self, entity):
         self.entity = entity
-        self.path = store_file(self.path, settings.NGINX_UPLOAD_ROOT, str(self.entity.id))
+        self.path = store_file(self.path, django_settings.NGINX_UPLOAD_ROOT, str(self.entity.id))
         self.recalculate_color()
         self.save()
 
     def move_to_avatar(self, entity):
         self.entity = entity
-        self.path = store_file(self.path, settings.NGINX_AVATAR_ROOT, str(self.entity.id))
+        self.path = store_file(self.path, django_settings.NGINX_AVATAR_ROOT, str(self.entity.id))
         self.recalculate_color()
         self.save()
 
     def move_to_misc(self, entity):
         self.entity = entity
-        self.path = store_file(self.path, settings.NGINX_MISC_ROOT, str(self.entity.id))
+        self.path = store_file(self.path, django_settings.NGINX_MISC_ROOT, str(self.entity.id))
         self.recalculate_color()
         self.save()
 
@@ -352,7 +376,7 @@ class FileObject(HappBaseDocument):
 
 
 class Localized(Document):
-    language = StringField(default=settings.HAPP_LANGUAGES[0])
+    language = StringField(default=django_settings.HAPP_LANGUAGES[0])
     data = DictField()
     entity = GenericReferenceField()
 

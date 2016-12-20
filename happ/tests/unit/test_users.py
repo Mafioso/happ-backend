@@ -180,6 +180,41 @@ class Tests(SimpleTestCase):
             for i in e.interests:
                 self.assertFalse(i in parent_interest2.family)
 
+    def test_get_map_feed(self):
+        """
+        we can take map feed for a particular user
+        """
+        c = CityFactory()
+
+        ins_set = map(lambda _: InterestFactory(), range(3))
+        ci = CityInterestsFactory(c=c, ins=ins_set)
+
+        u = UserFactory()
+        u.interests = [ci]
+        u.settings.city = c
+        u.save()
+
+        center = [random.uniform(-180, 180), random.uniform(-90, 90)]
+        radius = 50000
+
+        for i in range(5):
+            EventFactory(
+                city=c,
+                interests=[random.choice(ins_set)],
+                type=Event.NORMAL,
+                geopoint=generate_geopoint(center, radius),
+            )
+
+        for i in range(10):
+            EventFactory(
+                city=c,
+                interests=[random.choice(ins_set)],
+                type=Event.NORMAL,
+                geopoint=generate_geopoint(center, radius, inside=False),
+            )
+
+        self.assertEqual(len(u.get_map_feed(center, radius)), 5)
+
     def test_activate(self):
         """
         we can activate user
