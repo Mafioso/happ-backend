@@ -1,5 +1,6 @@
 from django import forms
 from django.template import loader
+from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -8,26 +9,11 @@ from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 
+from ..utils import send_mail
+
 
 class HappPasswordResetForm(forms.Form):
     email = forms.EmailField(label=_("Email"), max_length=254)
-
-    def send_mail(self, subject_template_name, email_template_name,
-                  context, from_email, to_email, html_email_template_name=None):
-        """
-        Sends a django.core.mail.EmailMultiAlternatives to `to_email`.
-        """
-        subject = loader.render_to_string(subject_template_name, context)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        body = loader.render_to_string(email_template_name, context)
-
-        email_message = EmailMultiAlternatives(subject, body, from_email, [to_email])
-        if html_email_template_name is not None:
-            html_email = loader.render_to_string(html_email_template_name, context)
-            email_message.attach_alternative(html_email, 'text/html')
-
-        email_message.send()
 
     def get_users(self, email):
         """Given an email, return matching user(s) who should receive a reset.
@@ -59,7 +45,7 @@ class HappPasswordResetForm(forms.Form):
             else:
                 site_name = domain = domain_override
             context = {
-                'schema': 'happapp',
+                'schema': settings.HAPP_PREFIX,
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
@@ -70,7 +56,7 @@ class HappPasswordResetForm(forms.Form):
             }
             if extra_email_context is not None:
                 context.update(extra_email_context)
-            self.send_mail(
+            send_mail(
                 subject_template_name, email_template_name, context, from_email,
                 user.email, html_email_template_name=html_email_template_name,
             )

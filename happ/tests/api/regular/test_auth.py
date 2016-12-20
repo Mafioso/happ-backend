@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
@@ -6,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
+from happ.auth.utils import generate_confirmation_key
 from happ.models import User
 from happ.factories import UserFactory
 from happ.tests import *
@@ -311,6 +314,156 @@ class Tests(APISimpleTestCase):
         data = {
             'old_password': '1234',
             'new_password': '1234qwerASDF!@#$',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_email_confirm_request(self):
+        """
+        Ensures that user send email confirmation request
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('email-confirm-request')
+
+        response = self.client.get(url, format='json')
+        u = User.objects.get(id=u.id)
+        self.assertNotEqual(u.confirmation_key, None)
+        self.assertNotEqual(u.confirmation_key_expires, None)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        u.email = None
+        u.save()
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_email_confirm(self):
+        """
+        Ensures that user can confirm email
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('email-confirm-request')
+        response = self.client.get(url, format='json')
+        u = User.objects.get(id=u.id)
+
+        url = prepare_url('email-confirm')
+
+        data = {
+            'key': u.confirmation_key
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        u = User.objects.get(id=u.id)
+        self.assertEqual(u.role, User.ORGANIZER)
+        self.assertEqual(u.confirmation_key, None)
+        self.assertEqual(u.confirmation_key_expires, None)
+
+    def test_email_confirm_no_key(self):
+        """
+        Ensures that user cannot confirm email with no key provided
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('email-confirm-request')
+        response = self.client.get(url, format='json')
+        u = User.objects.get(id=u.id)
+
+        url = prepare_url('email-confirm')
+
+        data = {}
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_email_confirm_wrong_key(self):
+        """
+        Ensures that user cannot confirm email with wrong key provided
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('email-confirm-request')
+        response = self.client.get(url, format='json')
+        u = User.objects.get(id=u.id)
+
+        url = prepare_url('email-confirm')
+
+        data = {
+            'key': u.confirmation_key+'123'
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_email_confirm_key_expired(self):
+        """
+        Ensures that user cannot confirm email with expired key
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('email-confirm-request')
+        response = self.client.get(url, format='json')
+        u = User.objects.get(id=u.id)
+        u.confirmation_key_expires = u.confirmation_key_expires - datetime.timedelta(days=settings.CONFIRMATION_KEY_EXPIRES)
+        u.save()
+
+        url = prepare_url('email-confirm')
+
+        data = {
+            'key': u.confirmation_key
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

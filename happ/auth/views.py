@@ -1,8 +1,12 @@
-from django.contrib.auth import get_user_model
-from django.contrib.auth.tokens import default_token_generator
+import datetime
+
+from django.conf import settings
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
@@ -10,10 +14,12 @@ from rest_framework.response import Response
 from rest_framework_jwt.views import ObtainJSONWebToken
 from rest_framework_jwt.settings import api_settings
 
+from happ.utils import send_mail
 from happ.models import User
 from happ.serializers import UserSerializer, UserPayloadSerializer
 
 from .forms import HappPasswordResetForm, HappSetPasswordForm, PasswordChangeForm
+from .utils import generate_confirmation_key
 
 jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -142,6 +148,74 @@ class PasswordChange(APIView):
                 {'error_message': _('Invalid data.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class EmailConfirmationRequest(APIView):
+
+    def get(self, request, format=None):
+        """
+        Generates organizer mode confirmation key and sends email with it
+        """
+        user = request.user
+        if not user.email:
+            return Response(
+                {'error_message': _('No email provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.confirmation_key = generate_confirmation_key(user)
+        user.confirmation_key_expires = datetime.datetime.now() + datetime.timedelta(days=settings.CONFIRMATION_KEY_EXPIRES)
+        user.save()
+        domain = get_current_site(request).domain
+
+        context = {
+            'user': user,
+            'domain': domain,
+            'schema': settings.HAPP_PREFIX,
+        }
+
+        send_mail(subject_template_name='happ/email_confirmation.txt',
+                  email_template_name='happ/email_confirmation.html',
+                  context=context,
+                  from_email=None,
+                  to_email=user.email,
+                  html_email_template_name='happ/email_confirmation.html'
+        )
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class EmailConfirmation(APIView):
+
+    def post(self, request, format=None):
+        """
+        Confirms email and assigns Organizer role to user
+        """
+        key = request.data.pop('key', None)
+        if not key:
+            return Response(
+                {'error_message': _('Confirmation key is not provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            user = User.objects.get(confirmation_key=key)
+        except User.DoesNotExist:
+            return Response(
+                {'error_message': _('Wrong confirmation key.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if datetime.datetime.now() > user.confirmation_key_expires:
+            return Response(
+                {'error_message': _('Confirmation key expired.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.confirmation_key = None
+        user.confirmation_key_expires = None
+        user.role = User.ORGANIZER
+        user.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AdminLogin(ObtainJSONWebToken):

@@ -1,0 +1,13 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}You're receiving this email because you requested an email confirmation for HAPP app.{% endblocktrans %}<br />
+
+{% trans "Please go to the following page to confirm email:" %}<br />
+{% block reset_link %}
+<a href="{{ schema }}://{{ domain }}{% url 'email-confirm' %}?key={{ user.confirmation_key }}">Confirm email</a><br />
+{% endblock %}
+
+{% trans "Thanks for using our site!" %}<br /><br />
+
+{% blocktrans %}The HAPP team{% endblocktrans %}<br />
+
+{% endautoescape %}

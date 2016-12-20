@@ -196,7 +196,10 @@ HAPP_LANGUAGES_VERBOSE = [
     {'code': 'de', 'text': _('German'), },
 ]
 
+HAPP_PREFIX = 'happapp'
 HAPP_LANGUAGES = map(lambda x: x['code'], HAPP_LANGUAGES_VERBOSE)
+
+CONFIRMATION_KEY_EXPIRES = 1 # days
 
 DATE_STRING_FIELD_FORMAT = "%Y%m%d"
 TIME_STRING_FIELD_FORMAT = "%H%M%S"

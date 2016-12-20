@@ -95,6 +95,8 @@ class User(AbstractUser, HappBaseDocument):
     is_active = BooleanField(default=True)
     last_login = DateTimeField(blank=True, null=True)
     role = IntField(choices=ROLES, default=REGULAR)
+    confirmation_key = StringField()
+    confirmation_key_expires = DateTimeField(blank=True, null=True)
 
     @property
     def fn(self):

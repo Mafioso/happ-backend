@@ -1,4 +1,6 @@
 import jwt
+import random
+import hashlib
 
 from django.conf import settings
 from django.utils.encoding import smart_text
@@ -56,3 +58,7 @@ def check_user(payload):
             return False
 
         return user
+
+def generate_confirmation_key(user):
+    salt = hashlib.sha1(str(random.random())).hexdigest()[:5]
+    return hashlib.sha1(user.username+salt).hexdigest()
