@@ -49,3 +49,15 @@ def patch_permission_classes(permission_classes):
             return rv
         return wrapper
     return decorator
+
+def patch_pagination_class(pagination_class):
+
+    def decorator(fn):
+        def wrapper(self, request, *a, **kw):
+            prev_pagination_class = self.pagination_class
+            self.pagination_class = pagination_class
+            rv = fn(self, request, *a, **kw)
+            self.pagination_class = prev_pagination_class
+            return rv
+        return wrapper
+    return decorator
