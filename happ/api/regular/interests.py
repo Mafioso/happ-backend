@@ -14,6 +14,7 @@ from happ.serializers import InterestParentSerializer
 
 class InterestViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = InterestParentSerializer
+    pagination_class = None
     queryset = Interest.objects.filter(is_active=True, parent=None).order_by('title')
     filter_backends = (filters.MongoSearchFilter, )
     search_fields = ('title', )
