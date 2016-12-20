@@ -143,6 +143,43 @@ class Tests(SimpleTestCase):
         self.assertEqual(len(u1.get_organizer_feed()), 1)
         self.assertEqual(len(u2.get_organizer_feed()), 2)
 
+    def test_get_explore_feed(self):
+        """
+        we can take explore feed for a particular user
+        """
+
+        c = CityFactory()
+
+        parent_interest1 = InterestFactory(parent=None)
+        parent_interest2 = InterestFactory(parent=None)
+
+        # this set is not used
+        ins_set1 = map(lambda _: InterestFactory(parent=parent_interest1), range(5))
+
+        # this set is assigned to user for current city
+        ins_set2 = map(lambda _: InterestFactory(parent=parent_interest2), range(3))
+
+        ci = CityInterestsFactory(c=c, ins=[parent_interest1])
+
+        u = UserFactory()
+        u.interests = [ci]
+        u.settings.city = c
+        u.save()
+
+        for i in range(3):
+            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+
+        for i in range(4):
+            EventFactory(city=c, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+
+        self.assertEqual(len(u.get_explore()), 3)
+        for e in u.get_explore():
+            for i in e.interests:
+                self.assertTrue(i in parent_interest1.family)
+        for e in u.get_explore():
+            for i in e.interests:
+                self.assertFalse(i in parent_interest2.family)
+
     def test_activate(self):
         """
         we can activate user

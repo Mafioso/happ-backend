@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import random
 import datetime
 from copy import deepcopy
 
@@ -131,6 +132,22 @@ class User(AbstractUser, HappBaseDocument):
     def get_organizer_feed(self):
         return Event.objects(author=self)
 
+    def get_explore(self):
+        """
+            gets HAPP_EXPLORE_PAGE_SIZE from parent and sibling interests of current interests
+        """
+        family_interests = [x.family for x in self.current_interests]
+        # make it flatten
+        interests = [item for sublist in family_interests for item in sublist]
+
+        all_events = Event.objects(interests__in=interests,
+                                   type__in=[Event.NORMAL, Event.ADS],
+                                   status=Event.APPROVED)
+        if all_events.count() < settings.HAPP_EXPLORE_PAGE_SIZE:
+            return all_events
+        i = random.randint(0, all_events.count() - settings.HAPP_EXPLORE_PAGE_SIZE)
+        return all_events[i:i+settings.HAPP_EXPLORE_PAGE_SIZE]
+
     def activate(self):
         self.is_active = True
         self.save()
@@ -150,6 +167,19 @@ class Interest(HappBaseDocument):
     @property
     def children(self):
         return Interest.objects.filter(parent=self)
+
+    @property
+    def siblings(self):
+        if self.parent:
+            return self.parent.children
+        return []
+
+    @property
+    def family(self):
+        if self.parent:
+            return [self.parent] + list(self.siblings)
+        else:
+            return [self] + list(self.children)
 
     @property
     def image(self):
