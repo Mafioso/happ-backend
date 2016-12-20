@@ -74,6 +74,13 @@ class OrganizerRulesView(EditableHTMLView):
     template_name = 'texts/organizer_rules.html'
 
 
+class FAQView(EditableHTMLView):
+    """
+    API endpoint for setting and getting FAQ page
+    """
+    template_name = 'texts/faq.html'
+
+
 class GooglePlacesView(APIView):
     """
     API endpoint for retranslating google places search results to user

@@ -143,5 +143,9 @@ class PrivacyPolicyView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/settings/privacy-policy.html'
 
 
+class FAQView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/settings/faq.html'
+
+
 class OrganizerRulesView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/settings/organizer-rules.html'
