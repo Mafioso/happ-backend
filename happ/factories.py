@@ -16,6 +16,7 @@ from models import (
     Localized,
     CityInterests,
     FileObject,
+    Complaint,
 )
 
 ALL_CITIES = City.objects
@@ -148,3 +149,11 @@ class LocalizedFactory(factory.mongoengine.MongoEngineFactory):
 class FileObjectFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = FileObject
+
+
+class ComplaintFactory(factory.mongoengine.MongoEngineFactory):
+    text = factory.Faker('sentence')
+    author = factory.LazyAttribute(lambda x: User.objects.first())
+
+    class Meta:
+        model = Complaint
