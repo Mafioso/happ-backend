@@ -2,6 +2,7 @@ import os
 
 from django.conf import settings
 from django.http.response import HttpResponse
+from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status
 from rest_framework.views import APIView
