@@ -79,6 +79,8 @@ def getlist(d, attr):
 
 @register.filter(name='split')
 def split(s, delimeter=' '):
+    if not s:
+        return []
     return s.split(delimeter)
 
 @register.simple_tag
