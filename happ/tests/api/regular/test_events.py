@@ -958,3 +958,35 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 5)
+
+    def test_complaint_event(self):
+        """
+        we can send a complaint to event
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('events-complaint', kwargs={'id': str(e.id)})
+        data = {
+            'text': 'WTF?'
+        }
+
+        self.assertEqual(len(e.complaints), 0)
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(e.complaints), 1)
+        self.assertEqual(e.complaints[0].text, 'WTF?')
+        self.assertEqual(e.complaints[0].author.id, u.id)

@@ -7,7 +7,7 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
-from .models import Country, City, Currency, User, UserSettings, Interest, Event, FileObject
+from .models import Country, City, Currency, User, UserSettings, Interest, Event, FileObject, Complaint
 
 
 class LocalizedSerializer(serializers.DocumentSerializer):
@@ -523,3 +523,12 @@ class EventAdminSerializer(LocalizedSerializer):
 
     def get_images(self, obj):
         return FileObjectSerializer(obj.images, many=True).data
+
+
+class ComplaintSerializer(serializers.DocumentSerializer):
+
+    class Meta:
+        model = Complaint
+        exclude = (
+            'date_edited',
+        )

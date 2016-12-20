@@ -279,6 +279,10 @@ class Event(HappBaseDocument):
     def images(self):
         return FileObject.objects.filter(entity=self)
 
+    @property
+    def complaints(self):
+        return Complaint.objects.filter(event=self)
+
     def localized(self, language=django_settings.HAPP_LANGUAGES[0]):
         try:
             return Localized.objects.get(entity=self, language=language)
@@ -380,6 +384,18 @@ class Localized(Document):
     language = StringField(default=django_settings.HAPP_LANGUAGES[0])
     data = DictField()
     entity = GenericReferenceField()
+
+
+class Complaint(HappBaseDocument):
+    STATUSES = OPEN, CLOSED = range(2)
+
+    text = StringField()
+    author = ReferenceField(User, reverse_delete_rule=CASCADE)
+    status = IntField(choices=STATUSES, default=OPEN)
+    answer = StringField()
+    date_answered = DateTimeField()
+    executor = ReferenceField(User, reverse_delete_rule=CASCADE)
+    event = ReferenceField(Event, reverse_delete_rule=CASCADE)
 
 
 # Notification

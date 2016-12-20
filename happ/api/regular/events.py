@@ -11,7 +11,7 @@ from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time
-from happ.models import Event
+from happ.models import Event, Complaint
 from happ.filters import EventFilter
 from happ.pagination import SolidPagination
 from happ.decorators import patch_queryset, patch_order, patch_pagination_class
@@ -238,3 +238,12 @@ class EventViewSet(viewsets.ModelViewSet):
     @patch_pagination_class(SolidPagination)
     def map(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
+
+    @detail_route(methods=['post'], url_path='complaint')
+    def complaint(self, request, *args, **kwargs):
+        instance = self.get_object()
+        Complaint.objects.create(text=request.data.get('text', ''),
+                                 event=instance,
+                                 author=self.request.user
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
