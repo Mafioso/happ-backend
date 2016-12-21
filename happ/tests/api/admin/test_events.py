@@ -113,10 +113,16 @@ class Tests(APISimpleTestCase):
         token = response.data['token']
 
         e = EventFactory()
+        count = len(e.rejection_reasons)
+
+        data = {
+            'text': 'Disgusting',
+        }
 
         url = prepare_url('admin-events-reject', kwargs={'id': str(e.id)})
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.post(url, format='json')
+        response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.status, Event.REJECTED)
+        self.assertEqual(len(e.rejection_reasons), count+1)

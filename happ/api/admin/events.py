@@ -178,7 +178,8 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @detail_route(methods=['post'], url_path='reject')
     def reject(self, request, *args, **kwargs):
+        text = request.data.get('text', '')
         instance = self.get_object()
-        instance.reject()
+        instance.reject(text=text, author=request.user)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
