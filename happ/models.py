@@ -223,9 +223,10 @@ class Upvote(EmbeddedDocument):
     ts = DateTimeField(default=datetime.datetime.now)
 
 
-class RejectionReason(EmbeddedDocument):
+class RejectionReason(HappBaseDocument):
+
+    event = ReferenceField('Event')
     author = ReferenceField('User')
-    ts = DateTimeField(default=datetime.datetime.now)
     text = StringField()
 
 
@@ -255,7 +256,6 @@ class Event(HappBaseDocument):
     web_site = URLField()
     votes = EmbeddedDocumentListField('Upvote')  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
-    rejection_reasons = EmbeddedDocumentListField('RejectionReason')
     start_date = DateStringField()
     start_time = TimeStringField()
     end_date = DateStringField()
@@ -290,6 +290,10 @@ class Event(HappBaseDocument):
     def complaints(self):
         return Complaint.objects.filter(event=self)
 
+    @property
+    def rejection_reasons(self):
+        return RejectionReason.objects.filter(event=self)
+
     def localized(self, language=django_settings.HAPP_LANGUAGES[0]):
         try:
             return Localized.objects.get(entity=self, language=language)
@@ -303,7 +307,6 @@ class Event(HappBaseDocument):
         new_instance.in_favourites = []
         new_instance.votes = []
         new_instance.votes_num = 0
-        new_instance.rejection_reasons = []
         new_instance.save()
         return new_instance
 
@@ -358,8 +361,8 @@ class Event(HappBaseDocument):
     def reject(self, text, author):
         self.status = Event.REJECTED
         self.save()
-        rr = RejectionReason(text=text, author=author)
-        self.update(push__rejection_reasons=rr)
+        rr = RejectionReason(text=text, author=author, event=self)
+        rr.save()
 
 
 class FileObject(HappBaseDocument):
