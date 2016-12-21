@@ -397,6 +397,13 @@ class Complaint(HappBaseDocument):
     executor = ReferenceField(User, reverse_delete_rule=CASCADE)
     event = ReferenceField(Event, reverse_delete_rule=CASCADE)
 
+    def reply(self, answer, executor):
+        self.answer = answer
+        self.executor = executor
+        self.date_answered = datetime.datetime.now()
+        self.status = Complaint.CLOSED
+        self.save()
+
 
 # Notification
 #  - text
