@@ -153,3 +153,7 @@ class OrganizerRulesView(JWTAuthRequiredMixin, TemplateView):
 
 class ComplaintOpenView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/complaints_open_list.html'
+
+
+class ComplaintClosedView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/complaints_closed_list.html'
