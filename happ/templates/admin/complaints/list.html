@@ -5,7 +5,12 @@
       <th style="width:1%;">#</th>
       <th>Название события</th>
       <th>Автор</th>
-      <th style="width: 30%">Действия</th>
+      {% if item.status == 0 %}
+        <th style="width: 30%">Действия</th>
+      {% else %}
+        <th>Ответ</th>
+        <th>Ответчик</th>
+      {% endif %}
     </tr>
   </thead>
   <tbody id="complaint-table-body">
@@ -14,9 +19,14 @@
       <th scope="row">{{forloop.counter}}</th>
       <td>{{item.event.title}}</td>
       <td>{{item.author.fn}}</td>
-      <td>
-        {% if item.status == 0 %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Ответить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
-      </td>
+      {% if item.status == 0 %}
+        <td>
+          <a href="#" class="btn btn-warning btn-xs" ic-on-beforeSend="$('#reply-form').modal('show');" ic-get-from="{% url 'admin-complaints-reply/form' id=item.id %}?format=html" ic-indicator="indicator-update" ic-target="#reply-form"><i class="fa fa-reply"></i> Ответить <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        </td>
+      {% else %}
+        <td>{{item.answer|default:''}}</td>
+        <td>{{item.executor.fn}}</td>
+      {% endif %}
     </tr>
   {% endfor %}
     <tr ></tr>

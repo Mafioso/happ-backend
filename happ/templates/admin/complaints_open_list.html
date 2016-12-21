@@ -22,10 +22,23 @@
           <div class="clearfix"></div>
         </div>
         <div class="x_content">
-          <div id="complaint-table" ic-src="/api/v1/admin/complaints.html" ic-trigger-on="load" ic-target="#complaint-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="complaint-table" ic-src="/api/v1/admin/complaints/open.html" ic-trigger-on="load" ic-target="#complaint-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
-
+          <center> <!-- lol -->
+            <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
+          </center>
+          <div class="pull-left">
+            <div id="reply-form" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-content">
+                  <div class="modal-body">
+                    <center> <!-- lol -->
+                      <i class="fa fa-spinner fa-spin fa-5x" id="indicator_form" style="display: none"></i>
+                    </center>
+                  </div>
+                </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
