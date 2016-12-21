@@ -133,8 +133,14 @@ class Tests(SimpleTestCase):
         """
         we can reject event
         """
+        text = "Disgusting"
+        u = UserFactory()
+
         e = EventFactory()
         self.assertEqual(e.status, Event.MODERATION)
+        self.assertEqual(len(e.rejection_reasons), 0)
 
-        e.reject()
+        e.reject(text=text, author=u)
+        e = Event.objects.get(id=e.id)
         self.assertEqual(e.status, Event.REJECTED)
+        self.assertEqual(len(e.rejection_reasons), 1)

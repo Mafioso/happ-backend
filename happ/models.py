@@ -223,6 +223,12 @@ class Upvote(EmbeddedDocument):
     ts = DateTimeField(default=datetime.datetime.now)
 
 
+class RejectionReason(EmbeddedDocument):
+    author = ReferenceField('User')
+    ts = DateTimeField(default=datetime.datetime.now)
+    text = StringField()
+
+
 class Event(HappBaseDocument):
     TYPES = (NORMAL, FEATURED, ADS) = range(3)
     STATUSES = (MODERATION, APPROVED, REJECTED) = range(3)
@@ -249,6 +255,7 @@ class Event(HappBaseDocument):
     web_site = URLField()
     votes = EmbeddedDocumentListField('Upvote')  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
+    rejection_reasons = EmbeddedDocumentListField('RejectionReason')
     start_date = DateStringField()
     start_time = TimeStringField()
     end_date = DateStringField()
@@ -343,9 +350,11 @@ class Event(HappBaseDocument):
         self.status = Event.APPROVED
         self.save()
 
-    def reject(self):
+    def reject(self, text, author):
         self.status = Event.REJECTED
         self.save()
+        rr = RejectionReason(text=text, author=author)
+        self.update(push__rejection_reasons=rr)
 
 
 class FileObject(HappBaseDocument):

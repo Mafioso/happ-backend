@@ -7,7 +7,18 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
-from .models import Country, City, Currency, User, UserSettings, Interest, Event, FileObject, Complaint
+from .models import (
+    Country,
+    City,
+    Currency,
+    User,
+    UserSettings,
+    Interest,
+    Event,
+    FileObject,
+    Complaint,
+    RejectionReason,
+)
 
 
 class LocalizedSerializer(serializers.DocumentSerializer):
@@ -299,12 +310,20 @@ class AuthorSerializer(serializers.DocumentSerializer):
         )
 
 
+class RejectionReasonSerializer(LocalizedSerializer):
+    author = AuthorSerializer()
+
+    class Meta:
+        model = RejectionReason
+
+
 class EventSerializer(LocalizedSerializer):
     # read only fields
     interests = InterestChildSerializer(many=True, read_only=True)
     city = CitySerializer(read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
+    rejection_reasons = RejectionReasonSerializer(many=True, read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
     end_datetime = drf_serializers.CharField(read_only=True)
     is_upvoted = drf_serializers.SerializerMethodField()
