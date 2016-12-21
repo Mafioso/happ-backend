@@ -82,6 +82,7 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'image_ids': [],
+            'geopoint': [0, 0],
             'interest_ids': map(lambda _: str(InterestFactory().id), range(3)),
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -105,6 +106,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'image_ids': [],
+            'geopoint': [0, 0],
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -128,6 +130,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'max_price': 120,
             'image_ids': [],
+            'geopoint': [0, 0],
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
