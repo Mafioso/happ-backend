@@ -17,6 +17,7 @@ from models import (
     CityInterests,
     FileObject,
     Complaint,
+    RejectionReason,
 )
 
 ALL_CITIES = City.objects
@@ -93,6 +94,11 @@ class InterestFactory(factory.mongoengine.MongoEngineFactory):
 class UpvoteFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = Upvote
+
+
+class RejectionReasonFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = RejectionReason
 
 
 class EventFactory(factory.mongoengine.MongoEngineFactory):

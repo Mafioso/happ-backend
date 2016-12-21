@@ -299,6 +299,11 @@ class Event(HappBaseDocument):
     def copy(self):
         new_instance = deepcopy(self)
         new_instance.id = None
+        new_instance.status = Event.MODERATION
+        new_instance.in_favourites = []
+        new_instance.votes = []
+        new_instance.votes_num = 0
+        new_instance.rejection_reasons = []
         new_instance.save()
         return new_instance
 

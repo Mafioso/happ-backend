@@ -1,11 +1,48 @@
 from django.test import SimpleTestCase
 
 from happ.models import Upvote, Event
-from happ.factories import UserFactory, EventFactory
+from happ.factories import (
+    UserFactory,
+    EventFactory,
+    UpvoteFactory,
+    InterestFactory,
+    ComplaintFactory,
+    RejectionReasonFactory,
+)
 from .. import *
 
 
 class Tests(SimpleTestCase):
+
+    def test_copy(self):
+        """
+        we can copy event
+        """
+        i = InterestFactory()
+        rr = RejectionReasonFactory()
+        author = UserFactory()
+        upvote = UpvoteFactory()
+        favourited_u = UserFactory()
+        e = EventFactory(
+            status=random.choice(Event.STATUSES),
+            author=author,
+            interests=[i],
+            in_favourites=[favourited_u],
+            votes=[upvote],
+            votes_num=1,
+            rejection_reasons=[rr],
+        )
+        ComplaintFactory(event=e)
+
+        e2 = e.copy()
+        self.assertEqual(e2.status, Event.MODERATION)
+        self.assertEqual(e2.author, author)
+        self.assertEqual(e2.interests, [i])
+        self.assertEqual(e2.in_favourites, [])
+        self.assertEqual(e2.votes, [])
+        self.assertEqual(e2.votes_num, 0)
+        self.assertEqual(e2.rejection_reasons, [])
+        self.assertEqual(len(e2.complaints), 0)
 
     def test_upvote(self):
         """
