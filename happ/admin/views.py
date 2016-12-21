@@ -81,7 +81,7 @@ class EventCreateView(JWTAuthRequiredMixin, TemplateView):
         context = super(EventCreateView, self).get_context_data(**kwargs)
         context['cities'] = City.objects.filter(is_active=True)
         context['currencies'] = Currency.objects.all()
-        context['interests'] = Interest.objects.filter(is_active=True, parent=None)
+        context['interests'] = Interest.objects.filter(is_active=True, parent=None).order_by('title')
         return context
 
 

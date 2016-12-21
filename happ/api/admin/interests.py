@@ -8,7 +8,7 @@ from happ.models import Interest
 from happ.policies import StaffPolicy, RootAdministratorPolicy
 from happ.decorators import patch_permission_classes, patch_serializer_class, patch_queryset
 from happ.serializers import InterestSerializer, InterestParentSerializer, InterestChildSerializer
-
+from happ.pagination import SolidPagination
 
 class InterestViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffPolicy, )
@@ -35,9 +35,10 @@ class InterestViewSet(viewsets.ModelViewSet):
         return response
 
     @list_route(methods=['get'], url_path='categories')
-    @patch_queryset(lambda self, x: x.filter(parent=None).order_by('-date_created'))
+    @patch_queryset(lambda self, x: x.filter(parent=None).order_by('title'))
     @patch_serializer_class(InterestParentSerializer)
     def categories(self, request, *args, **kwargs):
+        self.pagination_class = SolidPagination
         response = super(InterestViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
         response.template_name = 'admin/categories/list.html'
@@ -46,7 +47,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         return response
 
     @list_route(methods=['get'], url_path='children')
-    @patch_queryset(lambda self, x: x.filter(parent__ne=None))
+    @patch_queryset(lambda self, x: x.filter(parent__ne=None).order_by('parent'))
     @patch_serializer_class(InterestChildSerializer)
     def children(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).list(request, *args, **kwargs)
