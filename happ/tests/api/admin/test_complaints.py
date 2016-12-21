@@ -64,7 +64,7 @@ class Tests(APISimpleTestCase):
 
 
     def test_reply(self):
-        u = UserFactory(role=MODERATOR)
+        u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
 
