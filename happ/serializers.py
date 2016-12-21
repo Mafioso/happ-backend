@@ -310,7 +310,7 @@ class AuthorSerializer(serializers.DocumentSerializer):
         )
 
 
-class RejectionReasonSerializer(LocalizedSerializer):
+class RejectionReasonSerializer(serializers.DocumentSerializer):
     author = AuthorSerializer()
 
     class Meta:
@@ -439,6 +439,7 @@ class EventAdminSerializer(LocalizedSerializer):
     city = CitySerializer(read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
+    rejection_reasons = RejectionReasonSerializer(many=True, read_only=True)
     start_datetime = drf_serializers.CharField(read_only=True)
     end_datetime = drf_serializers.CharField(read_only=True)
     images = drf_serializers.SerializerMethodField()
