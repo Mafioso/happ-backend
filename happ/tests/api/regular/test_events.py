@@ -426,7 +426,7 @@ class Tests(APISimpleTestCase):
         u.set_password('123')
         u.save()
 
-        e = EventFactory()
+        e = EventFactory(status=random.choice(Event.STATUSES))
         e.save()
 
         auth_url = prepare_url('login')
@@ -454,6 +454,7 @@ class Tests(APISimpleTestCase):
         response = self.client.patch(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'New event')
+        self.assertEqual(response.data['status'], Event.MODERATION)
         self.assertEqual(response.data['min_price'], 100)
         self.assertEqual(response.data['max_price'], 120)
         self.assertEqual(Event.objects.count(), n)

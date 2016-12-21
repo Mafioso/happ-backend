@@ -414,6 +414,7 @@ class EventSerializer(LocalizedSerializer):
             FileObject.objects.filter(id__in=(old_ids-image_ids)).delete()
             map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=(image_ids-old_ids)))
 
+        event.status = Event.MODERATION
         event.save()
         # event.translate()
         return event
