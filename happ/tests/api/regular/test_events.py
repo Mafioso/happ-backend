@@ -784,6 +784,7 @@ class Tests(APISimpleTestCase):
         ins_set = map(lambda _: InterestFactory(), range(3))
         ci1 = CityInterestsFactory(c=c1, ins=ins_set)
 
+        # correct
         for i in range(5):
             EventFactory(
                 title='t{}'.format(i),
@@ -795,9 +796,27 @@ class Tests(APISimpleTestCase):
                 max_price=i+10,
                 city=c1,
                 interests=[random.choice(ins_set)],
+                is_active=True,
                 status=Event.APPROVED,
             )
 
+        # inactive
+        for i in range(4):
+            EventFactory(
+                title='t{}'.format(i),
+                description='t{}_description'.format(i),
+                votes_num=(5-i),
+                start_date='20160520',
+                start_time='0{}3000'.format(i),
+                min_price=i,
+                max_price=i+10,
+                city=c1,
+                interests=[random.choice(ins_set)],
+                is_active=False,
+                status=Event.APPROVED,
+            )
+
+        # not APPROVED
         for i in range(3):
             EventFactory(
                 title='t{}'.format(i),
@@ -809,6 +828,7 @@ class Tests(APISimpleTestCase):
                 max_price=i+10,
                 city=c1,
                 interests=[random.choice(ins_set)],
+                is_active=True,
                 status=random.choice([Event.MODERATION, Event.REJECTED]),
             )
 
@@ -903,20 +923,34 @@ class Tests(APISimpleTestCase):
         ins_set = map(lambda _: InterestFactory(), range(3))
         ci1 = CityInterestsFactory(c=c1, ins=ins_set)
 
+        # correct
         for i in range(5):
             EventFactory(
                 city=c1,
                 interests=[random.choice(ins_set)],
                 type=Event.FEATURED,
                 status=Event.APPROVED,
+                is_active=True
             )
 
+        # inactive
+        for i in range(5):
+            EventFactory(
+                city=c1,
+                interests=[random.choice(ins_set)],
+                type=Event.FEATURED,
+                status=Event.APPROVED,
+                is_active=False
+            )
+
+        # not APPROVED
         for i in range(3):
             EventFactory(
                 city=c1,
                 interests=[random.choice(ins_set)],
                 type=Event.FEATURED,
                 status=random.choice([Event.MODERATION, Event.REJECTED]),
+                is_active=True
             )
 
         u = UserFactory()
@@ -990,11 +1024,21 @@ class Tests(APISimpleTestCase):
 
         ci = CityInterestsFactory(c=c, ins=[parent_interest1])
 
+        # correct
         for i in range(3):
-            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED, is_active=True)
 
+        # inactive
+        for i in range(3):
+            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED, is_active=False)
+
+        # not APPROVED
+        for i in range(3):
+            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=random.choice([Event.MODERATION, Event.REJECTED]), is_active=True)
+
+        # other interest set
         for i in range(4):
-            EventFactory(city=c, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+            EventFactory(city=c, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED, is_active=True)
 
         u = UserFactory()
         u.interests = [ci]
@@ -1034,19 +1078,43 @@ class Tests(APISimpleTestCase):
         center = [random.uniform(-180, 180), random.uniform(-90, 90)]
         radius = 500
 
+        # correct
         for i in range(5):
             EventFactory(city=c,
                          interests=[random.choice(ins_set)],
                          type=Event.NORMAL,
                          status=Event.APPROVED,
+                         is_active=True,
                          geopoint=generate_geopoint(center, radius)
             )
 
+        # inactive
+        for i in range(5):
+            EventFactory(city=c,
+                         interests=[random.choice(ins_set)],
+                         type=Event.NORMAL,
+                         status=Event.APPROVED,
+                         is_active=False,
+                         geopoint=generate_geopoint(center, radius)
+            )
+
+        # not APPROVED
+        for i in range(5):
+            EventFactory(city=c,
+                         interests=[random.choice(ins_set)],
+                         type=Event.NORMAL,
+                         status=random.choice([Event.MODERATION, Event.REJECTED]),
+                         is_active=True,
+                         geopoint=generate_geopoint(center, radius)
+            )
+
+        # rejected by geoposition
         for i in range(10):
             EventFactory(city=c,
                          interests=[random.choice(ins_set)],
                          type=Event.NORMAL,
                          status=Event.APPROVED,
+                         is_active=True,
                          geopoint=generate_geopoint(center, radius, inside=False)
             )
 

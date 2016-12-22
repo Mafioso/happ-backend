@@ -128,7 +128,8 @@ class User(AbstractUser, HappBaseDocument):
             city=self.settings.city,
             interests__in=self.current_interests,
             type__in=[Event.NORMAL, Event.ADS],
-            status=Event.APPROVED
+            status=Event.APPROVED,
+            is_active=True
         )
 
     def get_featured(self):
@@ -136,7 +137,8 @@ class User(AbstractUser, HappBaseDocument):
             city=self.settings.city,
             interests__in=self.current_interests,
             type__in=[Event.FEATURED],
-            status=Event.APPROVED
+            status=Event.APPROVED,
+            is_active=True
         )
 
     def get_organizer_feed(self):
@@ -152,7 +154,8 @@ class User(AbstractUser, HappBaseDocument):
 
         all_events = Event.objects(interests__in=interests,
                                    type__in=[Event.NORMAL, Event.ADS],
-                                   status=Event.APPROVED)
+                                   status=Event.APPROVED,
+                                   is_active=True)
         if all_events.count() < django_settings.HAPP_EXPLORE_PAGE_SIZE:
             return all_events
         i = random.randint(0, all_events.count() - django_settings.HAPP_EXPLORE_PAGE_SIZE)
@@ -166,6 +169,7 @@ class User(AbstractUser, HappBaseDocument):
             interests__in=self.current_interests,
             type__in=[Event.NORMAL, Event.ADS],
             status=Event.APPROVED,
+            is_active=True,
             geopoint__geo_within_sphere=[center, radius / django_settings.EARTH_RADIUS],
         )
 
