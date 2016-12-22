@@ -20,6 +20,7 @@ from .models import (
     FileObject,
     Complaint,
     RejectionReason,
+    FeedbackMessage,
 )
 
 
@@ -560,3 +561,20 @@ class ComplaintSerializer(serializers.DocumentSerializer):
         exclude = (
             'date_edited',
         )
+
+
+class FeedbackMessageSerializer(serializers.DocumentSerializer):
+    author = AuthorSerializer(read_only=True)
+
+    class Meta:
+        model = FeedbackMessage
+        exclude = (
+            'date_edited',
+        )
+
+    def create(self, validated_data):
+        author = validated_data.pop('author')
+        fm = super(FeedbackMessageSerializer, self).create(validated_data)
+        fm.author = author
+        fm.save()
+        return fm

@@ -422,6 +422,12 @@ class Complaint(HappBaseDocument):
         self.save()
 
 
+class FeedbackMessage(HappBaseDocument):
+
+    text = StringField()
+    author = ReferenceField(User, reverse_delete_rule=CASCADE)
+
+
 # Notification
 #  - text
 #  - receivers

@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from rest_framework_mongoengine.routers import DefaultRouter
 
-from . import cities, currencies, interests, events, users, languages, complaints
+from . import cities, currencies, interests, events, users, languages, complaints, feedback
 from . import (
     VersionView,
     TempUploadView,
@@ -24,6 +24,7 @@ router.register(r'events', events.EventViewSet, 'events')
 router.register(r'users', users.UsersViewSet, 'users')
 router.register(r'languages', languages.LanguageViewSet, 'languages')
 router.register(r'complaints', complaints.ComplaintViewSet, 'complaints')
+router.register(r'feedback', feedback.FeedbackMessageViewSet, 'feedback')
 
 urlpatterns = [
     url(r'^version/$', VersionView.as_view(), name='version_api'),

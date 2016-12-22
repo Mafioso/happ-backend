@@ -18,6 +18,7 @@ from models import (
     FileObject,
     Complaint,
     RejectionReason,
+    FeedbackMessage,
 )
 
 ALL_CITIES = City.objects
@@ -163,3 +164,11 @@ class ComplaintFactory(factory.mongoengine.MongoEngineFactory):
 
     class Meta:
         model = Complaint
+
+
+class FeedbackMessageFactory(factory.mongoengine.MongoEngineFactory):
+    text = factory.Faker('sentence')
+    author = factory.LazyAttribute(lambda x: User.objects.first())
+
+    class Meta:
+        model = FeedbackMessage
