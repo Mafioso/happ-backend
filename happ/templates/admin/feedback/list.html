@@ -1,0 +1,33 @@
+{% load happ %}
+<table class="table table-bordered" ic-src="/api/v1/admin/feedback.html" ic-target="#complaint-table" ic-indicator="#indicator">
+  <thead>
+    <tr>
+      <th style="width:1%;">#</th>
+      <th>Текст</th>
+      <th>Автор</th>
+      <th style="width: 30%">Действия</th>
+    </tr>
+  </thead>
+  <tbody id="complaint-table-body">
+  {% for item in results %}
+    <tr id="row-{{item.id}}">
+      <th scope="row">{{forloop.counter}}</th>
+      <td>{{item.text|truncatechars_html:40|safe}}</td>
+      <td>{{item.author.fn}}</td>
+      <td>
+        <a href="#" class="btn btn-warning btn-xs" ic-on-beforeSend="$('#look-form').modal('show');" ic-get-from="{% url 'admin-feedback-detail' id=item.id %}?format=html" ic-indicator="indicator-update" ic-target="#look-form"><i class="fa fa-search"></i> Просмотр <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+      </td>
+    </tr>
+  {% endfor %}
+    <tr ></tr>
+  </tbody>
+</table>
+<div class="btn-group pull-right">
+  <!-- <button class="btn btn-default" type="button"><i class="fa fa-angle-double-left"></i></button> -->
+  {% for item in count|paginate %}
+  <button class="btn btn-default" type="button" ic-get-from="{% url 'admin-feedback-list' %}?format=html&page={{forloop.counter}}" ic-target="#complaint-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  {% endfor %}
+<!--   <button class="btn btn-default active" type="button" ic-get-from="{% url 'admin-cities-list' %}?format=html&page=2" ic-target="#complaint-table" ic-indicator="#indicator">2</button>
+  <button class="btn btn-default" type="button">3</button>
+  <button class="btn btn-default" type="button"><i class="fa fa-angle-double-right"></i></button> -->
+</div>

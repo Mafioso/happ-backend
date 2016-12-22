@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^settings/faq/$', views.FAQView.as_view(), name="faq"),
     url(r'^complaints/open/$', views.ComplaintOpenView.as_view(), name="complaints_open"),
     url(r'^complaints/closed/$', views.ComplaintClosedView.as_view(), name="complaints_closed"),
+    url(r'^feedback/$', views.FeedbackView.as_view(), name="feedback"),
 ]

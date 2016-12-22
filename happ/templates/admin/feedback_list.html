@@ -1,0 +1,48 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+Список сообщений обратной связи
+{% endblock %}
+
+{% block main %}
+<div class="">
+  <div class="page-title">
+    <div class="title_left">
+      <h3>Список сообщений <small>обратной связи</small></h3>
+    </div>
+  </div>
+
+  <div class="clearfix"></div>
+
+  <div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+      <div class="x_panel">
+        <div class="x_title">
+          <h2>Сообщения</h2>
+          <div class="clearfix"></div>
+        </div>
+        <div class="x_content">
+          <div id="complaint-table" ic-src="/api/v1/admin/feedback.html" ic-trigger-on="load" ic-target="#complaint-table" ic-indicator="#indicator" ic-deps="*">
+
+          </div>
+          <center> <!-- lol -->
+            <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
+          </center>
+          <div class="pull-left">
+            <div id="look-form" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+              <div class="modal-content">
+                  <div class="modal-body">
+                    <center> <!-- lol -->
+                      <i class="fa fa-spinner fa-spin fa-5x" id="indicator_form" style="display: none"></i>
+                    </center>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

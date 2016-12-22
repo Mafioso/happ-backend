@@ -157,3 +157,7 @@ class ComplaintOpenView(JWTAuthRequiredMixin, TemplateView):
 
 class ComplaintClosedView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/complaints_closed_list.html'
+
+
+class FeedbackView(JWTAuthRequiredMixin, TemplateView):
+    template_name = 'admin/feedback_list.html'

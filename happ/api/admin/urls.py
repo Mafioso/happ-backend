@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from rest_framework_mongoengine.routers import DefaultRouter
 
-from . import countries, cities, currencies, interests, events, users, complaints
+from . import countries, cities, currencies, interests, events, users, complaints, feedback
 from . import UrlShortenerView
 
 
@@ -14,6 +14,7 @@ router.register(r'interests', interests.InterestViewSet, 'admin-interests')
 router.register(r'events', events.EventViewSet, 'admin-events')
 router.register(r'users', users.UserViewSet, 'admin-users')
 router.register(r'complaints', complaints.ComplaintViewSet, 'admin-complaints')
+router.register(r'feedback', feedback.FeedbackMessageViewSet, 'admin-feedback')
 
 urlpatterns = [
     url(r'^shorten_url/$', UrlShortenerView.as_view(), name='admin-shorten-url'),
