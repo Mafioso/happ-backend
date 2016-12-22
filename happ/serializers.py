@@ -7,6 +7,8 @@ from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
+from mongoextensions.filters.fields import GeoPointField
+
 from .models import (
     Country,
     City,
@@ -318,6 +320,8 @@ class RejectionReasonSerializer(serializers.DocumentSerializer):
 
 
 class EventSerializer(LocalizedSerializer):
+    geopoint = GeoPointField()
+
     # read only fields
     interests = InterestChildSerializer(many=True, read_only=True)
     city = CitySerializer(read_only=True)

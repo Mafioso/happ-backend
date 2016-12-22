@@ -19,6 +19,7 @@ from happ.factories import (
     InterestFactory,
     CityInterestsFactory,
 )
+from happ.serializers import EventSerializer
 from happ.tests import *
 
 
@@ -82,7 +83,7 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'image_ids': [],
-            'geopoint': [0, 0],
+            'geopoint': {'lng': 1, 'lat':0},
             'interest_ids': map(lambda _: str(InterestFactory().id), range(3)),
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -93,7 +94,11 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, 100)
         self.assertEqual(e.max_price, 120)
+        self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 3)
+
+        es = EventSerializer(e).data
+        self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
 
@@ -106,7 +111,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'min_price': 100,
             'image_ids': [],
-            'geopoint': [0, 0],
+            'geopoint': {'lng': 1, 'lat':0},
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -117,7 +122,11 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, 100)
         self.assertEqual(e.max_price, None)
+        self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
+
+        es = EventSerializer(e).data
+        self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
 
@@ -130,7 +139,7 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1, hours=1),
             'max_price': 120,
             'image_ids': [],
-            'geopoint': [0, 0],
+            'geopoint': {'lng': 1, 'lat':0},
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
@@ -141,7 +150,11 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, None)
         self.assertEqual(e.max_price, 120)
+        self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
+
+        es = EventSerializer(e).data
+        self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
     def test_create_event_no_title(self):
         """
@@ -448,15 +461,18 @@ class Tests(APISimpleTestCase):
             'end_datetime': datetime.now() + timedelta(days=1),
             'min_price': 100,
             'max_price': 120,
+            'geopoint': {'lng': 1, 'lat':0},
             'image_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')
+        print response.data
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'New event')
         self.assertEqual(response.data['status'], Event.MODERATION)
         self.assertEqual(response.data['min_price'], 100)
         self.assertEqual(response.data['max_price'], 120)
+        self.assertEqual(response.data['geopoint'], {'lng': 1, 'lat':0})
         self.assertEqual(Event.objects.count(), n)
 
     def test_delete_event(self):
