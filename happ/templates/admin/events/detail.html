@@ -156,7 +156,7 @@
           }
       );
       function initMap() {
-        var point = {lng: {{object.geopoint.0}}, lat: {{object.geopoint.1}}};
+        var point = {lng: {{object.geopoint.coordinates.0}}, lat: {{object.geopoint.coordinates.1}}};
         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 12,
           center: point,
