@@ -19,13 +19,9 @@
       <td>
         {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-interests-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-interests-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
         <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-interests-detail' id=item.id %}?format=html&category=true" ic-target="#create-form"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        <a href="#" class="btn btn-danger btn-xs" ic-delete-from="{% url 'admin-interests-detail' id=item.id %}" indicator="#indicator-delete" ic-confirm="Вы уверены, что хотите удалить?"><i class="fa fa-trash-o"></i> Удалить <i id="indicator-delete" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
-<div class="btn-group pull-right">
-  {% for item in count|paginate %}
-  <button class="btn btn-default {% if forloop.counter == page %}active{% endif %}" type="button" ic-get-from="{% url 'admin-interests-categories' %}?format=html&page={{forloop.counter}}" ic-target="#interest-table" ic-indicator="#indicator">{{forloop.counter}}</button>
-  {% endfor %}
-</div>
