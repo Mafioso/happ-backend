@@ -241,6 +241,7 @@ class Event(HappBaseDocument):
     language = StringField(default=django_settings.HAPP_LANGUAGES[0]) # en ru fr it es de
     type = IntField(choices=TYPES, default=NORMAL)
     status = IntField(choices=STATUSES, default=MODERATION)
+    is_active = BooleanField(default=True)
     author = ReferenceField(User, reverse_delete_rule=CASCADE)
     city = ReferenceField(City, reverse_delete_rule=CASCADE, required=False)
     currency = ReferenceField(Currency, required=False)
@@ -363,6 +364,14 @@ class Event(HappBaseDocument):
         self.save()
         rr = RejectionReason(text=text, author=author, event=self)
         rr.save()
+
+    def activate(self):
+        self.is_active = True
+        self.save()
+
+    def deactivate(self):
+        self.is_active = False
+        self.save()
 
 
 class FileObject(HappBaseDocument):

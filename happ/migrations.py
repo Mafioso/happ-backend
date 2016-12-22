@@ -172,3 +172,7 @@ def migration__countries_and_currencies__0018():
     for currency in curr_coll.find({}):
         if 'code' not in currency:
             curr_coll.remove({'_id': currency['_id']})
+
+def migration__event__fill_place_name_field__0019():
+    coll = get_db()['event']
+    coll.update({}, {'$set': {'is_active': True}}, multi=True)

@@ -180,3 +180,23 @@ class Tests(SimpleTestCase):
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.status, Event.REJECTED)
         self.assertEqual(len(e.rejection_reasons), 1)
+
+    def test_activate(self):
+        """
+        we can activate event
+        """
+        e = EventFactory(is_active=False)
+        self.assertFalse(e.is_active)
+
+        e.activate()
+        self.assertTrue(e.is_active)
+
+    def test_deactivate(self):
+        """
+        we can deactivate event
+        """
+        e = EventFactory()
+        self.assertTrue(e.is_active)
+
+        e.deactivate()
+        self.assertFalse(e.is_active)

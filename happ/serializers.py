@@ -334,6 +334,7 @@ class EventSerializer(LocalizedSerializer):
     is_upvoted = drf_serializers.SerializerMethodField()
     is_in_favourites = drf_serializers.SerializerMethodField()
     images = drf_serializers.SerializerMethodField()
+    is_active = drf_serializers.BooleanField(read_only=True)
 
     # write only fields
     interest_ids = drf_serializers.ListField(write_only=True, required=False)
@@ -347,9 +348,6 @@ class EventSerializer(LocalizedSerializer):
 
     class Meta:
         model = Event
-        extra_kwargs = {
-            'city': {'read_only': True},
-        }
         exclude = (
             'votes',
             'in_favourites',
@@ -463,9 +461,6 @@ class EventAdminSerializer(LocalizedSerializer):
 
     class Meta:
         model = Event
-        extra_kwargs = {
-            'city': {'read_only': True},
-        }
         exclude = (
             'votes',
             'in_favourites',
