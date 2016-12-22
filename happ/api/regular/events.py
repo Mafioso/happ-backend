@@ -247,3 +247,17 @@ class EventViewSet(viewsets.ModelViewSet):
                                  author=self.request.user
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['post'], url_path='activate')
+    def activate(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.activate()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['post'], url_path='deactivate')
+    def deactivate(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.deactivate()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

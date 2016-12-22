@@ -1010,3 +1010,53 @@ class Tests(APISimpleTestCase):
         self.assertEqual(len(e.complaints), 1)
         self.assertEqual(e.complaints[0].text, 'WTF?')
         self.assertEqual(e.complaints[0].author.id, u.id)
+
+    def test_activate(self):
+        """
+        we can activate event through API
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = EventFactory(is_active=False)
+
+        url = prepare_url('events-activate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        i = Event.objects.get(id=i.id)
+        self.assertTrue(i.is_active)
+
+    def test_deactivate(self):
+        """
+        we can deactivate event through API
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = EventFactory(is_active=True)
+
+        url = prepare_url('events-deactivate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        i = Event.objects.get(id=i.id)
+        self.assertFalse(i.is_active)
