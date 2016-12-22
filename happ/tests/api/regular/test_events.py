@@ -466,13 +466,56 @@ class Tests(APISimpleTestCase):
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')
-        print response.data
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['title'], 'New event')
         self.assertEqual(response.data['status'], Event.MODERATION)
         self.assertEqual(response.data['min_price'], 100)
         self.assertEqual(response.data['max_price'], 120)
         self.assertEqual(response.data['geopoint'], {'lng': 1, 'lat':0})
+        self.assertEqual(Event.objects.count(), n)
+
+    def test_edit_event_another_author(self):
+        """
+        we cannot edit event of other users
+        """
+        ou = UserFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory(status=random.choice(Event.STATUSES), author=ou)
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-detail', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'start_datetime': datetime.now(),
+            'end_datetime': datetime.now() + timedelta(days=1),
+            'min_price': 100,
+            'max_price': 120,
+            'geopoint': {'lng': 1, 'lat':0},
+            'image_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        e2 = Event.objects.get(id=e.id)
+        self.assertEqual(e2.title, e.title)
+        self.assertEqual(e2.status, e2.status)
+        self.assertEqual(e2.min_price, e2.min_price)
+        self.assertEqual(e2.max_price, e2.max_price)
         self.assertEqual(Event.objects.count(), n)
 
     def test_delete_event(self):
@@ -502,6 +545,34 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Event.objects.count(), n-1)
 
+    def test_delete_event_another_author(self):
+        """
+        we cannot delete event of other users
+        """
+        ou = UserFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory(author=ou)
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-detail', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Event.objects.count(), n)
+
     def test_copy_event(self):
         """
         we can copy event
@@ -529,6 +600,34 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Event.objects.count(), (n+1))
         self.assertNotEqual(response.data['id'], str(e.id))
+
+    def test_copy_event_another_author(self):
+        """
+        we cannot copy event of other users
+        """
+        ou = UserFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory(author=ou)
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-copy', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Event.objects.count(), n)
 
     def test_upvote_event(self):
         """
@@ -1036,6 +1135,32 @@ class Tests(APISimpleTestCase):
         i = Event.objects.get(id=i.id)
         self.assertTrue(i.is_active)
 
+    def test_activate_another_author(self):
+        """
+        we cannot activate event through API of other users
+        """
+        ou = UserFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = EventFactory(is_active=False, author=ou)
+
+        url = prepare_url('events-activate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        i = Event.objects.get(id=i.id)
+        self.assertFalse(i.is_active)
+
     def test_deactivate(self):
         """
         we can deactivate event through API
@@ -1060,3 +1185,29 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         i = Event.objects.get(id=i.id)
         self.assertFalse(i.is_active)
+
+    def test_deactivate_another_author(self):
+        """
+        we cannot deactivate event through API of other users
+        """
+        ou = UserFactory()
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = EventFactory(is_active=True, author=ou)
+
+        url = prepare_url('events-deactivate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        i = Event.objects.get(id=i.id)
+        self.assertTrue(i.is_active)

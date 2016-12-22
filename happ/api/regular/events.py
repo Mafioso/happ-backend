@@ -98,6 +98,8 @@ class EventViewSet(viewsets.ModelViewSet):
         - launches celery tasks for translation
         """
         instance = self.get_object()
+        if instance.author != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         if 'title' not in request.data:
             return Response(
                 {'error_message': _('No title provided.')},
@@ -148,17 +150,21 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.author != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        return super(EventViewSet, self).destroy(request, *args, **kwargs)
+
     @detail_route(methods=['post'], url_path='copy')
     def copy(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.author != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         new_instance = instance.copy()
         serializer = self.get_serializer(new_instance)
         new_instance.translate()
         return Response(serializer.data)
-
-    @list_route(methods=['post'], url_path='upload')
-    def upload(self, request, *args, **kwargs):
-        return Response(request.data.getlist('images', []))
 
     @detail_route(methods=['post'], url_path='upvote')
     def upvote(self, request, *args, **kwargs):
@@ -251,6 +257,8 @@ class EventViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['post'], url_path='activate')
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.author != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         instance.activate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -258,6 +266,8 @@ class EventViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['post'], url_path='deactivate')
     def deactivate(self, request, *args, **kwargs):
         instance = self.get_object()
+        if instance.author != request.user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         instance.deactivate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
