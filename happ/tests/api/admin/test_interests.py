@@ -214,7 +214,7 @@ class Tests(APISimpleTestCase):
         for i in range(3):
             interest = InterestFactory(parent=None)
 
-        interest = InterestFactory(parent=interest)
+        inter = InterestFactory(parent=interest)
 
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
@@ -232,7 +232,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(len(response.data['results']), 3)
         self.assertEqual(len(response.data['results'][0]['children']), 1)
 
     def test_get_children(self):
