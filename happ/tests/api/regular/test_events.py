@@ -473,6 +473,36 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['max_price'], 120)
         self.assertEqual(response.data['geopoint'], {'lng': 1, 'lat':0})
         self.assertEqual(Event.objects.count(), n)
+        self.assertEqual(len(response.data['datetimes']), 2)
+        self.assertEqual(response.data['datetimes'][0]['date'], datetime.now().date().isoformat())
+        self.assertEqual(response.data['datetimes'][1]['date'], (datetime.now() + timedelta(days=1)).date().isoformat())
+
+        times_n = EventTime.objects.count()
+        data = {
+            'title': 'New event2',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'start_datetime': datetime.now() + timedelta(days=2),
+            'end_datetime': datetime.now() + timedelta(days=4),
+            'min_price': 130,
+            'max_price': 140,
+            'geopoint': {'lng': 2, 'lat':3},
+            'image_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(times_n+1, EventTime.objects.count())
+        self.assertEqual(response.data['title'], 'New event2')
+        self.assertEqual(response.data['status'], Event.MODERATION)
+        self.assertEqual(response.data['min_price'], 130)
+        self.assertEqual(response.data['max_price'], 140)
+        self.assertEqual(response.data['geopoint'], {'lng': 2, 'lat':3})
+        self.assertEqual(Event.objects.count(), n)
+        self.assertEqual(len(response.data['datetimes']), 3)
+        self.assertEqual(response.data['datetimes'][0]['date'], (datetime.now() + timedelta(days=2)).date().isoformat())
+        self.assertEqual(response.data['datetimes'][1]['date'], (datetime.now() + timedelta(days=3)).date().isoformat())
+        self.assertEqual(response.data['datetimes'][2]['date'], (datetime.now() + timedelta(days=4)).date().isoformat())
 
     def test_edit_event_another_author(self):
         """
