@@ -21,6 +21,7 @@ from .models import (
     Complaint,
     RejectionReason,
     FeedbackMessage,
+    EventTime,
 )
 
 
@@ -322,6 +323,7 @@ class RejectionReasonSerializer(serializers.DocumentSerializer):
 
 class EventSerializer(LocalizedSerializer):
     geopoint = GeoPointField()
+    datetimes = drf_serializers.ListField(required=False)
 
     # read only fields
     interests = InterestChildSerializer(many=True, read_only=True)
@@ -329,8 +331,6 @@ class EventSerializer(LocalizedSerializer):
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     rejection_reasons = RejectionReasonSerializer(many=True, read_only=True)
-    start_datetime = drf_serializers.CharField(read_only=True)
-    end_datetime = drf_serializers.CharField(read_only=True)
     is_upvoted = drf_serializers.SerializerMethodField()
     is_in_favourites = drf_serializers.SerializerMethodField()
     images = drf_serializers.SerializerMethodField()
@@ -341,10 +341,6 @@ class EventSerializer(LocalizedSerializer):
     currency_id = serializers.ObjectIdField(write_only=True, required=False)
     city_id = serializers.ObjectIdField(write_only=True, required=False)
     image_ids = drf_serializers.ListField(write_only=True, required=False)
-    start_date = drf_serializers.DateField(write_only=True, required=False)
-    start_time = drf_serializers.TimeField(write_only=True, required=False)
-    end_date = drf_serializers.DateField(write_only=True, required=False)
-    end_time = drf_serializers.TimeField(write_only=True, required=False)
 
     class Meta:
         model = Event
@@ -377,8 +373,6 @@ class EventSerializer(LocalizedSerializer):
         """
         if 'min_price' in data and 'max_price' in data and data['min_price'] > data['max_price']:
             raise ValidationError(_("Min_price should be less than Max_price"))
-        if datetime.combine(data['start_date'], data['start_time']) > datetime.combine(data['end_date'], data['end_time']):
-            raise ValidationError(_("Start date should be earlier than End date"))
         return data
 
     def create(self, validated_data):
@@ -387,6 +381,7 @@ class EventSerializer(LocalizedSerializer):
         interest_ids = validated_data.pop('interest_ids') if 'interest_ids' in validated_data else []
         image_ids = validated_data.pop('image_ids') if 'image_ids' in validated_data else []
         author = validated_data.pop('author')
+        datetimes = validated_data.pop('datetimes')
         event = super(EventSerializer, self).create(validated_data)
 
         event.city = city
@@ -395,13 +390,18 @@ class EventSerializer(LocalizedSerializer):
         event.interests = Interest.objects.filter(id__in=interest_ids)
         event.save()
 
+        [EventTime.objects.create(event=event, **datetime) for datetime in datetimes]
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
         # event.translate()
         return event
 
     def update(self, instance, validated_data):
+        datetimes = validated_data.pop('datetimes') if 'datetimes' in validated_data else None
         event = super(EventSerializer, self).update(instance, validated_data)
 
+        if datetimes:
+            EventTime.objects.filter(event=event).delete()
+            [EventTime.objects.create(event=event, **datetime) for datetime in datetimes]
         if 'city_id' in validated_data:
             city = validated_data.pop('city_id')
             event.city = city
@@ -434,6 +434,9 @@ class EventSerializer(LocalizedSerializer):
 
     def get_images(self, obj):
         return FileObjectSerializer(obj.images, many=True).data
+
+    def get_datetimes(self, obj):
+        return self.get_datetimes
 
 
 class EventAdminSerializer(LocalizedSerializer):

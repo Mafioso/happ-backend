@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
-from happ.models import User, City, Currency, Event
+from happ.models import User, City, Currency, Event, EventTime
 from happ.factories import (
     UserFactory,
     CityFactory,
@@ -73,6 +73,7 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('events-list')
         n = Event.objects.count()
+        times_n = EventTime.objects.count()
 
         # full
         data = {
@@ -91,17 +92,22 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
+        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, 100)
         self.assertEqual(e.max_price, 120)
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 3)
+        self.assertEqual(len(e.datetimes), 2)
+        self.assertEqual(e.datetimes[0]['date'], datetime.now().date().isoformat())
+        self.assertEqual(e.datetimes[1]['date'], (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
+        times_n = EventTime.objects.count()
 
         # no max_price
         data = {
@@ -119,17 +125,22 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
+        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, 100)
         self.assertEqual(e.max_price, None)
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
+        self.assertEqual(len(e.datetimes), 2)
+        self.assertEqual(e.datetimes[0]['date'], datetime.now().date().isoformat())
+        self.assertEqual(e.datetimes[1]['date'], (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
+        times_n = EventTime.objects.count()
 
         # no min_price
         data = {
@@ -147,12 +158,16 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
+        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, None)
         self.assertEqual(e.max_price, 120)
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
+        self.assertEqual(len(e.datetimes), 2)
+        self.assertEqual(e.datetimes[0]['date'], datetime.now().date().isoformat())
+        self.assertEqual(e.datetimes[1]['date'], (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
@@ -326,9 +341,9 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(n, Event.objects.count())
 
-    def test_create_event_start_end_date(self):
+    def test_create_event_no_start_end_date(self):
         """
-        We cannot create event if start date is later than end date
+        We cannot create event if no start_datetime and end_datetime
         """
         u = UserFactory()
         u.set_password('123')
@@ -349,24 +364,6 @@ class Tests(APISimpleTestCase):
             'title': 'New event',
             'city_id': str(CityFactory.create().id),
             'currency_id': str(CurrencyFactory.create().id),
-            'start_datetime': datetime.now() + timedelta(days=1),
-            'end_datetime': datetime.now(),
-            'min_price': 100,
-            'max_price': 120,
-            'image_ids': [],
-            'interest_ids': [],
-        }
-        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
-        response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(n, Event.objects.count())
-
-        data = {
-            'title': 'New event',
-            'city_id': str(CityFactory.create().id),
-            'currency_id': str(CurrencyFactory.create().id),
-            'start_datetime': datetime.now() + timedelta(hours=1),
-            'end_datetime': datetime.now(),
             'min_price': 100,
             'max_price': 120,
             'image_ids': [],
@@ -453,6 +450,7 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('events-detail', kwargs={'id': str(e.id)})
         n = Event.objects.count()
+        times_n = EventTime.objects.count()
 
         data = {
             'title': 'New event',
@@ -468,6 +466,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(times_n+2, EventTime.objects.count())
         self.assertEqual(response.data['title'], 'New event')
         self.assertEqual(response.data['status'], Event.MODERATION)
         self.assertEqual(response.data['min_price'], 100)

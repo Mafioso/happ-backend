@@ -284,6 +284,15 @@ class Event(HappBaseDocument):
         return datetime.datetime.combine(self.end_date, self.end_time or datetime.time()).isoformat()
 
     @property
+    def datetimes(self):
+        event_times = EventTime.objects.filter(event=self).order_by('date')
+        return [{
+            'date': x.date.isoformat(),
+            'start_time': x.start_time.isoformat(),
+            'end_time': x.end_time.isoformat(),
+        } for x in event_times]
+
+    @property
     def images(self):
         return FileObject.objects.filter(entity=self)
 
