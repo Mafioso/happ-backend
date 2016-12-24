@@ -176,3 +176,24 @@ def migration__countries_and_currencies__0018():
 def migration__event__fill_place_name_field__0019():
     coll = get_db()['event']
     coll.update({}, {'$set': {'is_active': True}}, multi=True)
+
+def migration__event_time__0020():
+    coll = get_db()['event']
+    coll2 = get_db()['event_time']
+    for event in coll.find({}):
+        if 'start_date' not in event or 'end_date' not in event:
+            continue
+        start_date = event['start_date']
+        end_date = event['end_date']
+        for date in range(int(start_date), int(end_date)+1):
+            data = {
+                'date': str(date),
+                'start_time': event['start_time'] if 'start_time' in event else '000000',
+                'end_time': event['end_time'] if 'end_time' in event else '235959',
+                'event': event['_id'],
+            }
+            coll2.insert(data)
+    coll.update({}, {'$unset': {'start_date': ''}}, multi=True)
+    coll.update({}, {'$unset': {'end_date': ''}}, multi=True)
+    coll.update({}, {'$unset': {'start_time': ''}}, multi=True)
+    coll.update({}, {'$unset': {'end_time': ''}}, multi=True)

@@ -5,7 +5,7 @@ from .fields import  DateTime000Field, ListField, RangeField, GeoPointField,  Ob
 
 COMPARISION_OPERATORS = ('ne', 'gt', 'gte', 'lt', 'lte')
 
-class Filter():
+class Filter(object):
     """ filter base class
     Wraps serializer field to parse value from querydict.
     Binding name (name of filterset attribute) is used as key in query_params.
@@ -215,3 +215,24 @@ class GeoNearFilter(GeoFilter):
 class GeoDistanceFilter(GeoFilter):
     field_class = fields.FloatField
     lookup_type = 'max_distance'
+
+
+class OtherEntityFilter(Filter):
+    field_class = fields.CharField
+    def __init__(self, entity, entity_field, reference_field, lookup=None, name=None, **kwargs):
+        self.entity = entity
+        self.entity_field = entity_field
+        self.reference_field = reference_field
+        super(OtherEntityFilter, self).__init__(lookup=lookup, name=name, **kwargs)
+
+    def filter_params(self, value):
+        """ return filtering params """
+        if value is None:
+            return {}
+
+        q_param = self.entity_field
+        if self.lookup_type is not None:
+            q_param += '__' + self.lookup_type
+
+        ids = [x.id for x in self.entity.objects.filter(**{q_param: value}).distinct(field=self.reference_field)]
+        return { "id__in": ids }

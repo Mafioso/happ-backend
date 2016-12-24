@@ -15,6 +15,7 @@ from happ.factories import (
     CityFactory,
     CurrencyFactory,
     EventFactory,
+    EventTimeFactory,
     LocalizedFactory,
     InterestFactory,
     CityInterestsFactory,
@@ -786,12 +787,10 @@ class Tests(APISimpleTestCase):
 
         # correct
         for i in range(5):
-            EventFactory(
+            e = EventFactory(
                 title='t{}'.format(i),
                 description='t{}_description'.format(i),
                 votes_num=(5-i),
-                start_date='20160520',
-                start_time='0{}3000'.format(i),
                 min_price=i,
                 max_price=i+10,
                 city=c1,
@@ -799,15 +798,18 @@ class Tests(APISimpleTestCase):
                 is_active=True,
                 status=Event.APPROVED,
             )
+            EventTimeFactory(
+                date='20160520',
+                start_time='0{}3000'.format(i),
+                event=e
+            )
 
         # inactive
         for i in range(4):
-            EventFactory(
+            e = EventFactory(
                 title='t{}'.format(i),
                 description='t{}_description'.format(i),
                 votes_num=(5-i),
-                start_date='20160520',
-                start_time='0{}3000'.format(i),
                 min_price=i,
                 max_price=i+10,
                 city=c1,
@@ -815,21 +817,29 @@ class Tests(APISimpleTestCase):
                 is_active=False,
                 status=Event.APPROVED,
             )
+            EventTimeFactory(
+                date='20160520',
+                start_time='0{}3000'.format(i),
+                event=e
+            )
 
         # not APPROVED
         for i in range(3):
-            EventFactory(
+            e = EventFactory(
                 title='t{}'.format(i),
                 description='dt{}'.format(i),
                 votes_num=(5-i),
-                start_date='20170520',
-                start_time='0{}3000'.format(i),
                 min_price=i,
                 max_price=i+10,
                 city=c1,
                 interests=[random.choice(ins_set)],
                 is_active=True,
                 status=random.choice([Event.MODERATION, Event.REJECTED]),
+            )
+            EventTimeFactory(
+                date='20170520',
+                start_time='0{}3000'.format(i),
+                event=e
             )
 
         u = UserFactory()
@@ -871,13 +881,6 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][4]['title'], 't4')
 
         ## filtering
-        # start_time
-        url = prepare_url('events-feed', query={'start_time': '033000'})
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 2)
-        self.assertEqual(response.data['results'][0]['title'], 't3')
-        self.assertEqual(response.data['results'][1]['title'], 't4')
         # min_price
         url = prepare_url('events-feed', query={'min_price': 1})
         response = self.client.get(url, format='json')
@@ -914,6 +917,101 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.data['results'][0]['title'], 't1')
+
+    def test_filter_datetime(self):
+        """
+        we can use filter by start and end datetimes
+        """
+        c1 = CityFactory()
+        ins_set = map(lambda _: InterestFactory(), range(3))
+        ci1 = CityInterestsFactory(c=c1, ins=ins_set)
+
+        # correct
+        for i in range(5):
+            e = EventFactory(
+                title='t{}'.format(i),
+                description='t{}_description'.format(i),
+                votes_num=(5-i),
+                min_price=i,
+                max_price=i+10,
+                city=c1,
+                interests=[random.choice(ins_set)],
+                is_active=True,
+                status=Event.APPROVED,
+            )
+            EventTimeFactory(
+                date='2016052{}'.format(i),
+                start_time='0{}3000'.format(i),
+                end_time='0{}3000'.format(i+1),
+                event=e
+            )
+
+        u = UserFactory()
+        u.interests = [ci1]
+        u.settings.city = c1
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('events-feed')
+
+        # start_time
+        url = prepare_url('events-feed', query={'start_time': '033000'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['title'], 't3')
+        self.assertEqual(response.data['results'][1]['title'], 't4')
+
+        # end_time
+        url = prepare_url('events-feed', query={'end_time': '033000'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(response.data['results'][0]['title'], 't0')
+        self.assertEqual(response.data['results'][1]['title'], 't1')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+
+        # start_time and end_time
+        url = prepare_url('events-feed', query={'start_time': '033000', 'end_time': '043000'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 't3')
+
+        # start_date
+        url = prepare_url('events-feed', query={'start_date': '20160523'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['title'], 't3')
+        self.assertEqual(response.data['results'][1]['title'], 't4')
+
+        # end_date
+        url = prepare_url('events-feed', query={'end_date': '20160523'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(response.data['results'][0]['title'], 't0')
+        self.assertEqual(response.data['results'][1]['title'], 't1')
+        self.assertEqual(response.data['results'][2]['title'], 't2')
+        self.assertEqual(response.data['results'][3]['title'], 't3')
+
+        # start_date and end_date
+        url = prepare_url('events-feed', query={'start_date': '20160523', 'end_date': '20160524'})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['title'], 't3')
+        self.assertEqual(response.data['results'][1]['title'], 't4')
 
     def test_get_events_featured(self):
         """

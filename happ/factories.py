@@ -13,6 +13,7 @@ from models import (
     Upvote,
     Interest,
     Event,
+    EventTime,
     Localized,
     CityInterests,
     FileObject,
@@ -102,6 +103,15 @@ class RejectionReasonFactory(factory.mongoengine.MongoEngineFactory):
         model = RejectionReason
 
 
+class EventTimeFactory(factory.mongoengine.MongoEngineFactory):
+    class Meta:
+        model = EventTime
+
+    date = factory.Faker('date', pattern=settings.DATE_STRING_FIELD_FORMAT)
+    start_time = factory.Faker('time', pattern=settings.TIME_STRING_FIELD_FORMAT)
+    end_time = factory.Faker('time', pattern=settings.TIME_STRING_FIELD_FORMAT)
+
+
 class EventFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = Event
@@ -118,10 +128,6 @@ class EventFactory(factory.mongoengine.MongoEngineFactory):
     email = factory.Faker('email')
     web_site = factory.Faker('url')
     # votes = factory.Faker('pyint')
-    start_date = factory.Faker('date', pattern=settings.DATE_STRING_FIELD_FORMAT)
-    start_time = factory.Faker('time', pattern=settings.TIME_STRING_FIELD_FORMAT)
-    end_date = factory.Faker('date', pattern=settings.DATE_STRING_FIELD_FORMAT)
-    end_time = factory.Faker('time', pattern=settings.TIME_STRING_FIELD_FORMAT)
 
     # def geopoint(self):
     #     print factory.Faker('longitude'), factory.Faker('latitude'),

@@ -261,10 +261,6 @@ class Event(HappBaseDocument):
     web_site = URLField()
     votes = EmbeddedDocumentListField('Upvote')  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
-    start_date = DateStringField()
-    start_time = TimeStringField()
-    end_date = DateStringField()
-    end_time = TimeStringField()
     close_on_start = BooleanField(default=False)
     registration_link = StringField()
     min_age = IntField(default=0)
@@ -376,6 +372,13 @@ class Event(HappBaseDocument):
     def deactivate(self):
         self.is_active = False
         self.save()
+
+
+class EventTime(Document):
+    date = DateStringField()
+    start_time = TimeStringField()
+    end_time = TimeStringField()
+    event = ReferenceField('Event')
 
 
 class FileObject(HappBaseDocument):
