@@ -83,7 +83,24 @@ class EventViewSet(viewsets.ModelViewSet):
                 'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
                 'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
             } for date in range(int(start_date), int(end_date)+1)]
-
+        else:
+            for item in request.data['datetimes']:
+                if 'date' not in item or \
+                   'start_time' not in item or \
+                   'end_time' not in item:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                try:
+                    string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT)
+                    string_to_time(item['start_time'], settings.TIME_STRING_FIELD_FORMAT)
+                    string_to_time(item['end_time'], settings.TIME_STRING_FIELD_FORMAT)
+                except:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -150,6 +167,24 @@ class EventViewSet(viewsets.ModelViewSet):
                 'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
                 'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
             } for date in range(int(start_date), int(end_date)+1)]
+        else:
+            for item in request.data['datetimes']:
+                if 'date' not in item or \
+                   'start_time' not in item or \
+                   'end_time' not in item:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                try:
+                    string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT)
+                    string_to_time(item['start_time'], settings.TIME_STRING_FIELD_FORMAT)
+                    string_to_time(item['end_time'], settings.TIME_STRING_FIELD_FORMAT)
+                except:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():

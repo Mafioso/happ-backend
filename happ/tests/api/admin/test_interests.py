@@ -233,7 +233,11 @@ class Tests(APISimpleTestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['results']), 3)
-        self.assertEqual(len(response.data['results'][0]['children']), 1)
+        for data in response.data['results']:
+            if data['id'] == str(interest.id):
+                self.assertEqual(len(data['children']), 1)
+            else:
+                self.assertEqual(len(data['children']), 0)
 
     def test_get_children(self):
         """

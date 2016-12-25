@@ -172,6 +172,49 @@ class Tests(APISimpleTestCase):
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
+        n = Event.objects.count()
+        times_n = EventTime.objects.count()
+
+        # datetimes object
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'datetimes': [
+                {
+                    'date': '20161010',
+                    'start_time': '102030',
+                    'end_time': '112030',
+                },
+                {
+                    'date': '20161012',
+                    'start_time': '102030',
+                    'end_time': '112030',
+                },
+            ],
+            'max_price': 120,
+            'image_ids': [],
+            'geopoint': {'lng': 1, 'lat':0},
+            'interest_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(n+1, Event.objects.count())
+        self.assertEqual(times_n+2, EventTime.objects.count())
+        e = Event.objects.get(id=response.data['id'])
+        self.assertEqual(e.title, 'New event')
+        self.assertEqual(e.min_price, None)
+        self.assertEqual(e.max_price, 120)
+        self.assertEqual(e.geopoint['coordinates'], [1, 0])
+        self.assertEqual(len(e.interests), 0)
+        self.assertEqual(len(e.datetimes), 2)
+        self.assertEqual(e.datetimes[0]['date'], '2016-10-10')
+        self.assertEqual(e.datetimes[1]['date'], '2016-10-12')
+
+        es = EventSerializer(e).data
+        self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
+
     def test_create_event_no_title(self):
         """
         We cannot create event without title
@@ -367,6 +410,110 @@ class Tests(APISimpleTestCase):
             'min_price': 100,
             'max_price': 120,
             'image_ids': [],
+            'interest_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(n, Event.objects.count())
+
+    def test_create_event_wrong_datetimes(self):
+        """
+        We cannot create event if items in datetimes have wrong format
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-list')
+        n = Event.objects.count()
+
+        # wrong format
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'datetimes': [
+                {
+                    'date': '20161012',
+                    'start_time': '1020402',
+                    'end_time': '112030',
+                },
+            ],
+            'max_price': 120,
+            'image_ids': [],
+            'geopoint': {'lng': 1, 'lat':0},
+            'interest_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(n, Event.objects.count())
+
+        # missing date
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'datetimes': [
+                {
+                    'start_time': '102030',
+                    'end_time': '112030',
+                },
+            ],
+            'max_price': 120,
+            'image_ids': [],
+            'geopoint': {'lng': 1, 'lat':0},
+            'interest_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(n, Event.objects.count())
+
+        # missing start_time
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'datetimes': [
+                {
+                    'date': '20161012',
+                    'end_time': '112030',
+                },
+            ],
+            'max_price': 120,
+            'image_ids': [],
+            'geopoint': {'lng': 1, 'lat':0},
+            'interest_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(n, Event.objects.count())
+
+        # missing end_time
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'datetimes': [
+                {
+                    'date': '20161012',
+                    'start_time': '10203',
+                },
+            ],
+            'max_price': 120,
+            'image_ids': [],
+            'geopoint': {'lng': 1, 'lat':0},
             'interest_ids': [],
         }
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
