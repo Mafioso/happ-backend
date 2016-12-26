@@ -47,7 +47,7 @@ class City(HappBaseDocument):
     is_active = BooleanField(default=True)
     name = StringField(required=True)
     country = ReferenceField(Country, reverse_delete_rule=CASCADE)
-    geopoint = GeoPointField()
+    geopoint = PointField()
 
     @property
     def country_name(self):

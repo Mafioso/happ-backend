@@ -77,6 +77,7 @@ class CountrySerializer(serializers.DocumentSerializer):
 class CitySerializer(serializers.DocumentSerializer):
     # read only fields
     country_name = drf_serializers.CharField(read_only=True)
+    geopoint = GeoPointField()
 
     # write only fields
     country_id = serializers.ObjectIdField(write_only=True)

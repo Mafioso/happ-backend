@@ -197,3 +197,21 @@ def migration__event_time__0020():
     coll.update({}, {'$unset': {'end_date': ''}}, multi=True)
     coll.update({}, {'$unset': {'start_time': ''}}, multi=True)
     coll.update({}, {'$unset': {'end_time': ''}}, multi=True)
+
+def migration__city_geopoint__0021():
+    coll = get_db()['city']
+    for city in coll.find({}):
+        if 'geopoint' in city and isinstance(event['geopoint'], list):
+            coll.update(
+                {'_id': city['_id']},
+                {'$set': {'geopoint': { "type" : "Point", "coordinates" : city['geopoint'] }}},
+            )
+
+def migration__event_geopoint__0022():
+    coll = get_db()['event']
+    for event in coll.find({}):
+        if 'geopoint' in event and isinstance(event['geopoint'], list):
+            coll.update(
+                {'_id': event['_id']},
+                {'$set': {'geopoint': { "type" : "Point", "coordinates" : event['geopoint'] }}},
+            )
