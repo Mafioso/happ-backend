@@ -68,6 +68,51 @@ class UserRegister(CreateAPIView):
         return Response({'token': token}, status=status.HTTP_201_CREATED, headers=headers)
 
 
+class FacebookUserRegister(CreateAPIView):
+    UserModel = get_user_model()
+    serializer_class = UserSerializer
+    permission_classes = ()
+
+    def create(self, request, *args, **kwargs):
+        """
+        Creates user using data from facebook
+        Once user created this endpoint returns JSON Web Token in response
+        - username => facebook_id
+        - gender
+        - fullname
+        """
+        if 'facebook_id' not in request.data:
+            return Response(
+                {'error_message': _('No facebook_id provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        request.data['username'] = request.data['facebook_id']
+        try:
+            UserModel.objects.get(username=request.data['username'])
+            return Response(
+                {'error_message': _('Username already exists.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except:
+            pass
+        try:
+            UserModel.objects.get(facebook_id=request.data['facebook_id'])
+            return Response(
+                {'error_message': _('Facebook_id already exists.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except:
+            pass
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+
+        payload = jwt_payload_handler(serializer.instance)
+        token = jwt_encode_handler(payload)
+        return Response({'token': token}, status=status.HTTP_201_CREATED, headers=headers)
+
+
 class FacebookLogin(APIView):
     authentication_classes = ()
     permission_classes = ()

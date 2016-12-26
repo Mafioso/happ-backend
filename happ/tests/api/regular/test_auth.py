@@ -112,6 +112,66 @@ class Tests(APISimpleTestCase):
         self.assertIn('error_message', response.data)
         self.assertEqual(User.objects.count(), n)
 
+    def test_user_facebook_registration(self):
+        """
+        Facebook registration resourse creates one user
+        it creates embedded settings
+        it returns JWT auth token
+        """
+        n = User.objects.count()
+        url = prepare_url('facebook-register')
+        data = {
+            'facebook_id': '123456',
+            'fullname': 'Richard Green',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = User.objects.get(username='123456')
+        self.assertEqual(User.objects.count(), n+1)
+        self.assertNotEqual(user.settings, None)
+        self.assertIn('token', response.data)
+
+    def test_user_registration_same_facebook_id(self):
+        """
+        We cannot register user with existing facebook_id
+        """
+        n = User.objects.count()
+        url = prepare_url('facebook-register')
+        data = {
+            'facebook_id': '123456',
+            'fullname': 'Richard Green',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        user = User.objects.get(username='123456')
+        self.assertEqual(User.objects.count(), n+1)
+        self.assertNotEqual(user.settings, None)
+        self.assertIn('token', response.data)
+
+        n = User.objects.count()
+        url = prepare_url('facebook-register')
+        data = {
+            'facebook_id': '123456',
+            'fullname': 'Richard Green',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(User.objects.count(), n)
+
+    def test_user_registration_no_facebook_id(self):
+        """
+        Ensures that we cannot register without facebook_id
+        """
+        n = User.objects.count()
+        url = prepare_url('facebook-register')
+        data = {
+            'fullname': 'Richard Green',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('error_message', response.data)
+        self.assertEqual(User.objects.count(), n)
+
     def test_authentication(self):
         """
         Ensures that user can authenticate with his username and password
