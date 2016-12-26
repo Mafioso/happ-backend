@@ -64,8 +64,17 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input id="date" class="date-picker form-control col-md-7 col-xs-12" type="text" name="">
                         </div>
-                        <input type="hidden" name="start_datetime" id="start_datetime" />
-                        <input type="hidden" name="end_datetime" id="end_datetime" />
+                      </div>
+                      <div class="form-group">
+
+                        <label for="date" class="control-label col-md-3 col-sm-3 col-xs-12">Выбранные даты</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <ul id="date_list" class="list-group"></ul>
+                        </div>
+
+                        <!-- <input type="hidden" name="start_datetime" id="start_datetime" />
+                        <input type="hidden" name="end_datetime" id="end_datetime" /> -->
+                        <input type="hidden" name="datetimes" id="datetimes" />
                       </div>
                       <div class="form-group">
                         <label for="close_on_start" class="control-label col-md-3 col-sm-3 col-xs-12">Можно посетить в любое время?</label>
@@ -251,14 +260,23 @@
     <script>
       $(document).ready(function() {
         window.cropp = null;
+
+        datetimes = []
+
         $('#date').daterangepicker({
             showDropdowns: true,
             timePicker: true,
-            timePicker24Hour: true,
+            timePicker24Hour: 1,
             timePickerIncrement: 10,
         }, function(start, end, label) {
-          $('#start_datetime').val(start);
-          $('#end_datetime').val(end);
+
+          datetimes.push({ date: start.format('YYYYMMDD'), start_time: start.format('HHmmss'), end_time: end.format('HHmmss') })
+          // $('#start_datetime').val(start);
+          // $('#end_datetime').val(end);
+          $('#date_list').append('<li class="list-group-item">'+start.format('YYYY-MM-DD') + " время начало: " + start.format('HH:mm') + " время конца: " + end.format('HH:mm')+'</li>');
+          $('#datetimes').val(JSON.stringify(datetimes))
+
+          console.log(datetimes);
         });
 
         $('#event-type').change(function() {

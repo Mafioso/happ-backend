@@ -499,6 +499,7 @@ class EventAdminSerializer(LocalizedSerializer):
         return data
 
     def create(self, validated_data):
+        print validated_data
         city = validated_data.pop('city_id')
         currency = validated_data.pop('currency_id')
         interest_ids = validated_data.pop('interest_ids')
