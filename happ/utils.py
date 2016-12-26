@@ -6,6 +6,7 @@ import dateutil
 import datetime
 import warnings
 from calendar import timegm
+from datetime import timedelta
 from PIL import Image
 
 from django.conf import settings
@@ -173,3 +174,9 @@ def send_mail(subject_template_name, email_template_name,
         email_message.attach_alternative(html_email, 'text/html')
 
     email_message.send()
+
+def daterange(start, end, delta=timedelta(days=1)):
+    curr = start
+    while curr <= end:
+        yield curr
+        curr += delta

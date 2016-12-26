@@ -10,7 +10,7 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from happ.utils import store_file, string_to_date, string_to_time
+from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string
 from happ.models import Event, Complaint
 from happ.filters import EventFilter
 from happ.pagination import SolidPagination
@@ -74,15 +74,13 @@ class EventViewSet(viewsets.ModelViewSet):
             start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
             end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
 
-            start_date = datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT)
             start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
-            end_date = datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT)
             end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
             request.data['datetimes'] = [{
-                'date': string_to_date(str(date), settings.DATE_STRING_FIELD_FORMAT),
+                'date': string_to_date(date_to_string(date, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT),
                 'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
                 'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
-            } for date in range(int(start_date), int(end_date)+1)]
+            } for date in daterange(start_datetime.date(), end_datetime.date())]
         else:
             for item in request.data['datetimes']:
                 if 'date' not in item or \
@@ -158,15 +156,13 @@ class EventViewSet(viewsets.ModelViewSet):
             start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
             end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
 
-            start_date = datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT)
             start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
-            end_date = datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT)
             end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
             request.data['datetimes'] = [{
-                'date': string_to_date(str(date), settings.DATE_STRING_FIELD_FORMAT),
+                'date': string_to_date(date_to_string(date, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT),
                 'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
                 'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
-            } for date in range(int(start_date), int(end_date)+1)]
+            } for date in daterange(start_datetime.date(), end_datetime.date())]
         else:
             for item in request.data['datetimes']:
                 if 'date' not in item or \

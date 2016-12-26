@@ -7,7 +7,7 @@ import pymongo
 from django.conf import settings
 
 from .models import get_db
-from .utils import average_color
+from .utils import average_color, daterange, string_to_date, date_to_string
 
 
 def migration__user__change_interests_schema__0001():
@@ -185,9 +185,9 @@ def migration__event_time__0020():
             continue
         start_date = event['start_date']
         end_date = event['end_date']
-        for date in range(int(start_date), int(end_date)+1):
+        for date in daterange(string_to_date(start_date, settings.DATE_STRING_FIELD_FORMAT), string_to_date(end_date, settings.DATE_STRING_FIELD_FORMAT)):
             data = {
-                'date': str(date),
+                'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
                 'start_time': event['start_time'] if 'start_time' in event else '000000',
                 'end_time': event['end_time'] if 'end_time' in event else '235959',
                 'event': event['_id'],
