@@ -11,7 +11,7 @@ from mongoengine.connection import connect, disconnect, get_connection
 
 def prepare_url(path_name, query={}, *args, **kwargs):
     url = reverse(path_name, *args, **kwargs)
-    url += '?' + urllib.urlencode(query)
+    url += '?' + urllib.urlencode(query, doseq=True)
     return url
 
 def calc_distance(p1, p2):

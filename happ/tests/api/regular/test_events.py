@@ -1275,7 +1275,75 @@ class Tests(APISimpleTestCase):
         u2 = UserFactory()
 
         for i in range(5):
-            EventFactory(author=u1)
+            EventFactory(
+                author=u1,
+                status=Event.APPROVED,
+                is_active=True,
+                datetimes=[
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-2)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-1)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                ]
+            )
+        for i in range(4):
+            EventFactory(
+                author=u1,
+                status=Event.APPROVED,
+                is_active=False,
+                datetimes=[
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-2)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-1)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                ]
+            )
+        for i in range(3):
+            EventFactory(
+                author=u1,
+                status=Event.MODERATION,
+                datetimes=[
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-2)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-1)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                ]
+            )
+        for i in range(2):
+            EventFactory(
+                author=u1,
+                status=Event.REJECTED,
+                datetimes=[
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-2)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-1)).date(),
+                        start_time='0{}3000'.format(i),
+                        end_time='0{}3000'.format(i+1),
+                    ),
+                ]
+            )
 
         for i in range(3):
             EventFactory(author=u2)
@@ -1289,11 +1357,60 @@ class Tests(APISimpleTestCase):
         token = response.data['token']
 
         url = prepare_url('events-organizer')
-
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 14)
+
+        url = prepare_url('events-organizer', query={'status': [0, 2]})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 5)
+
+        url = prepare_url('events-organizer', query={'is_active': True})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+
+        url = prepare_url('events-organizer', query={'is_active': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 4)
+
+        url = prepare_url('events-organizer', query={'is_active': [True, False]})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 9)
+
+        url = prepare_url('events-organizer', query={'is_active': [True, False], 'status': 2})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 11)
+
+        url = prepare_url('events-organizer', query={'is_active': [True, False], 'status': [0, 2]})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 14)
+
+        url = prepare_url('events-organizer', query={'is_active': True, 'status': [0, 2]})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 10)
+
+        url = prepare_url('events-organizer', query={'is_active': False, 'status': 0})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 7)
+
+        url = prepare_url('events-organizer', query={'is_active': False, 'status': 0, 'finished': True})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+
+        url = prepare_url('events-organizer', query={'is_active': [True, False], 'finished': True})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 7)
 
     def test_get_events_explore(self):
         """

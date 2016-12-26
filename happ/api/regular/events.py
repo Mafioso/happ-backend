@@ -12,9 +12,9 @@ from rest_framework_mongoengine import viewsets
 from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string
 from happ.models import Event, Complaint
-from happ.filters import EventFilter
+from happ.filters import EventFilter, EventOrganizerFilter
 from happ.pagination import SolidPagination
-from happ.decorators import patch_queryset, patch_order, patch_pagination_class
+from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class
 from happ.serializers import EventSerializer
 
 
@@ -274,6 +274,7 @@ class EventViewSet(viewsets.ModelViewSet):
     @list_route(methods=['get'], url_path='organizer')
     @patch_queryset(lambda self, x: self.request.user.get_organizer_feed())
     @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time', ), 'popular': ('datetimes__0__date', '-votes_num')})
+    @patch_filter_class(EventOrganizerFilter)
     def organizer(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 

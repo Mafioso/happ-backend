@@ -61,3 +61,15 @@ def patch_pagination_class(pagination_class):
             return rv
         return wrapper
     return decorator
+
+def patch_filter_class(filter_class):
+
+    def decorator(fn):
+        def wrapper(self, request, *a, **kw):
+            prev_filter_class = self.filter_class
+            self.filter_class = filter_class
+            rv = fn(self, request, *a, **kw)
+            self.filter_class = prev_filter_class
+            return rv
+        return wrapper
+    return decorator
