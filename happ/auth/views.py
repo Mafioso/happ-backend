@@ -171,7 +171,6 @@ class EmailConfirmationRequest(APIView):
         context = {
             'user': user,
             'domain': domain,
-            'schema': settings.HAPP_PREFIX,
         }
 
         send_mail(subject_template_name='happ/email_confirmation.txt',

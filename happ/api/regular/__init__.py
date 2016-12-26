@@ -1,7 +1,7 @@
 import os
 
 from django.conf import settings
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status
@@ -134,3 +134,16 @@ class YahooExchangeView(APIView):
                 {'error_message': _('Remote service error.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class AppRedirectView(APIView):
+    """
+    API endpoint for redirecting to app
+    """
+    permission_classes = ()
+
+    def get(self, request):
+        url = request.query_params.get('url', None)
+        response = HttpResponse("", status=302)
+        response['Location'] = "{}://{}".format(settings.HAPP_PREFIX, url)
+        return response

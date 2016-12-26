@@ -45,7 +45,6 @@ class HappPasswordResetForm(forms.Form):
             else:
                 site_name = domain = domain_override
             context = {
-                'schema': settings.HAPP_PREFIX,
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,

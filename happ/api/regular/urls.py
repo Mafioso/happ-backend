@@ -13,6 +13,7 @@ from . import (
     GooglePlacesView,
     GooglePhotosView,
     YahooExchangeView,
+    AppRedirectView,
 )
 
 
@@ -36,6 +37,7 @@ urlpatterns = [
     url(r'^places/$', GooglePlacesView.as_view(), name='google_places_api'),
     url(r'^photos/$', GooglePhotosView.as_view(), name='google_photos_api'),
     url(r'^exchange/$', YahooExchangeView.as_view(), name='yahoo_exchange_api'),
+    url(r'^redirect/$', AppRedirectView.as_view(), name='redirect'),
 ]
 
 urlpatterns += router.urls

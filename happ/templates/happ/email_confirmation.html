@@ -3,7 +3,7 @@
 
 {% trans "Please go to the following page to confirm email:" %}<br />
 {% block reset_link %}
-<a href="{{ schema }}://{{ domain }}{% url 'email-confirm' %}?key={{ user.confirmation_key }}">Confirm email</a><br />
+<a href="http://{{ domain }}{% url 'redirect' %}?url={{ domain }}{% url 'email-confirm' %}?key={{ user.confirmation_key }}" target="_blank">Confirm email</a><br />
 {% endblock %}
 
 {% trans "Thanks for using our site!" %}<br /><br />
