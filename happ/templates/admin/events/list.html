@@ -41,7 +41,7 @@
           {{item.type | event_type }}
         </td>
         <td>
-          <span class="date_span">{{item.start_datetime}}</span>
+          <span class="date_span">{{item.datetimes.0.date}} {{item.datetimes.0.start_time}}</span>
         </td>
         <td>
           {% join_by_attr item.interests "title" ", " %}
@@ -68,9 +68,9 @@
 {% block javascript %}
 <script>
   $(document).ready(function() {
-    $('.date_span').text(function(i, oldText) {
-        return moment(oldText).format('DD/MM/YYYY HH:mm');
-    });
+    // $('.date_span').text(function(i, oldText) {
+    //     return moment(oldText).format('YYYY-MM-DD HH:mm:ss');
+    // });
   });
 </script>
 {% endblock %}

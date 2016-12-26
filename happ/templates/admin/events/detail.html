@@ -145,8 +145,8 @@
 
     <script>
       $(document).ready(function() {
-        $('#start_datetime').text(moment('{{object.start_datetime}}').format('DD/MM/YYYY HH:mm'));
-        $('#end_datetime').text(moment('{{object.end_datetime}}').format('DD/MM/YYYY HH:mm'));
+        $('#start_datetime').text(moment('{{object.datetimes.0.date}} {{object.datetimes.0.start_time}}').format('YYYY-MM-DD HH:mm:ss'));
+        $('#end_datetime').text(moment('{{object.datetimes.0.date}} {{object.datetimes.0.end_time}}').format('YYYY-MM-DD HH:mm:ss'));
       });
       blueimp.Gallery(
           document.getElementById('images').getElementsByTagName('a'),
