@@ -261,19 +261,19 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'], url_path='feed')
     @patch_queryset(lambda self, x: self.request.user.get_feed())
-    @patch_order({'default': ('start_date', 'start_time', ), 'popular': ('start_date', '-votes_num')})
+    @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time', ), 'popular': ('datetimes__0__date', '-votes_num')})
     def feed(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 
     @list_route(methods=['get'], url_path='featured')
     @patch_queryset(lambda self, x: self.request.user.get_featured())
-    @patch_order({'default': ('start_date', 'start_time', ), 'popular': ('start_date', '-votes_num')})
+    @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time', ), 'popular': ('datetimes__0__date', '-votes_num')})
     def featured(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 
     @list_route(methods=['get'], url_path='organizer')
     @patch_queryset(lambda self, x: self.request.user.get_organizer_feed())
-    @patch_order({'default': ('start_date', 'start_time', ), 'popular': ('start_date', '-votes_num')})
+    @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time', ), 'popular': ('datetimes__0__date', '-votes_num')})
     def organizer(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 
