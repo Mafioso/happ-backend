@@ -9,6 +9,7 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
+from happ.utils import date_to_string
 from happ.models import User, City, Currency, Event, EventTime
 from happ.factories import (
     UserFactory,
@@ -73,7 +74,6 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('events-list')
         n = Event.objects.count()
-        times_n = EventTime.objects.count()
 
         # full
         data = {
@@ -92,7 +92,6 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
-        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, 100)
@@ -100,14 +99,13 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 3)
         self.assertEqual(len(e.datetimes), 2)
-        self.assertEqual(e.datetimes[0]['date'], datetime.now().date().isoformat())
-        self.assertEqual(e.datetimes[1]['date'], (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
+        self.assertEqual(e.datetimes[0]['date'].isoformat(), datetime.now().date().isoformat())
+        self.assertEqual(e.datetimes[1]['date'].isoformat(), (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
-        times_n = EventTime.objects.count()
 
         # no max_price
         data = {
@@ -125,7 +123,6 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
-        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, 100)
@@ -133,14 +130,13 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
         self.assertEqual(len(e.datetimes), 2)
-        self.assertEqual(e.datetimes[0]['date'], datetime.now().date().isoformat())
-        self.assertEqual(e.datetimes[1]['date'], (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
+        self.assertEqual(e.datetimes[0]['date'].isoformat(), datetime.now().date().isoformat())
+        self.assertEqual(e.datetimes[1]['date'].isoformat(), (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
-        times_n = EventTime.objects.count()
 
         # no min_price
         data = {
@@ -158,7 +154,6 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
-        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, None)
@@ -166,14 +161,13 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
         self.assertEqual(len(e.datetimes), 2)
-        self.assertEqual(e.datetimes[0]['date'], datetime.now().date().isoformat())
-        self.assertEqual(e.datetimes[1]['date'], (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
+        self.assertEqual(e.datetimes[0]['date'].isoformat(), datetime.now().date().isoformat())
+        self.assertEqual(e.datetimes[1]['date'].isoformat(), (datetime.now() + timedelta(days=1, hours=1)).date().isoformat())
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
 
         n = Event.objects.count()
-        times_n = EventTime.objects.count()
 
         # datetimes object
         data = {
@@ -201,7 +195,6 @@ class Tests(APISimpleTestCase):
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(n+1, Event.objects.count())
-        self.assertEqual(times_n+2, EventTime.objects.count())
         e = Event.objects.get(id=response.data['id'])
         self.assertEqual(e.title, 'New event')
         self.assertEqual(e.min_price, None)
@@ -209,8 +202,8 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e.geopoint['coordinates'], [1, 0])
         self.assertEqual(len(e.interests), 0)
         self.assertEqual(len(e.datetimes), 2)
-        self.assertEqual(e.datetimes[0]['date'], '2016-10-10')
-        self.assertEqual(e.datetimes[1]['date'], '2016-10-12')
+        self.assertEqual(e.datetimes[0]['date'].isoformat(), '2016-10-10')
+        self.assertEqual(e.datetimes[1]['date'].isoformat(), '2016-10-12')
 
         es = EventSerializer(e).data
         self.assertEqual(es['geopoint'], {'lng': 1, 'lat':0})
@@ -597,7 +590,6 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('events-detail', kwargs={'id': str(e.id)})
         n = Event.objects.count()
-        times_n = EventTime.objects.count()
 
         data = {
             'title': 'New event',
@@ -613,7 +605,6 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(times_n+2, EventTime.objects.count())
         self.assertEqual(response.data['title'], 'New event')
         self.assertEqual(response.data['status'], Event.MODERATION)
         self.assertEqual(response.data['min_price'], 100)
@@ -624,7 +615,6 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['datetimes'][0]['date'], datetime.now().date().isoformat())
         self.assertEqual(response.data['datetimes'][1]['date'], (datetime.now() + timedelta(days=1)).date().isoformat())
 
-        times_n = EventTime.objects.count()
         data = {
             'title': 'New event2',
             'city_id': str(CityFactory.create().id),
@@ -639,7 +629,6 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.patch(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(times_n+1, EventTime.objects.count())
         self.assertEqual(response.data['title'], 'New event2')
         self.assertEqual(response.data['status'], Event.MODERATION)
         self.assertEqual(response.data['min_price'], 130)
@@ -973,11 +962,10 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 is_active=True,
                 status=Event.APPROVED,
-            )
-            EventTimeFactory(
-                date='20160520',
-                start_time='0{}3000'.format(i),
-                event=e
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         # inactive
@@ -992,11 +980,10 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 is_active=False,
                 status=Event.APPROVED,
-            )
-            EventTimeFactory(
-                date='20160520',
-                start_time='0{}3000'.format(i),
-                event=e
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         # not APPROVED
@@ -1011,11 +998,28 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 is_active=True,
                 status=random.choice([Event.MODERATION, Event.REJECTED]),
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
-            EventTimeFactory(
-                date='20170520',
-                start_time='0{}3000'.format(i),
-                event=e
+
+        # already passed
+        for i in range(5):
+            e = EventFactory(
+                title='t{}'.format(i),
+                description='t{}_description'.format(i),
+                votes_num=(5-i),
+                min_price=i,
+                max_price=i+10,
+                city=c1,
+                interests=[random.choice(ins_set)],
+                is_active=True,
+                status=Event.APPROVED,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date()-timedelta(days=1),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         u = UserFactory()
@@ -1114,12 +1118,11 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 is_active=True,
                 status=Event.APPROVED,
-            )
-            EventTimeFactory(
-                date='2016052{}'.format(i),
-                start_time='0{}3000'.format(i),
-                end_time='0{}3000'.format(i+1),
-                event=e
+                datetimes=[EventTimeFactory(
+                    date=(datetime.now()+timedelta(days=i)).date(),
+                    start_time='0{}3000'.format(i),
+                    end_time='0{}3000'.format(i+1),
+                )]
             )
 
         u = UserFactory()
@@ -1164,7 +1167,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][0]['title'], 't3')
 
         # start_date
-        url = prepare_url('events-feed', query={'start_date': '20160523'})
+        url = prepare_url('events-feed', query={'start_date': date_to_string((datetime.now()+timedelta(days=3)).date(), settings.DATE_STRING_FIELD_FORMAT)})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 2)
@@ -1172,7 +1175,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][1]['title'], 't4')
 
         # end_date
-        url = prepare_url('events-feed', query={'end_date': '20160523'})
+        url = prepare_url('events-feed', query={'end_date': date_to_string((datetime.now()+timedelta(days=3)).date(), settings.DATE_STRING_FIELD_FORMAT)})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 4)
@@ -1182,7 +1185,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][3]['title'], 't3')
 
         # start_date and end_date
-        url = prepare_url('events-feed', query={'start_date': '20160523', 'end_date': '20160524'})
+        url = prepare_url('events-feed', query={'start_date': date_to_string((datetime.now()+timedelta(days=3)).date(), settings.DATE_STRING_FIELD_FORMAT), 'end_date': date_to_string((datetime.now()+timedelta(days=4)).date(), settings.DATE_STRING_FIELD_FORMAT)})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 2)
@@ -1204,7 +1207,11 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 type=Event.FEATURED,
                 status=Event.APPROVED,
-                is_active=True
+                is_active=True,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         # inactive
@@ -1214,7 +1221,11 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 type=Event.FEATURED,
                 status=Event.APPROVED,
-                is_active=False
+                is_active=False,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         # not APPROVED
@@ -1224,7 +1235,11 @@ class Tests(APISimpleTestCase):
                 interests=[random.choice(ins_set)],
                 type=Event.FEATURED,
                 status=random.choice([Event.MODERATION, Event.REJECTED]),
-                is_active=True
+                is_active=True,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         u = UserFactory()
@@ -1300,19 +1315,55 @@ class Tests(APISimpleTestCase):
 
         # correct
         for i in range(3):
-            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED, is_active=True)
+            EventFactory(city=c,
+                interests=[random.choice(ins_set1)],
+                type=random.choice([Event.NORMAL, Event.ADS]),
+                status=Event.APPROVED,
+                is_active=True,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         # inactive
         for i in range(3):
-            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED, is_active=False)
+            EventFactory(city=c,
+                interests=[random.choice(ins_set1)],
+                type=random.choice([Event.NORMAL, Event.ADS]),
+                status=Event.APPROVED,
+                is_active=False,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         # not APPROVED
         for i in range(3):
-            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=random.choice([Event.MODERATION, Event.REJECTED]), is_active=True)
+            EventFactory(city=c,
+                interests=[random.choice(ins_set1)],
+                type=random.choice([Event.NORMAL, Event.ADS]),
+                status=random.choice([Event.MODERATION, Event.REJECTED]),
+                is_active=True,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         # other interest set
         for i in range(4):
-            EventFactory(city=c, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED, is_active=True)
+            EventFactory(city=c,
+                interests=[random.choice(ins_set2)],
+                type=random.choice([Event.NORMAL, Event.ADS]),
+                status=Event.APPROVED,
+                is_active=True,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         u = UserFactory()
         u.interests = [ci]
@@ -1359,7 +1410,11 @@ class Tests(APISimpleTestCase):
                          type=Event.NORMAL,
                          status=Event.APPROVED,
                          is_active=True,
-                         geopoint=generate_geopoint(center, radius)
+                         geopoint=generate_geopoint(center, radius),
+                         datetimes=[EventTimeFactory(
+                            date=datetime.now().date(),
+                            start_time='0{}3000'.format(i),
+                         )]
             )
 
         # inactive
@@ -1369,7 +1424,11 @@ class Tests(APISimpleTestCase):
                          type=Event.NORMAL,
                          status=Event.APPROVED,
                          is_active=False,
-                         geopoint=generate_geopoint(center, radius)
+                         geopoint=generate_geopoint(center, radius),
+                         datetimes=[EventTimeFactory(
+                            date=datetime.now().date(),
+                            start_time='0{}3000'.format(i),
+                         )]
             )
 
         # not APPROVED
@@ -1379,7 +1438,11 @@ class Tests(APISimpleTestCase):
                          type=Event.NORMAL,
                          status=random.choice([Event.MODERATION, Event.REJECTED]),
                          is_active=True,
-                         geopoint=generate_geopoint(center, radius)
+                         geopoint=generate_geopoint(center, radius),
+                         datetimes=[EventTimeFactory(
+                            date=datetime.now().date(),
+                            start_time='0{}3000'.format(i),
+                         )]
             )
 
         # rejected by geoposition
@@ -1389,7 +1452,11 @@ class Tests(APISimpleTestCase):
                          type=Event.NORMAL,
                          status=Event.APPROVED,
                          is_active=True,
-                         geopoint=generate_geopoint(center, radius, inside=False)
+                         geopoint=generate_geopoint(center, radius, inside=False),
+                         datetimes=[EventTimeFactory(
+                            date=datetime.now().date(),
+                            start_time='0{}3000'.format(i),
+                         )]
             )
 
         auth_url = prepare_url('login')

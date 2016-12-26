@@ -1,9 +1,17 @@
 import random
+from datetime import datetime
 
 from django.test import SimpleTestCase
 
 from happ.models import Event
-from happ.factories import UserFactory, CityFactory, CityInterestsFactory, EventFactory, InterestFactory
+from happ.factories import (
+    UserFactory,
+    CityFactory,
+    CityInterestsFactory,
+    EventFactory,
+    InterestFactory,
+    EventTimeFactory,
+)
 from .. import *
 
 
@@ -76,12 +84,35 @@ class Tests(SimpleTestCase):
 
         for i in range(3):
             if i % 2 == 1:
-                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=Event.FEATURED, status=Event.APPROVED)
+                EventFactory(city=c1,
+                    interests=[random.choice(ins_set2)],
+                    type=Event.FEATURED,
+                    status=Event.APPROVED,
+                    datetimes=[EventTimeFactory(
+                        date=datetime.now().date(),
+                        start_time='0{}3000'.format(i),
+                    )]
+                )
             else:
-                EventFactory(city=c1, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+                EventFactory(city=c1,
+                    interests=[random.choice(ins_set2)],
+                    type=random.choice([Event.NORMAL, Event.ADS]),
+                    status=Event.APPROVED,
+                    datetimes=[EventTimeFactory(
+                        date=datetime.now().date(),
+                        start_time='0{}3000'.format(i),
+                    )]
+                )
 
         for i in range(4):
-            EventFactory(city=c2, interests=[random.choice(ins_set3)], status=Event.APPROVED)
+            EventFactory(city=c2,
+                interests=[random.choice(ins_set3)],
+                status=Event.APPROVED,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         self.assertEqual(len(u.get_feed()), 2)
 
@@ -112,17 +143,48 @@ class Tests(SimpleTestCase):
         for i in range(3):
             if i % 2 == 1:
                 # this event is going to be in final set because one of the interest matches
-                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=Event.FEATURED, status=Event.APPROVED)
+                EventFactory(city=c1,
+                    interests=[random.choice(ins_set2), random.choice(ins_set3)],
+                    type=Event.FEATURED,
+                    status=Event.APPROVED,
+                    datetimes=[EventTimeFactory(
+                        date=datetime.now().date(),
+                        start_time='0{}3000'.format(i),
+                    )]
+                )
 
                 # this event will be skipped because no one interest matches user's current set
-                EventFactory(city=c1, interests=[random.choice(ins_set3)], type=Event.FEATURED, status=Event.APPROVED)
+                EventFactory(city=c1,
+                    interests=[random.choice(ins_set3)],
+                    type=Event.FEATURED,
+                    status=Event.APPROVED,
+                    datetimes=[EventTimeFactory(
+                        date=datetime.now().date(),
+                        start_time='0{}3000'.format(i),
+                    )]
+                )
             else:
                 # this event is not featured
-                EventFactory(city=c1, interests=[random.choice(ins_set2), random.choice(ins_set3)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+                EventFactory(city=c1,
+                    interests=[random.choice(ins_set2), random.choice(ins_set3)],
+                    type=random.choice([Event.NORMAL, Event.ADS]),
+                    status=Event.APPROVED,
+                    datetimes=[EventTimeFactory(
+                        date=datetime.now().date(),
+                        start_time='0{}3000'.format(i),
+                    )]
+                )
 
         for i in range(4):
             # NORMAL events by default
-            EventFactory(city=c2, interests=[random.choice(ins_set3)], status=Event.APPROVED)
+            EventFactory(city=c2,
+                interests=[random.choice(ins_set3)],
+                status=Event.APPROVED,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         self.assertEqual(len(u.get_featured()), 1)
 
@@ -167,10 +229,26 @@ class Tests(SimpleTestCase):
         u.save()
 
         for i in range(3):
-            EventFactory(city=c, interests=[random.choice(ins_set1)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+            EventFactory(city=c,
+                interests=[random.choice(ins_set1)],
+                type=random.choice([Event.NORMAL,Event.ADS]),
+                status=Event.APPROVED,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         for i in range(4):
-            EventFactory(city=c, interests=[random.choice(ins_set2)], type=random.choice([Event.NORMAL, Event.ADS]), status=Event.APPROVED)
+            EventFactory(city=c,
+                interests=[random.choice(ins_set2)],
+                type=random.choice([Event.NORMAL,Event.ADS]),
+                status=Event.APPROVED,
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
+            )
 
         self.assertEqual(len(u.get_explore()), 3)
         for e in u.get_explore():
@@ -204,6 +282,10 @@ class Tests(SimpleTestCase):
                 type=Event.NORMAL,
                 status=Event.APPROVED,
                 geopoint=generate_geopoint(center, radius),
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         for i in range(10):
@@ -213,6 +295,10 @@ class Tests(SimpleTestCase):
                 type=Event.NORMAL,
                 status=Event.APPROVED,
                 geopoint=generate_geopoint(center, radius, inside=False),
+                datetimes=[EventTimeFactory(
+                    date=datetime.now().date(),
+                    start_time='0{}3000'.format(i),
+                )]
             )
 
         self.assertEqual(len(u.get_map_feed(None, radius)), 0)

@@ -236,3 +236,25 @@ class OtherEntityFilter(Filter):
 
         ids = [x.id for x in self.entity.objects.filter(**{q_param: value}).distinct(field=self.reference_field)]
         return { "id__in": ids }
+
+class ListItemFilter(Filter):
+    field_class = fields.CharField
+
+    def __init__(self, list_field=None, index=0, at2=None, lookup=None, name=None, **kwargs):
+        self.list_field = list_field
+        self.index = index
+        self.at2 = at2
+        super(ListItemFilter, self).__init__(lookup=lookup, name=name, **kwargs)
+
+    def filter_params(self, value):
+        """ return filtering params """
+        if value is None:
+            return {}
+
+        if self.index:
+            self.list_field += '__' + str(self.index)
+        if self.at2:
+            self.list_field += '__' + str(self.at2)
+        if self.lookup_type is not None:
+            self.list_field += '__' + self.lookup_type
+        return { self.list_field: value }

@@ -3,10 +3,10 @@ from .models import Event, EventTime
 
 
 class EventFilter(filtersets.ModelFilterset):
-    start_date = filters.OtherEntityFilter(entity=EventTime, entity_field='date', reference_field='event', lookup='gte')
-    start_time = filters.OtherEntityFilter(entity=EventTime, entity_field='start_time', reference_field='event', lookup='gte')
-    end_date = filters.OtherEntityFilter(entity=EventTime, entity_field='date', reference_field='event', lookup='lte')
-    end_time = filters.OtherEntityFilter(entity=EventTime, entity_field='end_time', reference_field='event', lookup='lte')
+    start_date = filters.ListItemFilter(list_field='datetimes', at2='date', lookup='gte')
+    start_time = filters.ListItemFilter(list_field='datetimes', at2='start_time', lookup='gte')
+    end_date = filters.ListItemFilter(list_field='datetimes', at2='date', lookup='lte')
+    end_time = filters.ListItemFilter(list_field='datetimes', at2='end_time', lookup='lte')
     min_price = filters.IntegerFilter('gte')
     max_price = filters.IntegerFilter('lte')
     status = filters.ListFilter('in')

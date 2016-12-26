@@ -129,6 +129,7 @@ class User(AbstractUser, HappBaseDocument):
             interests__in=self.current_interests,
             type__in=[Event.NORMAL, Event.ADS],
             status=Event.APPROVED,
+            datetimes__0__date__gte=datetime.datetime.now().date(),
             is_active=True
         )
 
@@ -138,6 +139,7 @@ class User(AbstractUser, HappBaseDocument):
             interests__in=self.current_interests,
             type__in=[Event.FEATURED],
             status=Event.APPROVED,
+            datetimes__0__date__gte=datetime.datetime.now().date(),
             is_active=True
         )
 
@@ -155,6 +157,7 @@ class User(AbstractUser, HappBaseDocument):
         all_events = Event.objects(interests__in=interests,
                                    type__in=[Event.NORMAL, Event.ADS],
                                    status=Event.APPROVED,
+                                   datetimes__0__date__gte=datetime.datetime.now().date(),
                                    is_active=True)
         if all_events.count() < django_settings.HAPP_EXPLORE_PAGE_SIZE:
             return all_events
@@ -170,6 +173,7 @@ class User(AbstractUser, HappBaseDocument):
             type__in=[Event.NORMAL, Event.ADS],
             status=Event.APPROVED,
             is_active=True,
+            datetimes__0__date__gte=datetime.datetime.now().date(),
             geopoint__geo_within_sphere=[center, radius / django_settings.EARTH_RADIUS],
         )
 
@@ -259,6 +263,7 @@ class Event(HappBaseDocument):
     phones = ListField(StringField())
     email = EmailField()
     web_site = URLField()
+    datetimes = EmbeddedDocumentListField('EventTime')
     votes = EmbeddedDocumentListField('Upvote')  # 3200  => {user: date} % 1000
     votes_num = IntField(default=0)
     close_on_start = BooleanField(default=False)
@@ -282,15 +287,6 @@ class Event(HappBaseDocument):
     @property
     def end_datetime(self):
         return datetime.datetime.combine(self.end_date, self.end_time or datetime.time()).isoformat()
-
-    @property
-    def datetimes(self):
-        event_times = EventTime.objects.filter(event=self).order_by('date')
-        return [{
-            'date': x.date.isoformat(),
-            'start_time': x.start_time.isoformat(),
-            'end_time': x.end_time.isoformat(),
-        } for x in event_times]
 
     @property
     def images(self):
@@ -383,11 +379,10 @@ class Event(HappBaseDocument):
         self.save()
 
 
-class EventTime(Document):
+class EventTime(EmbeddedDocument):
     date = DateStringField()
     start_time = TimeStringField()
     end_time = TimeStringField()
-    event = ReferenceField('Event')
 
 
 class FileObject(HappBaseDocument):

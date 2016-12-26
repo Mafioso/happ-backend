@@ -179,20 +179,19 @@ def migration__event__fill_place_name_field__0019():
 
 def migration__event_time__0020():
     coll = get_db()['event']
-    coll2 = get_db()['event_time']
+    # coll2 = get_db()['event_time']
     for event in coll.find({}):
         if 'start_date' not in event or 'end_date' not in event:
             continue
         start_date = event['start_date']
         end_date = event['end_date']
-        for date in daterange(string_to_date(start_date, settings.DATE_STRING_FIELD_FORMAT), string_to_date(end_date, settings.DATE_STRING_FIELD_FORMAT)):
-            data = {
-                'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
-                'start_time': event['start_time'] if 'start_time' in event else '000000',
-                'end_time': event['end_time'] if 'end_time' in event else '235959',
-                'event': event['_id'],
-            }
-            coll2.insert(data)
+        data = [{
+            'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
+            'start_time': event['start_time'] if 'start_time' in event else '000000',
+            'end_time': event['end_time'] if 'end_time' in event else '235959',
+            # 'event': event['_id'],
+        } for date in daterange(string_to_date(start_date, settings.DATE_STRING_FIELD_FORMAT), string_to_date(end_date, settings.DATE_STRING_FIELD_FORMAT))]
+        coll.update({'_id': event['_id']}, {'$set': {'datetimes': data}})
     coll.update({}, {'$unset': {'start_date': ''}}, multi=True)
     coll.update({}, {'$unset': {'end_date': ''}}, multi=True)
     coll.update({}, {'$unset': {'start_time': ''}}, multi=True)
@@ -201,10 +200,10 @@ def migration__event_time__0020():
 def migration__city_geopoint__0021():
     coll = get_db()['city']
     for city in coll.find({}):
-        if 'geopoint' in city and isinstance(event['geopoint'], list):
+        if 'geopoint' in city and isinstance(city['geopoint'], list):
             coll.update(
                 {'_id': city['_id']},
-                {'$set': {'geopoint': { "type" : "Point", "coordinates" : city['geopoint'] }}},
+                {'$set': {'geopoint': { "type" : "Point", "coordinates" : city['geopoint'] }}}
             )
 
 def migration__event_geopoint__0022():

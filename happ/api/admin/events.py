@@ -96,9 +96,9 @@ class EventViewSet(viewsets.ModelViewSet):
             start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
             end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
             request.data['datetimes'] = [{
-                'date': string_to_date(date_to_string(date, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT),
-                'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
-                'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
+                'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
+                'start_time': start_time,
+                'end_time': end_time,
             } for date in daterange(start_datetime.date(), end_datetime.date())]
         else:
             for item in request.data['datetimes']:
@@ -188,9 +188,9 @@ class EventViewSet(viewsets.ModelViewSet):
             start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
             end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
             request.data['datetimes'] = [{
-                'date': string_to_date(date_to_string(date, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT),
-                'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
-                'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
+                'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
+                'start_time': start_time,
+                'end_time': end_time,
             } for date in daterange(start_datetime.date(), end_datetime.date())]
         else:
             for item in request.data['datetimes']:
