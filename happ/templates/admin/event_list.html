@@ -66,7 +66,7 @@
                         <div class="col-md-6">
                           <div class="form-group" style="margin-right:10px;">
                               <label class="filter-col" for="start_date">Дата проведения: от</label>
-                              <input class="date-picker form-control" type="text" name="start_date" id="start_date" value={{ request.GET.start_date }}>
+                              <input class="date-picker form-control" type="text" name="start_date" id="start_date" value={{ request.GET.start_date }}{% if 'start_date' not in request.GET %}&start_date={% now 'Ymd' %}{% endif %}>
                               <label class="filter-col"  for="end_date">до</label>
                               <input class="date-picker form-control" type="text" name="end_date" id="end_date" value={{ request.GET.end_date }}>
                           </div>
@@ -84,7 +84,7 @@
           </div>
 
           <!-- start project list -->
-          <div id="event-table" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-src="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="event-table" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-src="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}{% if 'start_date' not in request.GET %}&start_date={% now 'Ymd' %}{% endif %}" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
 

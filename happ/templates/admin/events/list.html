@@ -41,7 +41,7 @@
           {{item.type | event_type }}
         </td>
         <td>
-          <span class="date_span">{{item.datetimes.0.date}} {{item.datetimes.0.start_time}}</span>
+          <span class="date_span">{{item.datetimes.0.date}} {{item.datetimes.0.start_time}} - {% with item.datetimes|last as last %}{{ last.date }} {{ last.end_time }}{% endwith %}</span>
         </td>
         <td>
           {% join_by_attr item.interests "title" ", " %}
