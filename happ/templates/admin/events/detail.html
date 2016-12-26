@@ -32,8 +32,13 @@
           <dl class="dl-horizontal">
             <dt>Дата проведения мероприятия</dt>
             <dd>
-              <b>Начало: </b><span id="start_datetime"></span><br />
-              <b>Окончание: </b><span id="end_datetime"></span>
+              <ul id="date_list" class="list-group">
+                {% for datetime in object.datetimes %}
+                  <li class="list-group-item">
+                    {{ datetime.date|date:'Y-m-d'}} время начало: {{ datetime.start_time|date:'H:i'}} время конца: {{ datetime.end_time|date:'H:i'}}
+                  </li>
+                {% endfor %}
+              </ul>
             </dd>
           </dl>
           <dl class="dl-horizontal">
@@ -144,10 +149,6 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
 
     <script>
-      $(document).ready(function() {
-        $('#start_datetime').text(moment('{{object.datetimes.0.date}} {{object.datetimes.0.start_time}}').format('YYYY-MM-DD HH:mm:ss'));
-        $('#end_datetime').text(moment('{{object.datetimes.0.date}} {{object.datetimes.0.end_time}}').format('YYYY-MM-DD HH:mm:ss'));
-      });
       blueimp.Gallery(
           document.getElementById('images').getElementsByTagName('a'),
           {

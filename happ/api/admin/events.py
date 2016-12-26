@@ -63,23 +63,13 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('No currency provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        # if 'start_datetime' not in request.data or request.data['start_datetime'] == '':
-        #     return Response(
-        #         {'error_message': _('No start_datetime provided.')},
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
-        # if 'end_datetime' not in request.data or request.data['end_datetime'] == '':
-        #     return Response(
-        #         {'error_message': _('No end_datetime provided.')},
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
         if ('min_price' not in request.data or request.data['min_price'] == '') and \
            ('max_price' not in request.data or request.data['max_price'] == ''):
             return Response(
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'datetimes' not in request.data:
+        if 'raw_datetimes' not in request.data:
             if 'start_datetime' not in request.data:
                 return Response(
                     {'error_message': _('No start_datetime provided.')},
@@ -95,20 +85,19 @@ class EventViewSet(viewsets.ModelViewSet):
 
             start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
             end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
-            request.data['datetimes'] = [{
+            request.data['raw_datetimes'] = [{
                 'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
                 'start_time': start_time,
                 'end_time': end_time,
             } for date in daterange(start_datetime.date(), end_datetime.date())]
         else:
-            datetimes = json.loads(request.data['datetimes'])
-            for item in datetimes:
-                print item
+            request.data.setlist('raw_datetimes', json.loads(request.data['raw_datetimes']))
+            for item in request.data.getlist('raw_datetimes'):
                 if 'date' not in item or \
                    'start_time' not in item or \
                    'end_time' not in item:
                     return Response(
-                        {'error_message': _('Wrong 123213datetimes format provided.')},
+                        {'error_message': _('Wrong datetimes format provided.')},
                         status=status.HTTP_400_BAD_REQUEST
                     )
                 try:
@@ -120,10 +109,6 @@ class EventViewSet(viewsets.ModelViewSet):
                         {'error_message': _('Wrong datetimes format provided.')},
                         status=status.HTTP_400_BAD_REQUEST
                     )
-
-            request.data['datetimes'] = []
-            for item in datetimes:
-                request.data['datetimes'].append(item)
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -161,23 +146,13 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('No currency provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'start_datetime' not in request.data or request.data['start_datetime'] == '':
-            return Response(
-                {'error_message': _('No start_datetime provided.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if 'end_datetime' not in request.data or request.data['end_datetime'] == '':
-            return Response(
-                {'error_message': _('No end_datetime provided.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
         if ('min_price' not in request.data or request.data['min_price'] == '') and \
            ('max_price' not in request.data or request.data['max_price'] == ''):
             return Response(
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if 'datetimes' not in request.data:
+        if 'raw_datetimes' not in request.data:
             if 'start_datetime' not in request.data:
                 return Response(
                     {'error_message': _('No start_datetime provided.')},
@@ -193,13 +168,14 @@ class EventViewSet(viewsets.ModelViewSet):
 
             start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
             end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
-            request.data['datetimes'] = [{
+            request.data['raw_datetimes'] = [{
                 'date': date_to_string(date, settings.DATE_STRING_FIELD_FORMAT),
                 'start_time': start_time,
                 'end_time': end_time,
             } for date in daterange(start_datetime.date(), end_datetime.date())]
         else:
-            for item in request.data['datetimes']:
+            request.data.setlist('raw_datetimes', json.loads(request.data['raw_datetimes']))
+            for item in request.data.getlist('raw_datetimes'):
                 if 'date' not in item or \
                    'start_time' not in item or \
                    'end_time' not in item:
