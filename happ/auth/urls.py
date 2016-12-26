@@ -3,6 +3,7 @@ from django.conf.urls import url
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 from .views import (
+    FacebookLogin,
     UserRegister,
     PasswordChange,
     PasswordReset,
@@ -15,6 +16,7 @@ from .views import (
 urlpatterns = [
     url(r'admin/login/$', AdminLogin.as_view(), name='admin-login-api'),
     url(r'login/$', obtain_jwt_token, name='login'),
+    url(r'login/facebook/$', FacebookLogin.as_view(), name='facebook-login'),
     url(r'refresh/$', refresh_jwt_token, name='refresh'),
     url(r'register/$', UserRegister.as_view(), name='register'),
     url(r'password/change/$', PasswordChange.as_view(), name='password-change'),

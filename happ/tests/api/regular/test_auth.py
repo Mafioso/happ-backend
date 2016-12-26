@@ -467,3 +467,43 @@ class Tests(APISimpleTestCase):
         }
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_facebook_login(self):
+        """
+        Login with facebook
+        it returns JWT auth token
+        """
+        facebook_id = '123'
+        u = UserFactory(facebook_id=facebook_id)
+        url = prepare_url('facebook-login')
+        data = {
+            'facebook_id': facebook_id,
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('token', response.data)
+
+    def test_facebook_login_no_facebook_id(self):
+        """
+        cannot auth if no facebook_id provided
+        """
+        facebook_id = '123'
+        u = UserFactory(facebook_id=facebook_id)
+        url = prepare_url('facebook-login')
+        data = {
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_facebook_login_wrong_facebook_id(self):
+        """
+        cannot auth if such facebook_id is not registered
+        """
+        facebook_id = '123'
+        u = UserFactory(facebook_id=facebook_id)
+        url = prepare_url('facebook-login')
+        data = {
+            'facebook_id': facebook_id + '123',
+        }
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

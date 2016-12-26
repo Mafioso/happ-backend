@@ -68,6 +68,30 @@ class UserRegister(CreateAPIView):
         return Response({'token': token}, status=status.HTTP_201_CREATED, headers=headers)
 
 
+class FacebookLogin(APIView):
+    authentication_classes = ()
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        facebook_id = request.data.get('facebook_id', None)
+        if not facebook_id:
+            return Response(
+                {'error_message': _('No facebook_id provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = get_user_model().objects.get(facebook_id=facebook_id)
+            payload = jwt_payload_handler(user)
+            token = jwt_encode_handler(payload)
+            return Response({'token': token}, status=status.HTTP_201_CREATED)
+        except:
+            return Response(
+                {'error_message': _('User does not exist.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 class PasswordReset(APIView):
     authentication_classes = ()
     permission_classes = ()
