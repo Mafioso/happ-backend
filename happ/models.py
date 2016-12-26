@@ -98,6 +98,7 @@ class User(AbstractUser, HappBaseDocument):
     role = IntField(choices=ROLES, default=REGULAR)
     confirmation_key = StringField()
     confirmation_key_expires = DateTimeField(blank=True, null=True)
+    facebook_id = StringField()
 
     @property
     def fn(self):
