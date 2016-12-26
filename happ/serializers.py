@@ -440,14 +440,14 @@ class EventSerializer(LocalizedSerializer):
 
 
 class EventAdminSerializer(LocalizedSerializer):
+    datetimes = drf_serializers.ListField(required=False)
+
     # read only fields
     interests = InterestChildSerializer(many=True, read_only=True)
     city = CitySerializer(read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
     rejection_reasons = RejectionReasonSerializer(many=True, read_only=True)
-    start_datetime = drf_serializers.CharField(read_only=True)
-    end_datetime = drf_serializers.CharField(read_only=True)
     images = drf_serializers.SerializerMethodField()
 
     # write only fields
@@ -455,10 +455,6 @@ class EventAdminSerializer(LocalizedSerializer):
     currency_id = serializers.ObjectIdField(write_only=True, required=False)
     city_id = serializers.ObjectIdField(write_only=True, required=False)
     image_ids = drf_serializers.CharField(write_only=True, required=False)
-    start_date = drf_serializers.DateField(write_only=True, required=False)
-    start_time = drf_serializers.TimeField(write_only=True, required=False)
-    end_date = drf_serializers.DateField(write_only=True, required=False)
-    end_time = drf_serializers.TimeField(write_only=True, required=False)
     geopoint_lng = drf_serializers.FloatField(write_only=True, required=False)
     geopoint_lat = drf_serializers.FloatField(write_only=True, required=False)
 
@@ -493,8 +489,6 @@ class EventAdminSerializer(LocalizedSerializer):
         """
         if 'min_price' in data and 'max_price' in data and data['min_price'] > data['max_price']:
             raise ValidationError(_("Min_price should be less than Max_price"))
-        if datetime.combine(data['start_date'], data['start_time']) > datetime.combine(data['end_date'], data['end_time']):
-            raise ValidationError(_("Start date should be earlier than End date"))
         return data
 
     def create(self, validated_data):
@@ -505,6 +499,7 @@ class EventAdminSerializer(LocalizedSerializer):
         geopoint_lng = validated_data.pop('geopoint_lng') if 'geopoint_lng' in validated_data else None
         geopoint_lat = validated_data.pop('geopoint_lat') if 'geopoint_lat' in validated_data else None
         author = validated_data.pop('author')
+        datetimes = validated_data.pop('datetimes')
         event = super(EventAdminSerializer, self).create(validated_data)
 
         event.city = city
@@ -515,13 +510,18 @@ class EventAdminSerializer(LocalizedSerializer):
         event.interests = Interest.objects.filter(id__in=interest_ids)
         event.save()
 
+        [EventTime.objects.create(event=event, **datetime) for datetime in datetimes]
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
         # event.translate()
         return event
 
     def update(self, instance, validated_data):
+        datetimes = validated_data.pop('datetimes') if 'datetimes' in validated_data else None
         event = super(EventAdminSerializer, self).update(instance, validated_data)
 
+        if datetimes:
+            EventTime.objects.filter(event=event).delete()
+            [EventTime.objects.create(event=event, **datetime) for datetime in datetimes]
         if 'city_id' in validated_data:
             city = validated_data.pop('city_id')
             event.city = city

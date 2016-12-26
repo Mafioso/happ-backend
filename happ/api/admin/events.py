@@ -79,13 +79,47 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0], dayfirst=True)
-        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0], dayfirst=True)
+        if 'datetimes' not in request.data:
+            if 'start_datetime' not in request.data:
+                return Response(
+                    {'error_message': _('No start_datetime provided.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if 'end_datetime' not in request.data:
+                return Response(
+                    {'error_message': _('No end_datetime provided.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
+            end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
 
-        request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
-        request.data['end_date'] = string_to_date(datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['end_time'] = string_to_time(datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
+            start_date = datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT)
+            start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
+            end_date = datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT)
+            end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
+            request.data['datetimes'] = [{
+                'date': string_to_date(str(date), settings.DATE_STRING_FIELD_FORMAT),
+                'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
+                'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
+            } for date in range(int(start_date), int(end_date)+1)]
+        else:
+            for item in request.data['datetimes']:
+                if 'date' not in item or \
+                   'start_time' not in item or \
+                   'end_time' not in item:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                try:
+                    string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT)
+                    string_to_time(item['start_time'], settings.TIME_STRING_FIELD_FORMAT)
+                    string_to_time(item['end_time'], settings.TIME_STRING_FIELD_FORMAT)
+                except:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -139,13 +173,47 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        start_datetime = dateutil.parser.parse(request.data.pop('start_datetime')[0], dayfirst=True)
-        end_datetime = dateutil.parser.parse(request.data.pop('end_datetime')[0], dayfirst=True)
+        if 'datetimes' not in request.data:
+            if 'start_datetime' not in request.data:
+                return Response(
+                    {'error_message': _('No start_datetime provided.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if 'end_datetime' not in request.data:
+                return Response(
+                    {'error_message': _('No end_datetime provided.')},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            start_datetime = dateutil.parser.parse(request.data.pop('start_datetime'))
+            end_datetime = dateutil.parser.parse(request.data.pop('end_datetime'))
 
-        request.data['start_date'] = string_to_date(datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['start_time'] = string_to_time(datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
-        request.data['end_date'] = string_to_date(datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT), settings.DATE_STRING_FIELD_FORMAT)
-        request.data['end_time'] = string_to_time(datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT), settings.TIME_STRING_FIELD_FORMAT)
+            start_date = datetime.datetime.strftime(start_datetime, settings.DATE_STRING_FIELD_FORMAT)
+            start_time = datetime.datetime.strftime(start_datetime, settings.TIME_STRING_FIELD_FORMAT)
+            end_date = datetime.datetime.strftime(end_datetime, settings.DATE_STRING_FIELD_FORMAT)
+            end_time = datetime.datetime.strftime(end_datetime, settings.TIME_STRING_FIELD_FORMAT)
+            request.data['datetimes'] = [{
+                'date': string_to_date(str(date), settings.DATE_STRING_FIELD_FORMAT),
+                'start_time': string_to_time(start_time, settings.TIME_STRING_FIELD_FORMAT),
+                'end_time': string_to_time(end_time, settings.TIME_STRING_FIELD_FORMAT),
+            } for date in range(int(start_date), int(end_date)+1)]
+        else:
+            for item in request.data['datetimes']:
+                if 'date' not in item or \
+                   'start_time' not in item or \
+                   'end_time' not in item:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                try:
+                    string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT)
+                    string_to_time(item['start_time'], settings.TIME_STRING_FIELD_FORMAT)
+                    string_to_time(item['end_time'], settings.TIME_STRING_FIELD_FORMAT)
+                except:
+                    return Response(
+                        {'error_message': _('Wrong datetimes format provided.')},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
