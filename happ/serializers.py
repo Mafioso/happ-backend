@@ -400,7 +400,7 @@ class EventSerializer(LocalizedSerializer):
         event.save()
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
-        event.translate()
+        #event.translate()
         return event
 
     def update(self, instance, validated_data):
@@ -427,7 +427,7 @@ class EventSerializer(LocalizedSerializer):
 
         event.status = Event.MODERATION
         event.save()
-        event.translate()
+        #event.translate()
         return event
 
     def get_is_upvoted(self, obj):
@@ -521,7 +521,7 @@ class EventAdminSerializer(LocalizedSerializer):
         event.save()
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
-        event.translate()
+        #event.translate()
         return event
 
     def update(self, instance, validated_data):
@@ -551,7 +551,7 @@ class EventAdminSerializer(LocalizedSerializer):
             event.geopoint = (geopoint_lng, geopoint_lat, )
 
         event.save()
-        event.translate()
+        #event.translate()
         return event
 
     def get_images(self, obj):
