@@ -2,6 +2,7 @@ from django import forms
 from django.template import loader
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+from django.core.urlresolvers import reverse
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.utils.translation import ugettext_lazy as _
@@ -44,13 +45,18 @@ class HappPasswordResetForm(forms.Form):
                 domain = current_site.domain
             else:
                 site_name = domain = domain_override
+            url = '{domain}{path}?uidb64={uid}&token={token}'.format(
+                domain=domain,
+                path=reverse('password-reset-confirm'),
+                uid=urlsafe_base64_encode(force_bytes(user.pk)),
+                token=token_generator.make_token(user),
+            )
             context = {
                 'email': user.email,
                 'domain': domain,
                 'site_name': site_name,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'url': url,
                 'user': user,
-                'token': token_generator.make_token(user),
                 'protocol': 'https' if use_https else 'http',
             }
             if extra_email_context is not None:

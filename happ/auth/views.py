@@ -1,6 +1,7 @@
 import datetime
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -237,9 +238,15 @@ class EmailConfirmationRequest(APIView):
         user.save()
         domain = get_current_site(request).domain
 
+        url = '{domain}{path}?key={key}'.format(
+                domain=domain,
+                path=reverse('email-confirm'),
+                key=user.confirmation_key,
+            )
         context = {
             'user': user,
             'domain': domain,
+            'url': url,
         }
 
         send_mail(subject_template_name='happ/email_confirmation.txt',
