@@ -269,6 +269,7 @@ class Event(HappBaseDocument):
     votes_num = IntField(default=0)
     close_on_start = BooleanField(default=False)
     registration_link = StringField()
+    tickets_link = StringField()
     min_age = IntField(default=0)
     max_age = IntField(default=200)
 
