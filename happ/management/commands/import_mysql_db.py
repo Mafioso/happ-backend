@@ -46,7 +46,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         host = options['host'] or 'localhost'
         user = options['user'] or 'root'
-        db = options['db'] or 'happ'
+        db = options['db'] or 'happapp'
         password = getpass.getpass('Enter password for user %s: ' % user)
         try:
             connection = pymysql.connect(host=host,
@@ -56,106 +56,106 @@ class Command(BaseCommand):
                                          charset='utf8mb4',
                                          cursorclass=pymysql.cursors.DictCursor)
 
-            # interests
-            with connection.cursor() as cursor:
-                sql = "SELECT * FROM `interests`"
-                cursor.execute(sql)
-                results = cursor.fetchall()
-                self.stdout.write(
-                    self.style.WARNING(
-                        'Started importing interests'
-                    )
-                )
-                pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
-                for idx, r in enumerate(results):
-                    i = Interest(
-                        title=r['name'],
-                        is_global=True,
-                        is_active=True,
-                    )
-                    i.save()
-                    FileObject.objects.create(path=r['picb'], entity=i)
-                    pbar.update(idx + 1)
-                pbar.finish()
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        'Successfully imported {} interests'.format(len(results))
-                    )
-                )
+            # # interests
+            # with connection.cursor() as cursor:
+            #     sql = "SELECT * FROM `interests`"
+            #     cursor.execute(sql)
+            #     results = cursor.fetchall()
+            #     self.stdout.write(
+            #         self.style.WARNING(
+            #             'Started importing interests'
+            #         )
+            #     )
+            #     pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
+            #     for idx, r in enumerate(results):
+            #         i = Interest(
+            #             title=r['name'],
+            #             is_global=True,
+            #             is_active=True,
+            #         )
+            #         i.save()
+            #         FileObject.objects.create(path=r['picb'], entity=i)
+            #         pbar.update(idx + 1)
+            #     pbar.finish()
+            #     self.stdout.write(
+            #         self.style.SUCCESS(
+            #             'Successfully imported {} interests'.format(len(results))
+            #         )
+            #     )
 
-            # cities
-            with connection.cursor() as cursor:
-                sql = "SELECT * FROM `cities`"
-                cursor.execute(sql)
-                results = cursor.fetchall()
-                country = Country.objects.create(name=u'Казахстан')
-                self.stdout.write(
-                    self.style.WARNING(
-                        'Started importing cities'
-                    )
-                )
-                pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
-                for idx, r in enumerate(results):
-                    i = City(
-                        name=r['name'],
-                        geopoint=(float(r['long']), float(r['latt']), ),
-                        country=country,
-                        is_active=True,
-                    )
-                    i.save()
-                    pbar.update(idx + 1)
-                pbar.finish()
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        'Successfully imported {} cities'.format(len(results))
-                    )
-                )
+            # # cities
+            # with connection.cursor() as cursor:
+            #     sql = "SELECT * FROM `cities`"
+            #     cursor.execute(sql)
+            #     results = cursor.fetchall()
+            #     country = Country.objects.create(name=u'Казахстан')
+            #     self.stdout.write(
+            #         self.style.WARNING(
+            #             'Started importing cities'
+            #         )
+            #     )
+            #     pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
+            #     for idx, r in enumerate(results):
+            #         i = City(
+            #             name=r['name'],
+            #             geopoint=(float(r['long']), float(r['latt']), ),
+            #             country=country,
+            #             is_active=True,
+            #         )
+            #         i.save()
+            #         pbar.update(idx + 1)
+            #     pbar.finish()
+            #     self.stdout.write(
+            #         self.style.SUCCESS(
+            #             'Successfully imported {} cities'.format(len(results))
+            #         )
+            #     )
 
-            # users
-            with connection.cursor() as cursor:
-                roles = {
-                    1: User.REGULAR,
-                    10: User.MODERATOR,
-                    20: User.ADMINISTRATOR,
-                }
-                sql = "SELECT * FROM `accounts`"
-                cursor.execute(sql)
-                results = cursor.fetchall()
-                k = 0
-                self.stdout.write(
-                    self.style.WARNING(
-                        'Started importing users'
-                    )
-                )
-                pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
-                for idx, r in enumerate(results):
-                    try:
-                        # email
-                        email = None
-                        if EmailField.EMAIL_REGEX.match(r['email']):
-                            email = r['email']
+            # # users
+            # with connection.cursor() as cursor:
+            #     roles = {
+            #         1: User.REGULAR,
+            #         10: User.MODERATOR,
+            #         20: User.ADMINISTRATOR,
+            #     }
+            #     sql = "SELECT * FROM `accounts`"
+            #     cursor.execute(sql)
+            #     results = cursor.fetchall()
+            #     k = 0
+            #     self.stdout.write(
+            #         self.style.WARNING(
+            #             'Started importing users'
+            #         )
+            #     )
+            #     pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
+            #     for idx, r in enumerate(results):
+            #         try:
+            #             # email
+            #             email = None
+            #             if EmailField.EMAIL_REGEX.match(r['email']):
+            #                 email = r['email']
 
-                        i = User(
-                            username=r['email'],
-                            email=email,
-                            gender=0 if r['sex']=='male' else 1,
-                            role=roles[r['role']],
-                            date_of_birth=datetime.datetime(datetime.datetime.now().year-int(r['age']), 1, 1),
-                            is_active=True,
-                            settings=UserSettings(),
-                            date_created=r['registered'] if r['registered'] else datetime.datetime.now(),
-                        )
-                        i.save()
-                        k+=1
-                    except Exception as e:
-                        pass
-                    pbar.update(idx + 1)
-                pbar.finish()
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        'Successfully imported {} users'.format(k)
-                    )
-                )
+            #             i = User(
+            #                 username=r['email'],
+            #                 email=email,
+            #                 gender=0 if r['sex']=='male' else 1,
+            #                 role=roles[r['role']],
+            #                 date_of_birth=datetime.datetime(datetime.datetime.now().year-int(r['age']), 1, 1),
+            #                 is_active=True,
+            #                 settings=UserSettings(),
+            #                 date_created=r['registered'] if r['registered'] else datetime.datetime.now(),
+            #             )
+            #             i.save()
+            #             k+=1
+            #         except Exception as e:
+            #             pass
+            #         pbar.update(idx + 1)
+            #     pbar.finish()
+            #     self.stdout.write(
+            #         self.style.SUCCESS(
+            #             'Successfully imported {} users'.format(k)
+            #         )
+            #     )
 
             # events
             with connection.cursor() as cursor:
@@ -241,11 +241,15 @@ class Command(BaseCommand):
                     elif URLField._URL_REGEX.match(r['url']):
                         web_site = r['url']
 
+                    # item = r
+                    # import pdb;pdb.set_trace()
+
                     i = Event(
                         title=r['name'],
                         city=city,
-                        start_date=r['date'],
-                        end_date=r['end_date'],
+                        datetimes=[{'date':r['date'].strftime("%Y%m%d"), 'start_time': r['date'].strftime("%H%M%S"), 'end_time': r['end_date'].strftime("%H%M%S")}],
+                        # start_date=r['date'],
+                        # end_date=r['end_date'],
                         interests=interests,
                         author=user,
                         status=statuses[r['status']],
@@ -279,52 +283,52 @@ class Command(BaseCommand):
                     )
                 )
 
-            # favorites
-            with connection.cursor() as cursor:
-                sql = "SELECT * FROM `favorites`"
-                cursor.execute(sql)
-                results = cursor.fetchall()
-                self.stdout.write(
-                    self.style.WARNING(
-                        'Started importing favorites'
-                    )
-                )
-                pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
-                for idx, r in enumerate(results):
-                    user, events = None, None
-                    # get event
-                    with connection.cursor() as cursor_1:
-                        event = None
-                        sql_1 = "SELECT * FROM `events` WHERE `id`=%s"
-                        cursor_1.execute(sql_1, (r['event_id']))
-                        r_1 = cursor_1.fetchone()
-                        if not r_1:
-                            print 'Event !!!!', r['event_id'], r['account_id']
-                        else:
-                            events = Event.objects.filter(title=r_1['name'],)
+            # # favorites
+            # with connection.cursor() as cursor:
+            #     sql = "SELECT * FROM `favorites`"
+            #     cursor.execute(sql)
+            #     results = cursor.fetchall()
+            #     self.stdout.write(
+            #         self.style.WARNING(
+            #             'Started importing favorites'
+            #         )
+            #     )
+            #     pbar = ProgressBar(widgets=[SimpleProgress()], maxval=len(results)).start()
+            #     for idx, r in enumerate(results):
+            #         user, events = None, None
+            #         # get event
+            #         with connection.cursor() as cursor_1:
+            #             event = None
+            #             sql_1 = "SELECT * FROM `events` WHERE `id`=%s"
+            #             cursor_1.execute(sql_1, (r['event_id']))
+            #             r_1 = cursor_1.fetchone()
+            #             if not r_1:
+            #                 print 'Event !!!!', r['event_id'], r['account_id']
+            #             else:
+            #                 events = Event.objects.filter(title=r_1['name'],)
 
-                    # get user
-                    with connection.cursor() as cursor_1:
-                        user = None
-                        sql_1 = "SELECT * FROM `accounts` WHERE `id`=%s"
-                        cursor_1.execute(sql_1, (r['account_id']))
-                        r_1 = cursor_1.fetchone()
-                        if not r_1:
-                            print 'User !!!!', r['event_id'], r['account_id']
-                        else:
-                            user = User.objects.get(username=r_1['email'])
+            #         # get user
+            #         with connection.cursor() as cursor_1:
+            #             user = None
+            #             sql_1 = "SELECT * FROM `accounts` WHERE `id`=%s"
+            #             cursor_1.execute(sql_1, (r['account_id']))
+            #             r_1 = cursor_1.fetchone()
+            #             if not r_1:
+            #                 print 'User !!!!', r['event_id'], r['account_id']
+            #             else:
+            #                 user = User.objects.get(username=r_1['email'])
 
-                    if events and user:
-                        for event in events:
-                            event.add_to_favourites(user)
+            #         if events and user:
+            #             for event in events:
+            #                 event.add_to_favourites(user)
 
-                    pbar.update(idx + 1)
-                pbar.finish()
-                self.stdout.write(
-                    self.style.SUCCESS(
-                        'Successfully imported {} favorites'.format(len(results))
-                    )
-                )
+            #         pbar.update(idx + 1)
+            #     pbar.finish()
+            #     self.stdout.write(
+            #         self.style.SUCCESS(
+            #             'Successfully imported {} favorites'.format(len(results))
+            #         )
+            #     )
 
             connection.close()
         except Exception as e:

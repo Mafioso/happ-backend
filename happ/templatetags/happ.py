@@ -24,11 +24,21 @@ def to_int(value, default='0'):
             return default
 
 @register.filter(name='paginate')
-def paginate(number):
+def paginate(number, page=1):
     x = ((number-1)/settings.PAGE_SIZE)+1
-    if x>10:
-        x=10
-    return range(x)
+    page = int(page)
+    if x < 10:
+        return range(1,x+1)
+    if page >= 6 and page < x-5:
+        return range(page-5, page+5)
+    elif page >= 6 and page >= x-5:
+        return range(x-10, x+1)
+    return range(1, 10)
+
+@register.filter(name='page_count')
+def page_count(number):
+    x = ((number-1)/settings.PAGE_SIZE)+1
+    return x
 
 @register.filter(name='page_counter')
 def page_counter(number, page=1):

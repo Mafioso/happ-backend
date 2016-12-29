@@ -34,7 +34,7 @@ class EventViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         response = super(EventViewSet, self).list(request, *args, **kwargs)
         response.template_name = 'admin/events/list.html'
-        response.data['page'] = request.GET.get('page', 1)
+        response.data['page'] = int(request.GET.get('page', 1))
         return response
 
     def perform_create(self, serializer):
@@ -109,6 +109,11 @@ class EventViewSet(viewsets.ModelViewSet):
                         {'error_message': _('Wrong datetimes format provided.')},
                         status=status.HTTP_400_BAD_REQUEST
                     )
+        # print request.data['close_on_start']
+        # if request.data['close_on_start'] == 'on':
+        #     request.data['close_on_start'] = True
+        # else:
+        #     request.data['close_on_start'] = False
 
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():

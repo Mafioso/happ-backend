@@ -60,9 +60,15 @@
   </tbody>
 </table>
 <div class="btn-group pull-right">
-  {% for item in count|paginate %}
-  <button class="btn btn-default {% if forloop.counter == page|to_int %}active{% endif %}" type="button" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{forloop.counter}}&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator">{{forloop.counter}}</button>
+  {% if page > 5 %}
+  <button class="btn btn-default" type="button" ic-get-from="{% url 'admin-events-list' %}?format=html&page=1&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator"><span aria-hidden="true">&laquo;</span></button>
+  {% endif %}
+  {% for item in count|paginate:page %}
+    <button class="btn btn-default {% if item == page|to_int %}active{% endif %}" type="button" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{item}}&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator">{{item}}</button>
   {% endfor %}
+  {% if page|add:5 < count|page_count %}
+  <button class="btn btn-default {% if forloop.counter == page|to_int %}active{% endif %}" type="button" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{count|page_count}}&{% with q=request.GET|get:'ic-current-url'|split:'?' %}{{ q.1 }}{% endwith %}" ic-target="#event-table" ic-indicator="#indicator"><span aria-hidden="true">&raquo;</span></button>
+  {% endif %}
 </div>
 
 {% block javascript %}
