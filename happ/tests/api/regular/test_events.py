@@ -516,7 +516,7 @@ class Tests(APISimpleTestCase):
 
     def test_create_event_not_organizer(self):
         """
-        Normal users cannot create events
+        Regular users cannot create events
         """
         u = UserFactory(role=User.REGULAR)
         u.set_password('123')
@@ -723,7 +723,7 @@ class Tests(APISimpleTestCase):
 
     def test_edit_event_not_organizer(self):
         """
-        Normal users cannot edit events
+        Regular users cannot edit events
         """
         u = UserFactory()
         u.set_password('123')
@@ -815,7 +815,7 @@ class Tests(APISimpleTestCase):
 
     def test_delete_event_not_organizer(self):
         """
-        Normal users cannot delete events
+        Regular users cannot delete events
         """
         u = UserFactory(role=User.REGULAR)
         u.set_password('123')
@@ -898,7 +898,7 @@ class Tests(APISimpleTestCase):
 
     def test_copy_event_not_organizer(self):
         """
-        Normal users cannot copy events
+        Regular users cannot copy events
         """
         u = UserFactory(role=User.REGULAR)
         u.set_password('123')
@@ -1768,7 +1768,7 @@ class Tests(APISimpleTestCase):
         """
         we can activate event through API
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -1793,8 +1793,8 @@ class Tests(APISimpleTestCase):
         """
         we cannot activate event through API of other users
         """
-        ou = UserFactory()
-        u = UserFactory()
+        ou = UserFactory(role=User.ORGANIZER)
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -1815,11 +1815,36 @@ class Tests(APISimpleTestCase):
         i = Event.objects.get(id=i.id)
         self.assertFalse(i.is_active)
 
+    def test_activate_not_organizer(self):
+        """
+        Regular users cannot activate events
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = EventFactory(is_active=False)
+
+        url = prepare_url('events-activate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        i = Event.objects.get(id=i.id)
+        self.assertFalse(i.is_active)
+
     def test_deactivate(self):
         """
         we can deactivate event through API
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -1844,8 +1869,8 @@ class Tests(APISimpleTestCase):
         """
         we cannot deactivate event through API of other users
         """
-        ou = UserFactory()
-        u = UserFactory()
+        ou = UserFactory(role=User.ORGANIZER)
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -1863,5 +1888,30 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        i = Event.objects.get(id=i.id)
+        self.assertTrue(i.is_active)
+
+    def test_deactivate_not_organizer(self):
+        """
+        Regular users cannot deactivate events
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        i = EventFactory(is_active=True)
+
+        url = prepare_url('events-deactivate', kwargs={'id': str(i.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         i = Event.objects.get(id=i.id)
         self.assertTrue(i.is_active)

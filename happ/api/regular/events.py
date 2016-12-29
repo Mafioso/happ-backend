@@ -324,6 +324,11 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if instance.author != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user.role < User.ORGANIZER:
+            return Response(
+                {'error_message': _('Only Organizer can activate events.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         instance.activate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -333,6 +338,11 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if instance.author != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user.role < User.ORGANIZER:
+            return Response(
+                {'error_message': _('Only Organizer can deactivate events.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         instance.deactivate()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
