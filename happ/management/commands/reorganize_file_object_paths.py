@@ -32,7 +32,7 @@ class Command(BaseCommand):
                 dest_folder = os.path.join(settings.NGINX_MISC_ROOT, str(f.entity.id))
             if not os.path.exists(dest_folder):
                 os.makedirs(dest_folder)
-            if os.path.exists(path) and options['mv']:
+            if os.path.exists(path):
                 shutil.move(path, os.path.join(dest_folder, filename))
             f.path = os.path.join(dest_folder, filename)
             f.save()

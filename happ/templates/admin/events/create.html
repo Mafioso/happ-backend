@@ -258,10 +258,16 @@
     <script src="{% get_static_prefix %}js/selectize.min.js"></script>
 
     <script>
+      datetimes = []
+      function delete_datetime(index){
+        datetimes.splice(index-1, 1);
+        console.log(datetimes);
+        $('#date_id'+index).remove();
+      }
+
+
       $(document).ready(function() {
         window.cropp = null;
-
-        datetimes = []
 
         $('#date').daterangepicker({
             showDropdowns: true,
@@ -273,11 +279,16 @@
           datetimes.push({ date: start.format('YYYYMMDD'), start_time: start.format('HHmmss'), end_time: end.format('HHmmss') })
           // $('#start_datetime').val(start);
           // $('#end_datetime').val(end);
-          $('#date_list').append('<li class="list-group-item">'+start.format('YYYY-MM-DD') + " время начало: " + start.format('HH:mm') + " время конца: " + end.format('HH:mm')+'</li>');
+          $('#date_list').append('<li id="date_id'+datetimes.length+'" class="list-group-item">'+start.format('YYYY-MM-DD') + " время начало: " + start.format('HH:mm') + " время конца: " + end.format('HH:mm')+' <a onclick="delete_datetime('+datetimes.length+')"><i class="fa fa-trash-o"></i></a></li>');
           $('#datetimes').val(JSON.stringify(datetimes))
 
           console.log(datetimes);
         });
+
+        var delete_datetime = function(index){
+          datetimes.splice(index-1, 1);
+          $(this).parent().remove();
+        }
 
         $('#event-type').change(function() {
           $('#title').val($(this).val() + ' «' + $('#title').val() + '»');
@@ -343,6 +354,7 @@
           valueField: 'name',
           labelField: 'name',
           searchField: 'name',
+          loadThrottle: 500,
           render: {
               option: function(item, escape) {
                   return '<div>' +
@@ -358,6 +370,7 @@
           },
           load: function(query, callback) {
               if (!query.length) return callback();
+              $(this)[0].clearOptions();
               $.ajax({
                   url: '{% url "google_places_api" %}',
                   type: 'POST',
@@ -371,6 +384,10 @@
                       callback(res.results);
                   }
               });
+          },
+          onLoad: function(data){
+            console.log(data);
+            $(this)[0].open();
           },
           onChange: function(value) {
             var options = $(this)[0].options;

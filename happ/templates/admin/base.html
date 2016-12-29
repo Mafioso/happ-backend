@@ -172,7 +172,7 @@
                         <span>Настройки</span>
                       </a>
                     </li>
-                    <li><a href="#"><i class="fa fa-sign-out pull-right"></i> Выйти</a></li>
+                    <li><a href="#" onclick="logout()"><i class="fa fa-sign-out pull-right"></i> Выйти</a></li>
                   </ul>
                 </li>
 
@@ -218,6 +218,14 @@
     <!-- Custom -->
     <script src="{% get_static_prefix %}js/custom.js"></script>
     {% endblock %}
+
+    <script type="text/javascript">
+      function logout(){
+        document.cookie = 'sessionid=;path=/;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        window.location = "/";
+      }
+
+    </script>
 
   </body>
 </html>
