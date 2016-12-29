@@ -11,7 +11,7 @@ from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string
-from happ.models import Event, Complaint
+from happ.models import Event, Complaint, User
 from happ.filters import EventFilter, EventOrganizerFilter
 from happ.pagination import SolidPagination
 from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class
@@ -40,6 +40,11 @@ class EventViewSet(viewsets.ModelViewSet):
         divides end_datetime into end_date and end_time
         - launches celery tasks for translation
         """
+        if request.user.role < User.ORGANIZER:
+            return Response(
+                {'error_message': _('Only Organizer can create events.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if 'title' not in request.data:
             return Response(
                 {'error_message': _('No title provided.')},
@@ -122,6 +127,11 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if instance.author != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user.role < User.ORGANIZER:
+            return Response(
+                {'error_message': _('Only Organizer can edit events.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if 'title' not in request.data:
             return Response(
                 {'error_message': _('No title provided.')},
@@ -198,6 +208,11 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if instance.author != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user.role < User.ORGANIZER:
+            return Response(
+                {'error_message': _('Only Organizer can delete events.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return super(EventViewSet, self).destroy(request, *args, **kwargs)
 
     @detail_route(methods=['post'], url_path='copy')
@@ -205,6 +220,11 @@ class EventViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         if instance.author != request.user:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        if request.user.role < User.ORGANIZER:
+            return Response(
+                {'error_message': _('Only Organizer can copy events.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         new_instance = instance.copy()
         serializer = self.get_serializer(new_instance)
         new_instance.translate()

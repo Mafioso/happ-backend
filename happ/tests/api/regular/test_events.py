@@ -60,7 +60,7 @@ class Tests(APISimpleTestCase):
         """
         We can create event
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -212,7 +212,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event without title
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -246,7 +246,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event without city_id
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -280,7 +280,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event without currency_id
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -314,7 +314,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event without price
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -347,7 +347,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event if min_price is greater than max_price
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -381,7 +381,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event if no start_datetime and end_datetime
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -414,7 +414,7 @@ class Tests(APISimpleTestCase):
         """
         We cannot create event if items in datetimes have wrong format
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -514,6 +514,43 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(n, Event.objects.count())
 
+    def test_create_event_not_organizer(self):
+        """
+        Normal users cannot create events
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-list')
+        n = Event.objects.count()
+
+        # full
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'start_datetime': datetime.now(),
+            'end_datetime': datetime.now() + timedelta(days=1, hours=1),
+            'min_price': 100,
+            'max_price': 120,
+            'image_ids': [],
+            'geopoint': {'lng': 1, 'lat':0},
+            'interest_ids': map(lambda _: str(InterestFactory().id), range(3)),
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(n, Event.objects.count())
+
     def test_retrieve_event(self):
         """
         We can retrieve event
@@ -573,7 +610,7 @@ class Tests(APISimpleTestCase):
         """
         we can edit event
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -644,8 +681,8 @@ class Tests(APISimpleTestCase):
         """
         we cannot edit event of other users
         """
-        ou = UserFactory()
-        u = UserFactory()
+        ou = UserFactory(role=User.ORGANIZER)
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -684,11 +721,48 @@ class Tests(APISimpleTestCase):
         self.assertEqual(e2.max_price, e2.max_price)
         self.assertEqual(Event.objects.count(), n)
 
+    def test_edit_event_not_organizer(self):
+        """
+        Normal users cannot edit events
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory(status=random.choice(Event.STATUSES))
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-detail', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        data = {
+            'title': 'New event',
+            'city_id': str(CityFactory.create().id),
+            'currency_id': str(CurrencyFactory.create().id),
+            'start_datetime': datetime.now(),
+            'end_datetime': datetime.now() + timedelta(days=1),
+            'min_price': 100,
+            'max_price': 120,
+            'geopoint': {'lng': 1, 'lat':0},
+            'image_ids': [],
+        }
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.patch(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Event.objects.count(), n)
+
     def test_delete_event(self):
         """
         we can delete event
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -715,8 +789,8 @@ class Tests(APISimpleTestCase):
         """
         we cannot delete event of other users
         """
-        ou = UserFactory()
-        u = UserFactory()
+        ou = UserFactory(role=User.ORGANIZER)
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -739,11 +813,38 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(Event.objects.count(), n)
 
+    def test_delete_event_not_organizer(self):
+        """
+        Normal users cannot delete events
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-detail', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.delete(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Event.objects.count(), n)
+
     def test_copy_event(self):
         """
         we can copy event
         """
-        u = UserFactory()
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -771,8 +872,8 @@ class Tests(APISimpleTestCase):
         """
         we cannot copy event of other users
         """
-        ou = UserFactory()
-        u = UserFactory()
+        ou = UserFactory(role=User.ORGANIZER)
+        u = UserFactory(role=User.ORGANIZER)
         u.set_password('123')
         u.save()
 
@@ -793,6 +894,33 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(Event.objects.count(), n)
+
+    def test_copy_event_not_organizer(self):
+        """
+        Normal users cannot copy events
+        """
+        u = UserFactory(role=User.REGULAR)
+        u.set_password('123')
+        u.save()
+
+        e = EventFactory()
+        e.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        url = prepare_url('events-copy', kwargs={'id': str(e.id)})
+        n = Event.objects.count()
+
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Event.objects.count(), n)
 
     def test_upvote_event(self):
