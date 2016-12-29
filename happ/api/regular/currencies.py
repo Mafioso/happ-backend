@@ -6,12 +6,14 @@ from rest_framework.decorators import detail_route
 from rest_framework_mongoengine import viewsets
 
 from happ.models import Currency
+from happ.pagination import SolidPagination
 from happ.serializers import CurrencySerializer
 
 
 class CurrencyViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     serializer_class = CurrencySerializer
     queryset = Currency.objects.all()
+    pagination_class = SolidPagination
 
     @detail_route(methods=['post'], url_path='set')
     def set(self, request, id=None, *args, **kwargs):
