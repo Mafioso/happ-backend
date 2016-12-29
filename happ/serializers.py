@@ -227,9 +227,7 @@ class UserSerializer(serializers.DocumentSerializer):
         )
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-        )
+        user = super(UserSerializer, self).create(validated_data)
         if 'password' in validated_data: # if registered with facebook there is no password
             user.set_password(validated_data['password'])
         user.settings = UserSettings()

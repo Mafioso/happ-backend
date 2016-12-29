@@ -35,6 +35,8 @@ class Tests(APISimpleTestCase):
         self.assertEqual(User.objects.count(), n+1)
         self.assertNotEqual(user.settings, None)
         self.assertIn('token', response.data)
+        self.assertEqual(user.username, 'username')
+        self.assertEqual(user.email, 'email@mail.com')
 
     def test_user_registration_same_username(self):
         """
@@ -130,6 +132,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(User.objects.count(), n+1)
         self.assertNotEqual(user.settings, None)
         self.assertIn('token', response.data)
+        self.assertNotEqual(user.facebook_id, None)
 
     def test_user_registration_same_facebook_id(self):
         """
@@ -566,4 +569,4 @@ class Tests(APISimpleTestCase):
             'facebook_id': facebook_id + '123',
         }
         response = self.client.post(url, data=data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

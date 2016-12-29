@@ -134,7 +134,7 @@ class FacebookLogin(APIView):
         except:
             return Response(
                 {'error_message': _('User does not exist.')},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_404_NOT_FOUND
             )
 
 
