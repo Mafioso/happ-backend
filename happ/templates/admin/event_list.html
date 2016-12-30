@@ -84,7 +84,7 @@
           </div>
 
           <!-- start project list -->
-          <div id="event-table" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-src="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}{% if 'start_date' not in request.GET %}&start_date={% now 'Ymd' %}{% endif %}" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="event-table" ic-get-from="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-src="{% url 'admin-events-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-trigger-on="load" ic-target="#event-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
 

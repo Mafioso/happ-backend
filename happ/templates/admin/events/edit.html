@@ -69,13 +69,9 @@
                       <div class="form-group">
 
                         <label for="date" class="control-label col-md-3 col-sm-3 col-xs-12">Выбранные даты</label>
-                        <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="col-md-6 col-sm-6 col-xs-12" style="overflow:scroll; max-height:150px;">
                           <ul id="date_list" class="list-group">
-                            {% for datetime in object.datetimes %}
-                              <li class="list-group-item">
-                                {{ datetime.date|date:'Y-m-d'}} время начало: {{ datetime.start_time|date:'H:i'}} время конца: {{ datetime.end_time|date:'H:i'}}
-                              </li>
-                            {% endfor %}
+
                           </ul>
                         </div>
 
@@ -277,10 +273,7 @@
     <script src="{% get_static_prefix %}js/selectize.min.js"></script>
 
     <script>
-      $(document).ready(function() {
-        window.cropp = null;
-
-        datetimes = [
+      datetimes = [
           {% for datetime in object.datetimes %}
             {% if not forloop.first %},{% endif %}
             {
@@ -290,6 +283,24 @@
             }
           {% endfor %}
         ]
+      update_datetime_list();
+
+      function update_datetime_list(){
+        $('#date_list').empty();
+        for(date in datetimes){
+          $('#date_list').append('<li id="date_id'+date+'" class="list-group-item">'+moment(datetimes[date].date, ["YYYYMMDD"]).format('DD-MM-YYYY') + " время начало: " + moment(datetimes[date].start_time, 'HHmm').format('HH:mm') + " время конца: " + moment(datetimes[date].end_time, 'HHmm').format('HH:mm')+' <a onclick="delete_datetime('+date+')"><i class="fa fa-trash-o"></i></a></li>');
+        }
+        $('#datetimes').val(JSON.stringify(datetimes))
+      }
+
+      function delete_datetime(index){
+        datetimes.splice(index, 1);
+        update_datetime_list();
+        console.log(datetimes);
+      }
+
+      $(document).ready(function() {
+        window.cropp = null;
 
         $('#date').daterangepicker({
             showDropdowns: true,
@@ -298,12 +309,14 @@
             timePickerIncrement: 10,
         }, function(start, end, label) {
 
-          datetimes.push({ date: start.format('YYYYMMDD'), start_time: start.format('HHmmss'), end_time: end.format('HHmmss') })
-          // $('#start_datetime').val(start);
-          // $('#end_datetime').val(end);
-          $('#date_list').append('<li class="list-group-item">'+start.format('YYYY-MM-DD') + " время начало: " + start.format('HH:mm') + " время конца: " + end.format('HH:mm')+'</li>');
-          $('#datetimes').val(JSON.stringify(datetimes))
-
+          if(start.format('YYYYMMDD')==end.format('YYYYMMDD')){
+            datetimes.push({ date: start.format('YYYYMMDD'), start_time: start.format('HHmmss'), end_time: end.format('HHmmss') })
+          }else{
+            for (var d = start; d <= end; d.add(1, 'd')) {
+              datetimes.push({ date: d.format('YYYYMMDD'), start_time: start.format('HHmmss'), end_time: end.format('HHmmss') })
+            }
+          }
+          update_datetime_list();
           console.log(datetimes);
         });
 

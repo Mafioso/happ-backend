@@ -14,7 +14,7 @@ from happ.utils import store_file, string_to_date, string_to_time, daterange, da
 from happ.models import Event
 from happ.filters import EventFilter
 from happ.policies import StaffPolicy
-from happ.decorators import patch_queryset
+from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class
 from happ.serializers import EventAdminSerializer
 
 
@@ -31,6 +31,7 @@ class EventViewSet(viewsets.ModelViewSet):
         response.template_name = '/admin/events/detail.html'
         return response
 
+    @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time',)})
     def list(self, request, *args, **kwargs):
         response = super(EventViewSet, self).list(request, *args, **kwargs)
         response.template_name = 'admin/events/list.html'
@@ -197,6 +198,10 @@ class EventViewSet(viewsets.ModelViewSet):
                         {'error_message': _('Wrong datetimes format provided.')},
                         status=status.HTTP_400_BAD_REQUEST
                     )
+        if request.data['close_on_start'] == 'on':
+            request.data['close_on_start'] = True
+        else:
+            request.data['close_on_start'] = False
 
         serializer = self.get_serializer(instance, data=request.data)
         if serializer.is_valid():
