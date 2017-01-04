@@ -79,6 +79,12 @@ class EventListView(JWTAuthRequiredMixin, TemplateView):
 class EventModerationListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/event_moderation_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(EventModerationListView, self).get_context_data(**kwargs)
+        context['cities'] = City.objects.filter(is_active=True)
+        context['interests'] = Interest.objects.filter(is_active=True, parent=None).order_by('title')
+        return context
+
 
 class EventCreateView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/events/create.html'
