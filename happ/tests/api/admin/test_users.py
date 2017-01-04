@@ -5,6 +5,7 @@ from rest_framework_jwt.settings import api_settings
 from happ.models import User
 from happ.factories import (
     UserFactory,
+    CityFactory,
 )
 from happ.tests import *
 
@@ -622,3 +623,85 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         u = User.objects.get(id=u.id)
         self.assertFalse(u.is_active)
+
+    def test_assign_city(self):
+        """
+        we can assign city for moderator through API
+        """
+
+        u1 = UserFactory(role=User.MODERATOR)
+
+        u = UserFactory(role=User.MODERATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        url = prepare_url('admin-users-assign-city', kwargs={'id': str(u1.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        c = CityFactory()
+        data = {
+            'city_id': str(c.id)
+        }
+
+        # restricted for moderator
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        # ok for administrator
+        u.role = User.ADMINISTRATOR
+        u.save()
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        u1 = User.objects.get(id=u1.id)
+        self.assertEqual(u1.assigned_city, c)
+
+        # ok for root
+        u.role = User.ROOT
+        u.save()
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        u1 = User.objects.get(id=u1.id)
+        self.assertEqual(u1.assigned_city, c)
+
+    def test_assign_city_for_non_staff(self):
+        """
+        we cannot assign city for regular and organizer users through API
+        """
+        c = CityFactory()
+        u = UserFactory(role=User.ADMINISTRATOR)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+
+        u = UserFactory(role=User.ORGANIZER)
+        data = {
+            'city_id': str(c.id)
+        }
+
+        url = prepare_url('admin-users-assign-city', kwargs={'id': str(u.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        u = UserFactory(role=User.REGULAR)
+        data = {
+            'city_id': str(c.id)
+        }
+
+        url = prepare_url('admin-users-assign-city', kwargs={'id': str(u.id)})
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

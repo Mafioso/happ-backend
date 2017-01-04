@@ -99,7 +99,7 @@ class User(AbstractUser, HappBaseDocument):
     confirmation_key = StringField()
     confirmation_key_expires = DateTimeField(blank=True, null=True)
     facebook_id = StringField()
-    assigned_city = ReferenceField(City, reverse_delete_rule=CASCADE, required=False)
+    assigned_city = ReferenceField(City, reverse_delete_rule=CASCADE, required=False, null=True)
 
     @property
     def fn(self):

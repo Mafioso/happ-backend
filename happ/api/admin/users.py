@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from happ.models import User
+from happ.models import User, City
 from happ.policies import StaffPolicy, RootAdministratorPolicy
 from happ.decorators import patch_permission_classes, patch_queryset
 from happ.serializers import UserAdminSerializer
@@ -120,4 +120,29 @@ class UserViewSet(viewsets.ModelViewSet):
 
         instance.set_password(new_password)
         instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['post'], url_path='assign_city')
+    @patch_permission_classes(( RootAdministratorPolicy, ))
+    def assign_city(self, request, *args, **kwargs):
+        if 'city_id' not in request.data:
+            return Response(
+                {'error_message': _("City is not provided")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        instance = self.get_object()
+        if instance.role < User.MODERATOR:
+            return Response(
+                {'error_message': _("City can be assinged only for staff users")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            city = City.objects.get(id=request.data['city_id'])
+        except:
+            return Response(
+                {'error_message': _("City does not exist")},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        instance.assign_city(city=city)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
