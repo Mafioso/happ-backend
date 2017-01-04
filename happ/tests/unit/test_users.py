@@ -323,3 +323,14 @@ class Tests(SimpleTestCase):
 
         u.deactivate()
         self.assertFalse(u.is_active)
+
+    def test_assign_city(self):
+        """
+        we can assign city
+        """
+        c = CityFactory()
+        u = UserFactory(assigned_city=None)
+        self.assertEqual(u.assigned_city, None)
+
+        u.assign_city(city=c)
+        self.assertEqual(u.assigned_city, c)
