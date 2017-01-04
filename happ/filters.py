@@ -14,6 +14,7 @@ class EventFilter(filtersets.ModelFilterset):
     status = filters.ListFilter('in')
     type = filters.ListFilter('in')
     city = filters.ListFilter('in')
+    interests = filters.ListFilter('in')
 
     class Meta:
         model = Event

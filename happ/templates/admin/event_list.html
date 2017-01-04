@@ -78,6 +78,17 @@
                               <label class="filter-col"  for="end_date">до</label>
                               <input class="date-picker form-control" type="text" name="end_date" id="end_date" value={{ request.GET.end_date }}>
                           </div>
+                          <div class="form-group" style="margin-right:10px;">
+                              <label for="interests" class="control-label">Интерес</label>
+                              <select id="interests" class="form-control selectpicker" name="interests" multiple="multiple">
+                                {% for item in interests %}
+                                  <option value="{{item.id}}" style="font-weight: bold" {% if item.id|stringformat:'s' in request.GET|getlist:'interests' %}selected="selected"{% endif %}>{{item.title}}</option>
+                                  {% for child in item.children %}
+                                    <option value="{{child.id}}" style="padding-left: 40px;" {% if child.id|stringformat:'s' in request.GET|getlist:'interests' %}selected="selected"{% endif %}>{{child.title}}</option>
+                                  {% endfor%}
+                                {% endfor%}
+                              </select>
+                          </div>
                         </div>
                         <div class="col-md-12 text-center">
                           <button type="submit" class="btn btn-default">Отправить</button>
@@ -161,6 +172,7 @@
     });
 
     $('#city').selectize();
+    $('#interests').selectize();
   });
 </script>
 {% endblock %}

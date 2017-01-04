@@ -92,7 +92,7 @@ class Tests(APISimpleTestCase):
                 min_price=i,
                 max_price=i+10,
                 city=c1,
-                interests=[i3],
+                interests=[i2, i3],
                 is_active=True,
                 status=Event.APPROVED,
                 datetimes=[EventTimeFactory(
@@ -110,7 +110,7 @@ class Tests(APISimpleTestCase):
                 min_price=i,
                 max_price=i+10,
                 city=c2,
-                interests=[i2],
+                interests=[i1, i2],
                 is_active=True,
                 status=Event.APPROVED,
                 datetimes=[EventTimeFactory(
@@ -128,7 +128,7 @@ class Tests(APISimpleTestCase):
                 min_price=i,
                 max_price=i+10,
                 city=c3,
-                interests=[i1],
+                interests=[i1, i3],
                 is_active=True,
                 status=Event.APPROVED,
                 datetimes=[EventTimeFactory(
@@ -264,6 +264,34 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][6]['title'], 't12')
         self.assertEqual(response.data['results'][7]['title'], 't11')
         self.assertEqual(response.data['results'][8]['title'], 't10')
+
+        # interests (one interest)
+        url = prepare_url('admin-events-list', query={'interests': i1.id})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(response.data['results'][0]['title'], 't32')
+        self.assertEqual(response.data['results'][1]['title'], 't31')
+        self.assertEqual(response.data['results'][2]['title'], 't30')
+        self.assertEqual(response.data['results'][3]['title'], 't23')
+        self.assertEqual(response.data['results'][4]['title'], 't22')
+        self.assertEqual(response.data['results'][5]['title'], 't21')
+        self.assertEqual(response.data['results'][6]['title'], 't20')
+        # several interests
+        url = prepare_url('admin-events-list', query={'interests': [i1.id, i2.id]})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 12)
+        self.assertEqual(response.data['results'][0]['title'], 't32')
+        self.assertEqual(response.data['results'][1]['title'], 't31')
+        self.assertEqual(response.data['results'][2]['title'], 't30')
+        self.assertEqual(response.data['results'][3]['title'], 't23')
+        self.assertEqual(response.data['results'][4]['title'], 't22')
+        self.assertEqual(response.data['results'][5]['title'], 't21')
+        self.assertEqual(response.data['results'][6]['title'], 't20')
+        self.assertEqual(response.data['results'][7]['title'], 't14')
+        self.assertEqual(response.data['results'][8]['title'], 't13')
+        self.assertEqual(response.data['results'][9]['title'], 't12')
 
     def test_approve(self):
         """
