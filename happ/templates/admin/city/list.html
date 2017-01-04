@@ -1,5 +1,5 @@
 {% load happ %}
-<table class="table table-bordered" ic-src="/api/v1/admin/cities.html" ic-target="#city-table" ic-indicator="#indicator">
+<table class="table table-bordered" ic-src="{% url 'admin-cities-list' %}?format=html" ic-target="#city-table" ic-indicator="#indicator">
   <thead>
     <tr>
       <th style="width:1%;">#</th>

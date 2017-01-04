@@ -22,7 +22,7 @@
           <div class="clearfix"></div>
         </div>
         <div class="x_content">
-          <div id="complaint-table" ic-src="/api/v1/admin/complaints/open.html" ic-trigger-on="load" ic-target="#complaint-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="complaint-table" ic-src="{% url 'admin-complaints-open' %}?format=html" ic-trigger-on="load" ic-target="#complaint-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
           <center> <!-- lol -->

@@ -22,7 +22,7 @@
           <div class="clearfix"></div>
         </div>
         <div class="x_content">
-          <div id="city-table" ic-src="/api/v1/admin/cities.html" ic-trigger-on="load" ic-target="#city-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="city-table" ic-src="{% url 'admin-cities-list' %}?format=html" ic-trigger-on="load" ic-target="#city-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
           <center> <!-- lol -->
