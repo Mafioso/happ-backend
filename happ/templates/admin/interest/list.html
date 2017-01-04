@@ -14,8 +14,8 @@
   {% for item in results %}
     <tr id="row-{{item.id}}">
       <th scope="row">{{forloop.counter|page_counter:page}}</th>
-      <td>{{item.title}}</td>
-      <td>{{item.parent.title}}</td>
+      <td><a href="{% url 'event_list' %}?interests={{item.id}}" class="btn btn-link">{{item.title}}</a></td>
+      <td><a href="{% url 'event_list' %}?interests={{item.parent.id}}" class="btn btn-link">{{item.parent.title}}</a></td>
       <td>{% if item.is_global %}Глобальный{% else %}Городской{% endif %}</td>
       <td>
         {% for city in item.local_cities %}

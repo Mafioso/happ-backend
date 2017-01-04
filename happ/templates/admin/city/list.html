@@ -13,7 +13,7 @@
   {% for item in results %}
     <tr id="row-{{item.id}}">
       <th scope="row">{{forloop.counter}}</th>
-      <td>{{item.name}}</td>
+      <td><a href="{% url 'event_list' %}?city={{item.id}}" class="btn btn-link">{{item.name}}</a></td>
       <td>{{item.country_name}}</td>
       <td>{% if item.is_active %}Активен{% else %}Не активен{% endif %}</td>
       <td>
