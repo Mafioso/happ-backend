@@ -13,6 +13,7 @@ class EventFilter(filtersets.ModelFilterset):
     max_price = filters.IntegerFilter('lte')
     status = filters.ListFilter('in')
     type = filters.ListFilter('in')
+    city = filters.ListFilter('in')
 
     class Meta:
         model = Event

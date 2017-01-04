@@ -62,6 +62,14 @@
                                 </label>
                               </div>
                           </div>
+                          <div class="form-group" style="margin-right:10px;">
+                              <label class="control-label" for="city">Город проведения</label>
+                              <select id="city" class="form-control selectize" name="city" multiple="multiple">
+                                {% for item in cities %}
+                                  <option value="{{item.id}}" data-subtext="{{item.country_name}}" {% if item.id|stringformat:'s' in request.GET|getlist:'city' %}selected="selected"{% endif %}>{{item.name}}</option>
+                                {% endfor%}
+                              </select>
+                          </div>
                         </div>
                         <div class="col-md-6">
                           <div class="form-group" style="margin-right:10px;">
@@ -128,6 +136,7 @@
 <!-- bootstrap-daterangepicker -->
 <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
 <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
+    <script src="{% get_static_prefix %}js/selectize.min.js"></script>
 
 <script>
   $(document).ready(function() {
@@ -150,6 +159,8 @@
       if($('#end_date').val())
         $('#end_date').val(moment($('#end_date').val()).format('YYYYMMDD'));
     });
+
+    $('#city').selectize();
   });
 </script>
 {% endblock %}

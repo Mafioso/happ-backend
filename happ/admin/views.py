@@ -69,6 +69,11 @@ class DashboardView(JWTAuthRequiredMixin, TemplateView):
 class EventListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/event_list.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(EventListView, self).get_context_data(**kwargs)
+        context['cities'] = City.objects.filter(is_active=True)
+        return context
+
 
 class EventModerationListView(JWTAuthRequiredMixin, TemplateView):
     template_name = 'admin/event_moderation_list.html'
