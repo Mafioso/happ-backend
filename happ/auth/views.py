@@ -222,11 +222,13 @@ class PasswordChange(APIView):
 
 class EmailConfirmationRequest(APIView):
 
-    def get(self, request, format=None):
+    def post(self, request, format=None):
         """
         Generates organizer mode confirmation key and sends email with it
         """
         user = request.user
+        if 'email' in request.data:
+            user.email = request.data['email']
         if not user.email:
             return Response(
                 {'error_message': _('No email provided.')},

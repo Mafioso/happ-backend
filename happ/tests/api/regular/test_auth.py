@@ -400,7 +400,7 @@ class Tests(APISimpleTestCase):
 
         url = prepare_url('email-confirm-request')
 
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         u = User.objects.get(id=u.id)
         self.assertNotEqual(u.confirmation_key, None)
         self.assertNotEqual(u.confirmation_key_expires, None)
@@ -408,8 +408,38 @@ class Tests(APISimpleTestCase):
 
         u.email = None
         u.save()
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_email_confirm_request_with_email(self):
+        """
+        Ensures that user send email confirmation request with email in request data
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('email-confirm-request')
+
+        data = {
+            'email': 'some@mail.com'
+        }
+
+        response = self.client.post(url, data=data, format='json')
+        u = User.objects.get(id=u.id)
+        self.assertNotEqual(u.confirmation_key, None)
+        self.assertNotEqual(u.confirmation_key_expires, None)
+        self.assertEqual(u.email, 'some@mail.com')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_email_confirm(self):
         """
@@ -429,7 +459,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
 
         url = prepare_url('email-confirm-request')
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         u = User.objects.get(id=u.id)
 
         url = prepare_url('email-confirm')
@@ -462,7 +492,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
 
         url = prepare_url('email-confirm-request')
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         u = User.objects.get(id=u.id)
 
         url = prepare_url('email-confirm')
@@ -489,7 +519,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
 
         url = prepare_url('email-confirm-request')
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         u = User.objects.get(id=u.id)
 
         url = prepare_url('email-confirm')
@@ -518,7 +548,7 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
 
         url = prepare_url('email-confirm-request')
-        response = self.client.get(url, format='json')
+        response = self.client.post(url, format='json')
         u = User.objects.get(id=u.id)
         u.confirmation_key_expires = u.confirmation_key_expires - datetime.timedelta(days=settings.CONFIRMATION_KEY_EXPIRES)
         u.save()
