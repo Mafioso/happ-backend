@@ -224,6 +224,7 @@ class UserSerializer(serializers.DocumentSerializer):
         }
         exclude = (
             'interests',
+            'assigned_city',
         )
 
     def create(self, validated_data):
@@ -256,6 +257,7 @@ class UserAdminSerializer(serializers.DocumentSerializer):
     fn = drf_serializers.CharField(read_only=True)
     settings = UserSettingsSerializer(read_only=True)
     avatar = FileObjectSerializer(read_only=True)
+    assigned_city = CitySerializer(read_only=True)
 
     # write only fields
     avatar_id = drf_serializers.CharField(write_only=True, required=False)

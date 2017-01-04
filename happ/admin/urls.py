@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^complaints/open/$', views.ComplaintOpenView.as_view(), name="complaints_open"),
     url(r'^complaints/closed/$', views.ComplaintClosedView.as_view(), name="complaints_closed"),
     url(r'^feedback/$', views.FeedbackView.as_view(), name="feedback"),
+    url(r'^moderators/$', views.ModeratorsListView.as_view(), name="moderators_list"),
 ]

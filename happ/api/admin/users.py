@@ -84,6 +84,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return response
 
+    @list_route(methods=['get'], url_path='moderators')
+    @patch_queryset(lambda self, x: x.filter(role__in=[User.MODERATOR]))
+    def moderators(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).list(request, *args, **kwargs)
+        response.data['page'] = int(request.GET.get('page', 1))
+        response.template_name = 'admin/users/moderators.html'
+
+        return response
+
     @detail_route(methods=['post'], url_path='activate')
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -146,3 +155,10 @@ class UserViewSet(viewsets.ModelViewSet):
         instance.assign_city(city=city)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @detail_route(methods=['get'], url_path='assign_city_form')
+    def assign_city_form(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).retrieve(request, *args, **kwargs)
+        response.data['cities'] = City.objects.all()
+        response.template_name = 'admin/users/assign_city_form.html'
+        return response

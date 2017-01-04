@@ -1,0 +1,30 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+      </button>
+      <h4 class="modal-title" id="myModalLabel">Назначить город</h4>
+    </div>
+    <div class="modal-body">
+      <form id="assign-form" data-parsley-validate class="form-horizontal form-label-left">
+        <div class="form-group">
+          <label class="control-label" for="city_id">Город</label>
+          <select id="city_id" class="form-control" name="city_id">
+            {% for item in cities %}
+              <option value="{{item.id}}" data-subtext="{{item.country_name}}" {% if assigned_city.id|stringformat:'s' == item.id|stringformat:'s' %}selected="selected"{% endif %}>{{item.name}}</option>
+            {% endfor%}
+          </select>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+      <button type="button" class="btn btn-primary" ic-post-to="{% url 'admin-users-assign-city' id=id %}" ic-include="#assign-form" ic-target="#success" ic-on-success="$('#assign-city-form').modal('hide');"  ic-indicator="#indicator3">Сохранить</button>
+    </div>
+    <div id="success" style="display:none;">
+
+    </div>
+
+  </div>
+</div>
