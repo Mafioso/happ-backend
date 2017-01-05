@@ -55,6 +55,10 @@ class City(HappBaseDocument):
             return self.country.name
         return ''
 
+    @property
+    def events_count(self):
+        return Event.objects.filter(city=self).count()
+
     def activate(self):
         self.is_active = True
         self.save()

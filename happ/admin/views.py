@@ -1,5 +1,6 @@
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -18,26 +19,27 @@ class DashboardView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardView, self).get_context_data(**kwargs)
+        context['api_key'] = settings.GOOGLE_BROWSER_KEY
 
         total_users = User.objects.count()
         total_users_lt = User.objects.filter(date_created__lte=datetime.now() - relativedelta(days=7)).count()
         context['total_users'] = total_users
-        context['total_users_delta'] = (total_users - total_users_lt) / total_users * 100
+        context['total_users_delta'] = total_users - total_users_lt
 
         total_organizers = User.objects.filter(role=User.ORGANIZER).count()
         total_organizers_lt = User.objects.filter(role=User.ORGANIZER, date_created__lte=datetime.now() - relativedelta(days=7)).count()
         context['total_organizers'] = total_organizers
-        context['total_organizers_delta'] = (total_organizers - total_organizers_lt) / 100
+        context['total_organizers_delta'] = total_organizers - total_organizers_lt
 
         total_events = Event.objects.count()
         total_events_lt = Event.objects.filter(date_created__lte=datetime.now() - relativedelta(days=7)).count()
         context['total_events'] = total_events
-        context['total_events_delta'] = (total_events - total_events_lt) / total_events * 100
+        context['total_events_delta'] = total_events - total_events_lt
 
         total_interests = Interest.objects.count()
         total_interests_lt = Interest.objects.filter(date_created__lte=datetime.now() - relativedelta(days=7)).count()
         context['total_interests'] = total_interests
-        context['total_interests_delta'] = (total_interests - total_interests_lt) / total_interests * 100
+        context['total_interests_delta'] = total_interests - total_interests_lt
 
         context['by_age'] = (
             User.objects.filter(date_of_birth__ne=None).count(),
@@ -64,6 +66,7 @@ class DashboardView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
 
         context['top_liked'] = Event.objects.order_by('-votes_num')[:5]
         context['top_favourited'] = Event.objects.order_by('-in_favourites')[:5]
+        context['cities'] = City.objects.all()
 
         return context
 

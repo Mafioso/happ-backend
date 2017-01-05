@@ -16,7 +16,7 @@ Dashbord
         <i class="green"><i class="fa fa-sort-asc"></i>
       {% else %}
         <i class="red"><i class="fa fa-sort-desc"></i>
-      {% endif %}{{ total_users_delta|floatformat:"0" }}% </i> с последней недели
+      {% endif %}{{ total_users_delta }} </i> с последней недели
     </span>
   </div>
   <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
@@ -27,7 +27,7 @@ Dashbord
         <i class="green"><i class="fa fa-sort-asc"></i>
       {% else %}
         <i class="red"><i class="fa fa-sort-desc"></i>
-      {% endif %}{{ total_organizers_delta|floatformat:"0" }}% </i> с последней недели
+      {% endif %}{{ total_organizers_delta }} </i> с последней недели
     </span>
   </div>
   <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
@@ -38,7 +38,7 @@ Dashbord
         <i class="green"><i class="fa fa-sort-asc"></i>
       {% else %}
         <i class="red"><i class="fa fa-sort-desc"></i>
-      {% endif %}{{ total_events_delta|floatformat:"0" }}% </i> с последней недели
+      {% endif %}{{ total_events_delta }} </i> с последней недели
     </span>
   </div>
   <div class="col-md-3 col-sm-4 col-xs-6 tile_stats_count">
@@ -49,7 +49,7 @@ Dashbord
         <i class="green"><i class="fa fa-sort-asc"></i>
       {% else %}
         <i class="red"><i class="fa fa-sort-desc"></i>
-      {% endif %}{{ total_interests_delta|floatformat:"0" }}% </i> с последней недели
+      {% endif %}{{ total_interests_delta }} </i> с последней недели
     </span>
   </div>
 </div>
@@ -383,7 +383,7 @@ Dashbord
                   <div class="byline">
                     <span>{% language 'ru' %}{{ event.date_created|timesince }}{% endlanguage %}</span> от <a>{{ event.author.fn }}</a>
                   </div>
-                  <p class="excerpt">{{ event.description }}</p>
+                  <p class="excerpt">{{ event.description|default:''|truncatechars_html:200 }}</p>
                 </div>
               </div>
             </li>
@@ -509,6 +509,11 @@ Dashbord
       </div>
 
     </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12 col-xs-12">
+        <div id="map"></div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -554,6 +559,8 @@ Dashbord
 
     <!-- Custom Theme Scripts -->
     <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- google maps -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
 
     <!-- Flot -->
     <script>
@@ -802,6 +809,20 @@ Dashbord
           $('#reportrange').data('daterangepicker').remove();
         });
       });
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lng: 71, lat: 43},
+          zoom: 4
+        });
+        {% for city in cities %}
+          var marker = new google.maps.Marker({
+            position: {lng: {{city.geopoint.coordinates.0}}, lat: {{city.geopoint.coordinates.1}}},
+            label: "{{city.events_count}}",
+            title: "{{city.name}}",
+            map: map,
+          });
+        {% endfor %}
+      }
     </script>
     <!-- /bootstrap-daterangepicker -->
 
