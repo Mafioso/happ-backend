@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
@@ -34,13 +36,13 @@ class CityViewSet(viewsets.ModelViewSet):
     @patch_permission_classes(( RootPolicy, ))
     def create(self, request, *args, **kwargs):
         response = super(CityViewSet, self).create(request, *args, **kwargs)
-        response.template_name = 'admin/city/success.html'
         return response
 
     @list_route(methods=['get'], url_path='create')
     @patch_permission_classes(( RootPolicy, ))
     def create_city_form(self, request, *args, **kwargs):
         response = super(CityViewSet, self).list(request, *args, **kwargs)
+        response.data['api_key'] = settings.GOOGLE_BROWSER_KEY
         response.template_name = 'admin/city/create.html'
         return response
 

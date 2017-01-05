@@ -1,6 +1,6 @@
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
-    <form id="user-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-users-list' %}" ic-target="#success" ic-on-success="$('#create-form').modal('hide');"  ic-indicator="#indicator3">
+    <form id="user-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-users-list' %}" ic-on-success="$('#create-form').modal('hide');" ic-indicator="#indicator3">
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
@@ -39,7 +39,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
+        <button type="submit" class="btn btn-primary">Сохранить <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></button>
       </div>
       <div id="success" style="display:none;">
 

@@ -81,6 +81,8 @@ class CitySerializer(serializers.DocumentSerializer):
 
     # write only fields
     country_id = serializers.ObjectIdField(write_only=True)
+    geopoint_lng = drf_serializers.FloatField(write_only=True, required=False)
+    geopoint_lat = drf_serializers.FloatField(write_only=True, required=False)
 
     class Meta:
         model = City
@@ -92,7 +94,12 @@ class CitySerializer(serializers.DocumentSerializer):
 
     def create(self, validated_data):
         country_id = validated_data.pop('country_id')
+        geopoint_lng = validated_data.pop('geopoint_lng') if 'geopoint_lng' in validated_data else None
+        geopoint_lat = validated_data.pop('geopoint_lat') if 'geopoint_lat' in validated_data else None
+
         city = City.objects.create(**validated_data)
+        if geopoint_lng and geopoint_lat:
+            city.geopoint = (geopoint_lng, geopoint_lat, )
         country = Country.objects.get(id=country_id)
         city.country = country
         city.save()
@@ -101,6 +108,10 @@ class CitySerializer(serializers.DocumentSerializer):
     def update(self, instance, validated_data):
         country_id = validated_data.pop('country_id')
         city = super(CitySerializer, self).update(instance, validated_data)
+        if 'geopoint_lng' in validated_data and 'geopoint_lat' in validated_data:
+            geopoint_lng = validated_data.pop('geopoint_lng')
+            geopoint_lat = validated_data.pop('geopoint_lat')
+            city.geopoint = (geopoint_lng, geopoint_lat, )
         country = Country.objects.get(id=country_id)
         city.country = country
         city.save()

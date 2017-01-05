@@ -1,15 +1,13 @@
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
+    <form id="city-form" data-parsley-validate class="form-horizontal form-label-left">
 
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-      </button>
-      <h4 class="modal-title" id="myModalLabel">Добавить новый город</h4>
-    </div>
-    <form id="city-add-form" ic-post-to="{% url 'admin-cities-list' %}?format=html" ic-verb="POST" class="form-horizontal form-label-left">
-    <div class="modal-body">
-
-
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Добавить новый город</h4>
+      </div>
+      <div class="modal-body">
         <div class="form-group">
           <label class="control-label col-md-3 col-sm-3 col-xs-12" for="event-name">Название города <span class="required">*</span>
           </label>
@@ -24,11 +22,46 @@
             </select>
           </div>
         </div>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-      <button type="submit" class="btn btn-primary">Сохранить</button>
-    </div>
+        <div class="form-group">
+          <label for="event-type" class="control-label col-md-3 col-sm-3 col-xs-12">Выберите центр города</label>
+          <div class="col-md-6 col-sm-6 col-xs-12">
+            <div id="map"></div>
+            <input type="hidden" name="geopoint_lng" id="geopoint_lng" />
+            <input type="hidden" name="geopoint_lat" id="geopoint_lat" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+        <button type="submit" class="btn btn-primary" ic-post-to="{% url 'admin-cities-list' %}" ic-on-success="$('#create-form').modal('hide');" ic-indicator="#indicator3">Сохранить <i id="indicator3" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></button>
+      </div>
     </form>
   </div>
 </div>
+
+<script>
+  $(document).ready(function() {
+      var marker, map;
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 43, lng: 71},
+        zoom: 4
+      });
+      google.maps.event.addListener(map, 'click', function(event) {
+        placeMarker(event.latLng);
+      });
+
+      function placeMarker(position) {
+        if ( marker ) {
+          marker.setPosition(position);
+        } else {
+          marker = new google.maps.Marker({
+            position: position,
+            map: map
+          });
+        }
+        $('#geopoint_lng').val(position.lng);
+        $('#geopoint_lat').val(position.lat);
+      }
+
+  });
+</script>

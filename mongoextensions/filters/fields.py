@@ -123,4 +123,6 @@ class GeoPointField(DictField):
         return { 'type': 'Point', 'coordinates': [ value['lng'], value['lat'] ] }
 
     def to_representation(self, value):
+        if isinstance(value, (tuple, list)):
+            return {'lng': value[0], 'lat': value[1]}
         return {'lng': value['coordinates'][0], 'lat': value['coordinates'][1]}

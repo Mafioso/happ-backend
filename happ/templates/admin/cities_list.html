@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% load static %}
 
 {% block title %}
 Список городов
@@ -30,7 +31,7 @@
           </center>
           {% if request.user.role == roles.root %}
             <div class="pull-left">
-              <button type="button" class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ic-get-from="{% url 'admin-cities-create' %}?format=html" ic-target="#create-form" ic-indicator="indicator_form">Добавить город</button>
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-form"  ic-get-from="{% url 'admin-cities-create' %}?format=html" ic-target="#create-form" ic-indicator="indicator_form">Добавить город</button>
               <div id="create-form" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
                 <div class="modal-content">
                     <div class="modal-body">
@@ -50,3 +51,18 @@
 </div>
 {% endblock %}
 
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{% get_static_prefix %}js/jquery.min.js"></script>
+    <!-- Intercooler js -->
+    <script src="{% get_static_prefix %}js/intercooler-0.9.7.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="{% get_static_prefix %}js/bootstrap.min.js"></script>
+    <!-- Bootstrap-select -->
+    <script src="{% get_static_prefix %}js/bootstrap-select.min.js"></script>
+    <!-- Custom -->
+    <script src="{% get_static_prefix %}js/custom.js"></script>
+    <!-- google maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}"></script>
+
+{% endblock %}

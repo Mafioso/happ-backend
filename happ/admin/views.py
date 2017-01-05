@@ -116,7 +116,7 @@ class EventDetailView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(EventDetailView, self).get_context_data(**kwargs)
-        context['api_key'] = settings.GOOGLE_API_KEY
+        context['api_key'] = settings.GOOGLE_BROWSER_KEY
         context['object'] = Event.objects.get(id=kwargs['id'])
         return context
 
@@ -131,6 +131,11 @@ class ProfileEditView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
 
 class CityListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/cities_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(CityListView, self).get_context_data(**kwargs)
+        context['api_key'] = settings.GOOGLE_BROWSER_KEY
+        return context
 
 
 class CategoriesListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):

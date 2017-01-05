@@ -214,6 +214,7 @@ CONFIRMATION_KEY_EXPIRES = 1 # days
 DATE_STRING_FIELD_FORMAT = "%Y%m%d"
 TIME_STRING_FIELD_FORMAT = "%H%M%S"
 
+GOOGLE_BROWSER_KEY = 'AIzaSyCGkwazxd0oxX1fxOb49PBJeV2sKZZj29U'
 GOOGLE_API_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
 GOOGLE_TRANSLATE_LINK = 'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
 GOOGLE_URL_SHORTENER_LINK = 'https://www.googleapis.com/urlshortener/v1/url?key={}'
