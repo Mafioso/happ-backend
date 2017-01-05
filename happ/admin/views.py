@@ -177,3 +177,7 @@ class FeedbackView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
 
 class ModeratorsListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/moderators_list.html'
+
+
+class AdministratorsListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+    template_name = 'admin/administrators_list.html'

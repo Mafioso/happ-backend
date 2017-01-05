@@ -7,7 +7,7 @@ from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.models import User, City
-from happ.policies import StaffPolicy, RootAdministratorPolicy
+from happ.policies import StaffPolicy, RootAdministratorPolicy, RootPolicy
 from happ.decorators import patch_permission_classes, patch_queryset
 from happ.serializers import UserAdminSerializer
 
@@ -97,6 +97,15 @@ class UserViewSet(viewsets.ModelViewSet):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['role'] = User.MODERATOR
         response.template_name = 'admin/users/create_form.html'
+        return response
+
+    @list_route(methods=['get'], url_path='administrators')
+    @patch_queryset(lambda self, x: x.filter(role__in=[User.ADMINISTRATOR]))
+    @patch_permission_classes(( RootPolicy, ))
+    def administrators(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).list(request, *args, **kwargs)
+        response.data['page'] = int(request.GET.get('page', 1))
+        response.template_name = 'admin/users/administrators.html'
         return response
 
     @detail_route(methods=['post'], url_path='activate')
