@@ -4,9 +4,9 @@ from django.conf import settings
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import UserPassesTestMixin
 
-from ..models import User, Event, Interest, City, Currency
+from ..models import User, Event, Interest, City, Currency, StaticText
 from ..permissions import IsAdministrator, IsRoot
-from .mixins import JWTAuthRequiredMixin, RoleMixin
+from .mixins import JWTAuthRequiredMixin, RoleMixin, StaticTextMixin
 
 
 class LoginView(TemplateView):
@@ -149,20 +149,24 @@ class OrganizersListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/users_organizers.html'
 
 
-class TermsOfServiceView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+class TermsOfServiceView(JWTAuthRequiredMixin, RoleMixin, StaticTextMixin, TemplateView):
     template_name = 'admin/settings/terms-of-service.html'
+    type = StaticText.TERMS_OF_SERVICE
 
 
-class PrivacyPolicyView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+class PrivacyPolicyView(JWTAuthRequiredMixin, RoleMixin, StaticTextMixin, TemplateView):
     template_name = 'admin/settings/privacy-policy.html'
+    type = StaticText.PRIVACY_POLICY
 
 
-class FAQView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+class FAQView(JWTAuthRequiredMixin, RoleMixin, StaticTextMixin, TemplateView):
     template_name = 'admin/settings/faq.html'
+    type = StaticText.FAQ
 
 
-class OrganizerRulesView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+class OrganizerRulesView(JWTAuthRequiredMixin, RoleMixin, StaticTextMixin, TemplateView):
     template_name = 'admin/settings/organizer-rules.html'
+    type = StaticText.ORGANIZER_RULES
 
 
 class ComplaintOpenView(JWTAuthRequiredMixin, RoleMixin, TemplateView):

@@ -465,6 +465,13 @@ class FeedbackMessage(HappBaseDocument):
     author = ReferenceField(User, reverse_delete_rule=CASCADE)
 
 
+class StaticText(HappBaseDocument):
+    TYPES = TERMS_OF_SERVICE, PRIVACY_POLICY, ORGANIZER_RULES, FAQ = range(4)
+
+    text = StringField()
+    type = IntField(choices=TYPES, default=TERMS_OF_SERVICE)
+
+
 # Notification
 #  - text
 #  - receivers

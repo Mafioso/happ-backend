@@ -20,7 +20,7 @@
       <div class="x_panel">
         <div class="x_content">
           <div class="row">
-            <div style="display:none" id="initial">{% include "texts/organizer_rules.html" %}</div>
+            <div style="display:none" id="initial">{{ text|default:''|safe }}</div>
             <textarea id="editor" style="width:100%; height: 500px"></textarea>
           </div>
           <div class="row" style="margin-top:20px">

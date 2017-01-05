@@ -8,9 +8,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.renderers import StaticHTMLRenderer
 
-from happ.models import FileObject, Currency
+from happ.models import FileObject, Currency, StaticText
 from happ.decorators import patch_permission_classes
 from happ.integrations import google, yahoo
 from happ.serializers import FileObjectSerializer
@@ -38,47 +38,55 @@ class TempUploadView(APIView):
 
 
 class EditableHTMLView(APIView):
-    renderer_classes = (TemplateHTMLRenderer, )
+    renderer_classes = (StaticHTMLRenderer, )
     permission_classes = ()
 
+    def get_static_text(self, request):
+        try:
+            st = StaticText.objects.get(type=self.type)
+        except:
+            st = StaticText(type=self.type)
+        return st
+
     def get(self, request):
-        return Response(template_name=self.template_name, status=status.HTTP_200_OK)
+        st = self.get_static_text(request)
+        return Response(st.text or '', status=status.HTTP_200_OK)
 
     @patch_permission_classes(api_settings.DEFAULT_PERMISSION_CLASSES)
     def post(self, request):
         text = request.data['text']
-        path = os.path.join(settings.TEMPLATES_DIR_ROOT, self.template_name)
-        with open(path, 'w') as f:
-            f.write(text.encode('utf-8'))
-        return Response(template_name=self.template_name, status=status.HTTP_200_OK)
+        st = self.get_static_text(request)
+        st.text = text.encode('utf-8')
+        st.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class TermsOfServiceView(EditableHTMLView):
     """
     API endpoint for setting and getting terms of service
     """
-    template_name = 'texts/terms_of_service.html'
+    type = StaticText.TERMS_OF_SERVICE
 
 
 class PrivacyPolicyView(EditableHTMLView):
     """
     API endpoint for setting and getting privacy policy
     """
-    template_name = 'texts/privacy_policy.html'
+    type = StaticText.PRIVACY_POLICY
 
 
 class OrganizerRulesView(EditableHTMLView):
     """
     API endpoint for setting and getting organizer rules
     """
-    template_name = 'texts/organizer_rules.html'
+    type = StaticText.ORGANIZER_RULES
 
 
 class FAQView(EditableHTMLView):
     """
     API endpoint for setting and getting FAQ page
     """
-    template_name = 'texts/faq.html'
+    type = StaticText.FAQ
 
 
 class GooglePlacesView(APIView):
