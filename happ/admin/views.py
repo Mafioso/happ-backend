@@ -55,6 +55,11 @@ class DashboardView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
             User.objects.filter(gender=User.FEMALE).count(),
         )
 
+        context['by_registration'] = (
+            User.objects.filter(facebook_id=None).count(),
+            User.objects.filter(facebook_id__ne=None).count(),
+        )
+
         context['last_events'] = Event.objects.order_by('-date_created')[:5]
 
         context['ads'] = {

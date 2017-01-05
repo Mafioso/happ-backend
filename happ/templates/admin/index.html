@@ -130,8 +130,6 @@ Dashbord
 <br />-->
 
 <div class="row">
-
-
   <div class="col-md-4 col-sm-4 col-xs-12">
     <div class="x_panel tile fixed_height_320">
       <div class="x_title">
@@ -156,7 +154,6 @@ Dashbord
           </div>
           <div class="clearfix"></div>
         </div>
-
         <div class="widget_summary">
           <div class="w_left w_25">
             <span>18 - 25</span>
@@ -259,7 +256,7 @@ Dashbord
   <div class="col-md-4 col-sm-4 col-xs-12">
     <div class="x_panel tile fixed_height_320 overflow_hidden">
       <div class="x_title">
-        <h2>Рекламные события</h2>
+        <h2>По способу регистрации</h2>
         <div class="clearfix"></div>
       </div>
       <div class="x_content">
@@ -269,7 +266,7 @@ Dashbord
             </th>
             <th>
               <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
-                <p class="">Статус</p>
+                <p class="">Способ</p>
               </div>
               <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
                 <p class="">Процент</p>
@@ -278,27 +275,21 @@ Dashbord
           </tr>
           <tr>
             <td>
-              <canvas id="canvas2" height="140" width="140" style="margin: 15px 10px 10px 0"></canvas>
+              <canvas id="canvas3" height="140" width="140" style="margin: 15px 10px 10px 0"></canvas>
             </td>
             <td>
               <table class="tile_info">
                 <tr>
                   <td>
-                    <p><i class="fa fa-square aero"></i>На модерации </p>
+                    <p><i class="fa fa-square blue"></i>Email </p>
                   </td>
-                  <td>{{ ads.moderation|mult:100|div:ads.total }}%</td>
+                  <td>{{ by_registration.0|mult:100|div:total_users }}%</td>
                 </tr>
                 <tr>
                   <td>
-                    <p><i class="fa fa-square green"></i>Утвержденные </p>
+                    <p><i class="fa fa-square green"></i>Facebook </p>
                   </td>
-                  <td>{{ ads.approved|mult:100|div:ads.total }}%</td>
-                </tr>
-                <tr>
-                  <td>
-                    <p><i class="fa fa-square red"></i>Отклоненные </p>
-                  </td>
-                  <td>{{ ads.rejected|mult:100|div:ads.total }}%</td>
+                  <td>{{ by_registration.1|mult:100|div:total_users }}%</td>
                 </tr>
               </table>
             </td>
@@ -307,7 +298,7 @@ Dashbord
       </div>
     </div>
   </div>
-
+</div>
 
   <!--<div class="col-md-4 col-sm-4 col-xs-12">
     <div class="x_panel tile fixed_height_320">
@@ -361,8 +352,105 @@ Dashbord
     </div>
   </div>-->
 
-</div>
+<div class="row">
+  <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>Популярные <small>по количеству лайков</small></h2>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
 
+        <div class="">
+          <ul class="to_do">
+            {% for event in top_liked %}
+            <li>
+              <p>
+                {{ event.title }} <span class="right">{{ event.votes_num }}</span>
+              </p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="x_panel">
+      <div class="x_title">
+        <h2>Популярные <small>по добавлению в избранное</small></h2>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+
+        <div class="">
+          <ul class="to_do">
+            {% for event in top_favourited %}
+            <li>
+              <p>
+                {{ event.title }} <span class="right">{{ event.in_favourites|length }}</span>
+              </p>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 col-sm-4 col-xs-12">
+    <div class="x_panel tile fixed_height_320 overflow_hidden">
+      <div class="x_title">
+        <h2>Рекламные события</h2>
+        <div class="clearfix"></div>
+      </div>
+      <div class="x_content">
+        <table class="" style="width:100%">
+          <tr>
+            <th style="width:37%;">
+            </th>
+            <th>
+              <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7">
+                <p class="">Статус</p>
+              </div>
+              <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                <p class="">Процент</p>
+              </div>
+            </th>
+          </tr>
+          <tr>
+            <td>
+              <canvas id="canvas2" height="140" width="140" style="margin: 15px 10px 10px 0"></canvas>
+            </td>
+            <td>
+              <table class="tile_info">
+                <tr>
+                  <td>
+                    <p><i class="fa fa-square aero"></i>На модерации </p>
+                  </td>
+                  <td>{{ ads.moderation|mult:100|div:ads.total }}%</td>
+                </tr>
+                <tr>
+                  <td>
+                    <p><i class="fa fa-square green"></i>Утвержденные </p>
+                  </td>
+                  <td>{{ ads.approved|mult:100|div:ads.total }}%</td>
+                </tr>
+                <tr>
+                  <td>
+                    <p><i class="fa fa-square red"></i>Отклоненные </p>
+                  </td>
+                  <td>{{ ads.rejected|mult:100|div:ads.total }}%</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="row">
   <div class="col-md-4 col-sm-4 col-xs-12">
@@ -393,10 +481,10 @@ Dashbord
       </div>
     </div>
   </div>
-
-
   <div class="col-md-8 col-sm-8 col-xs-12">
-
+    <div id="map"></div>
+  </div>
+</div>
 
 
     <!--<div class="row">
@@ -459,63 +547,7 @@ Dashbord
       </div>
 
     </div>-->
-    <div class="row">
 
-
-      <div class="col-md-6 col-sm-6 col-xs-12">
-        <div class="x_panel">
-          <div class="x_title">
-            <h2>Популярные <small>по количеству лайков</small></h2>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-
-            <div class="">
-              <ul class="to_do">
-                {% for event in top_liked %}
-                <li>
-                  <p>
-                    {{ event.title }} <span class="right">{{ event.votes_num }}</span>
-                  </p>
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-sm-6 col-xs-12">
-        <div class="x_panel">
-          <div class="x_title">
-            <h2>Популярные <small>по добавлению в избранное</small></h2>
-            <div class="clearfix"></div>
-          </div>
-          <div class="x_content">
-
-            <div class="">
-              <ul class="to_do">
-                {% for event in top_favourited %}
-                <li>
-                  <p>
-                    {{ event.title }} <span class="right">{{ event.in_favourites|length }}</span>
-                  </p>
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-    <div class="row">
-      <div class="col-md-12 col-sm-12 col-xs-12">
-        <div id="map"></div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block javascript %}
@@ -696,6 +728,29 @@ Dashbord
             ],
             datasets: [{
               data: [{{ by_gender.0 }}, {{ by_gender.1 }}],
+              backgroundColor: [
+                "#3498DB",
+                "#26B99A"
+              ],
+              hoverBackgroundColor: [
+                "#49A9EA",
+                "#36CAAB"
+              ]
+            }]
+          },
+          options: options
+        });
+
+        new Chart(document.getElementById("canvas3"), {
+          type: 'doughnut',
+          tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+          data: {
+            labels: [
+              "Email",
+              "Facebok",
+            ],
+            datasets: [{
+              data: [{{ by_registration.0 }}, {{ by_registration.1 }}],
               backgroundColor: [
                 "#3498DB",
                 "#26B99A"
