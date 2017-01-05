@@ -1,6 +1,11 @@
 {% extends 'admin/base.html' %}
 {% load happ %}
 {% load static %}
+
+{% block title %}
+Редактирование события {{ object.title }}
+{% endblock %}
+
 {% block main %}
 <div class="">
             <div class="page-title">
