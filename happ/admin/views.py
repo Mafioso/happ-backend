@@ -4,14 +4,14 @@ from django.conf import settings
 from django.views.generic import TemplateView
 
 from ..models import User, Event, Interest, City, Currency
-from .mixins import JWTAuthRequiredMixin
+from .mixins import JWTAuthRequiredMixin, RoleMixin
 
 
 class LoginView(TemplateView):
     template_name = 'admin/login.html'
 
 
-class DashboardView(JWTAuthRequiredMixin, TemplateView):
+class DashboardView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/index.html'
 
     def get_context_data(self, **kwargs):
@@ -66,7 +66,7 @@ class DashboardView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
-class EventListView(JWTAuthRequiredMixin, TemplateView):
+class EventListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/event_list.html'
 
     def get_context_data(self, **kwargs):
@@ -76,7 +76,7 @@ class EventListView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
-class EventModerationListView(JWTAuthRequiredMixin, TemplateView):
+class EventModerationListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/event_moderation_list.html'
 
     def get_context_data(self, **kwargs):
@@ -86,7 +86,7 @@ class EventModerationListView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
-class EventCreateView(JWTAuthRequiredMixin, TemplateView):
+class EventCreateView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/events/create.html'
 
     def get_context_data(self, **kwargs):
@@ -97,7 +97,7 @@ class EventCreateView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
-class EventEditView(JWTAuthRequiredMixin, TemplateView):
+class EventEditView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/events/edit.html'
 
     def get_context_data(self, **kwargs):
@@ -109,7 +109,7 @@ class EventEditView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
-class EventDetailView(JWTAuthRequiredMixin, TemplateView):
+class EventDetailView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/events/detail.html'
 
     def get_context_data(self, **kwargs):
@@ -119,61 +119,61 @@ class EventDetailView(JWTAuthRequiredMixin, TemplateView):
         return context
 
 
-class ProfileView(JWTAuthRequiredMixin, TemplateView):
+class ProfileView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/profile/detail.html'
 
 
-class ProfileEditView(JWTAuthRequiredMixin, TemplateView):
+class ProfileEditView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/profile/edit.html'
 
 
-class CityListView(JWTAuthRequiredMixin, TemplateView):
+class CityListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/cities_list.html'
 
 
-class CategoriesListView(JWTAuthRequiredMixin, TemplateView):
+class CategoriesListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/categories_list.html'
 
 
-class InterestListView(JWTAuthRequiredMixin, TemplateView):
+class InterestListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/interest_list.html'
 
 
-class UserListView(JWTAuthRequiredMixin, TemplateView):
+class UserListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/users_list.html'
 
 
-class OrganizersListView(JWTAuthRequiredMixin, TemplateView):
+class OrganizersListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/users_organizers.html'
 
 
-class TermsOfServiceView(JWTAuthRequiredMixin, TemplateView):
+class TermsOfServiceView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/settings/terms-of-service.html'
 
 
-class PrivacyPolicyView(JWTAuthRequiredMixin, TemplateView):
+class PrivacyPolicyView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/settings/privacy-policy.html'
 
 
-class FAQView(JWTAuthRequiredMixin, TemplateView):
+class FAQView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/settings/faq.html'
 
 
-class OrganizerRulesView(JWTAuthRequiredMixin, TemplateView):
+class OrganizerRulesView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/settings/organizer-rules.html'
 
 
-class ComplaintOpenView(JWTAuthRequiredMixin, TemplateView):
+class ComplaintOpenView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/complaints_open_list.html'
 
 
-class ComplaintClosedView(JWTAuthRequiredMixin, TemplateView):
+class ComplaintClosedView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/complaints_closed_list.html'
 
 
-class FeedbackView(JWTAuthRequiredMixin, TemplateView):
+class FeedbackView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/feedback_list.html'
 
 
-class ModeratorsListView(JWTAuthRequiredMixin, TemplateView):
+class ModeratorsListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/moderators_list.html'

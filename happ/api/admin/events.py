@@ -11,7 +11,7 @@ from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string
-from happ.models import Event
+from happ.models import Event, User
 from happ.filters import EventFilter
 from happ.policies import StaffPolicy
 from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class
@@ -25,6 +25,12 @@ class EventViewSet(viewsets.ModelViewSet):
     search_fields = ('title', )
     filter_class = EventFilter
     queryset = Event.objects.all().order_by('-date_created')
+
+    def get_queryset(self):
+        queryset = super(EventViewSet, self).get_queryset()
+        if self.request.user.role == User.MODERATOR:
+            queryset = queryset.filter(city=self.request.user.assigned_city)
+        return queryset
 
     def retrieve(self, request, *args, **kwargs):
         response = super(EventViewSet, self).retrieve(request, *args, **kwargs)

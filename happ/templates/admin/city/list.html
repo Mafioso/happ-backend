@@ -13,7 +13,17 @@
   {% for item in results %}
     <tr id="row-{{item.id}}">
       <th scope="row">{{forloop.counter}}</th>
-      <td><a href="{% url 'event_list' %}?city={{item.id}}" class="btn btn-link">{{item.name}}</a></td>
+      <td>
+        {% if request.user.role != roles.moderator %}
+          <a href="{% url 'event_list' %}?city={{item.id}}" class="btn btn-link btn-xs">{{item.name}}</a>
+        {% else %}
+          {% if request.user.assigned_city.id|stringformat:'s' == item.id|stringformat:'s' %}
+            <a href="{% url 'event_list' %}?city={{item.id}}" class="btn btn-link btn-xs">{{item.name}}</a>
+          {% else %}
+            {{item.name}}
+          {% endif %}
+        {% endif %}
+      </td>
       <td>{{item.country_name}}</td>
       <td>{% if item.is_active %}Активен{% else %}Не активен{% endif %}</td>
       <td>

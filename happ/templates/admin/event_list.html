@@ -3,14 +3,14 @@
 {% load static %}
 
 {% block title %}
-Список мероприятий
+Список мероприятий {% if request.user.role == roles.moderator %} для города {{request.user.assigned_city.name}}{% endif %}
 {% endblock %}
 
 {% block main %}
 <div>
   <div class="page-title">
     <div class="title_left">
-      <h3>Список <small>мероприятий</small></h3>
+      <h3>Список <small>мероприятий</small>{% if request.user.role == roles.moderator %} <small>для города </small>{{request.user.assigned_city.name}}{% endif %}</h3>
     </div>
   </div>
 
@@ -28,72 +28,7 @@
             <div id="filter-panel" class="collapse filter-panel">
               <div class="panel panel-default">
                   <div class="panel-body">
-                      <form class="form" role="form" method="get" action="" id="filter_form">
-                        <div class="col-md-6">
-                          <div class="form-group" style="margin-right:10px;">
-                              <label class="filter-col" style="margin-right:10px;" for="search">Поиск:</label>
-                              <input type="text" name="search" class="form-control input-sm" id="search" value={{ request.GET.search }}>
-                          </div><!-- form group [search] -->
-                          <div class="form-group" style="margin-right:10px;">
-                              <label class="filter-col" for="status">Статус:</label>
-                              <div class="checkbox">
-                                <label>
-                                  <input type="checkbox" name="status" value="0" {% if '0' in request.GET|getlist:'status' %}checked="checked"{% endif %}> На модерации
-                                </label>
-                                <label>
-                                  <input type="checkbox" name="status" value="1" {% if '1' in request.GET|getlist:'status' %}checked="checked"{% endif %}> Утверджен
-                                </label>
-                                <label>
-                                  <input type="checkbox" name="status" value="2" {% if '2' in request.GET|getlist:'status' %}checked="checked"{% endif %}> Отклонен
-                                </label>
-                              </div>
-                          </div>
-                          <div class="form-group" style="margin-right:10px;">
-                              <label class="filter-col" for="type">Тип:</label>
-                              <div class="checkbox">
-                                <label>
-                                  <input type="checkbox" name="type" value="0" {% if '0' in request.GET|getlist:'type' %}checked="checked"{% endif %}> Стандартные
-                                </label>
-                                <label>
-                                  <input type="checkbox" name="type" value="1" {% if '1' in request.GET|getlist:'type' %}checked="checked"{% endif %}> Featured
-                                </label>
-                                <label>
-                                  <input type="checkbox" name="type" value="2" {% if '2' in request.GET|getlist:'type' %}checked="checked"{% endif %}> Ads
-                                </label>
-                              </div>
-                          </div>
-                          <div class="form-group" style="margin-right:10px;">
-                              <label class="control-label" for="city">Город проведения</label>
-                              <select id="city" class="form-control selectize" name="city" multiple="multiple">
-                                {% for item in cities %}
-                                  <option value="{{item.id}}" data-subtext="{{item.country_name}}" {% if item.id|stringformat:'s' in request.GET|getlist:'city' %}selected="selected"{% endif %}>{{item.name}}</option>
-                                {% endfor%}
-                              </select>
-                          </div>
-                        </div>
-                        <div class="col-md-6">
-                          <div class="form-group" style="margin-right:10px;">
-                              <label class="filter-col" for="start_date">Дата проведения: от</label>
-                              <input class="date-picker form-control" type="text" name="start_date" id="start_date" value={{ request.GET.start_date }}{% if 'start_date' not in request.GET %}&start_date={% now 'Ymd' %}{% endif %}>
-                              <label class="filter-col"  for="end_date">до</label>
-                              <input class="date-picker form-control" type="text" name="end_date" id="end_date" value={{ request.GET.end_date }}>
-                          </div>
-                          <div class="form-group" style="margin-right:10px;">
-                              <label for="interests" class="control-label">Интерес</label>
-                              <select id="interests" class="form-control selectpicker" name="interests" multiple="multiple">
-                                {% for item in interests %}
-                                  <option value="{{item.id}}" style="font-weight: bold" {% if item.id|stringformat:'s' in request.GET|getlist:'interests' %}selected="selected"{% endif %}>{{item.title}}</option>
-                                  {% for child in item.children %}
-                                    <option value="{{child.id}}" style="padding-left: 40px;" {% if child.id|stringformat:'s' in request.GET|getlist:'interests' %}selected="selected"{% endif %}>{{child.title}}</option>
-                                  {% endfor%}
-                                {% endfor%}
-                              </select>
-                          </div>
-                        </div>
-                        <div class="col-md-12 text-center">
-                          <button type="submit" class="btn btn-default">Отправить</button>
-                        </div>
-                      </form>
+                    {% include 'admin/events/filter_form.html' %}
                   </div>
               </div>
             </div>

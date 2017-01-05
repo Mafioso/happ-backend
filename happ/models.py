@@ -122,6 +122,16 @@ class User(AbstractUser, HappBaseDocument):
         except FileObject.DoesNotExist:
             return None
 
+    @classmethod
+    def get_roles_dict(cls):
+        return {
+            'regular': User.REGULAR,
+            'organizer': User.ORGANIZER,
+            'moderator': User.MODERATOR,
+            'administrator': User.ADMINISTRATOR,
+            'root': User.ROOT,
+        }
+
     def get_favourites(self):
         return Event.objects(in_favourites=self)
 

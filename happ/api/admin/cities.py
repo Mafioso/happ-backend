@@ -4,7 +4,8 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from happ.models import City
+from happ.admin.mixins import RoleMixin
+from happ.models import City, User
 from happ.policies import StaffPolicy, RootPolicy
 from happ.decorators import patch_permission_classes
 from happ.serializers import CitySerializer
@@ -19,6 +20,7 @@ class CityViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         response = super(CityViewSet, self).list(request, *args, **kwargs)
+        response.data['roles'] = User.get_roles_dict()
         response.template_name = 'admin/city/list.html'
         if request.GET.get('select'):
             response.template_name = 'admin/city/select_city.html'
