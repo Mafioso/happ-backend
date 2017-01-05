@@ -272,10 +272,11 @@ class UserAdminSerializer(serializers.DocumentSerializer):
         )
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-        )
-        user.set_password(validated_data['password'])
+        user = super(UserAdminSerializer, self).create(validated_data)
+        if 'password' in validated_data:
+            user.set_password(validated_data['password'])
+        else:
+            user.set_password('123456') # by default for staff users (when created in admin page)
         user.settings = UserSettings()
         user.save()
         return user

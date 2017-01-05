@@ -67,7 +67,6 @@ class UserViewSet(viewsets.ModelViewSet):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
         response.template_name = 'admin/users/list.html'
-
         return response
 
     def retrieve(self, request, *args, **kwargs):
@@ -81,30 +80,35 @@ class UserViewSet(viewsets.ModelViewSet):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
         response.template_name = 'admin/users/organizers.html'
-
         return response
 
     @list_route(methods=['get'], url_path='moderators')
     @patch_queryset(lambda self, x: x.filter(role__in=[User.MODERATOR]))
+    @patch_permission_classes(( RootAdministratorPolicy, ))
     def moderators(self, request, *args, **kwargs):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
         response.template_name = 'admin/users/moderators.html'
+        return response
 
+    @list_route(methods=['get'], url_path='moderators/create_form')
+    @patch_permission_classes(( RootAdministratorPolicy, ))
+    def moderators_create_form(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).list(request, *args, **kwargs)
+        response.data['role'] = User.MODERATOR
+        response.template_name = 'admin/users/create_form.html'
         return response
 
     @detail_route(methods=['post'], url_path='activate')
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.activate()
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['post'], url_path='deactivate')
     def deactivate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.deactivate()
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @list_route(methods=['post'], url_path='change_password')
@@ -153,7 +157,6 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
         instance.assign_city(city=city)
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['get'], url_path='assign_city_form')
