@@ -110,8 +110,12 @@
                       <li><a href="{% url 'privacy_policy' %}">Политика конфиденциальности</a></li>
                       <li><a href="{% url 'organizer_rules' %}">Правила организатора события</a></li>
                       <li><a href="{% url 'faq' %}">Вопросы-ответы</a></li>
-                      <li><a href="{% url 'moderators_list' %}">Модераторы</a></li>
-                      <li><a href="{% url 'administrators_list' %}">Администраторы</a></li>
+                      {% if request.user.role != roles.moderator %}
+                        <li><a href="{% url 'moderators_list' %}">Модераторы</a></li>
+                      {% endif %}
+                      {% if request.user.role == roles.root %}
+                        <li><a href="{% url 'administrators_list' %}">Администраторы</a></li>
+                      {% endif %}
                       <!-- <li><a href="#">Рассылки</a></li> -->
                     </ul>
                   </li>

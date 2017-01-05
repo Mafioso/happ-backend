@@ -28,28 +28,30 @@
           <center> <!-- lol -->
             <i class="fa fa-spinner fa-spin fa-5x" id="indicator" style="display: none"></i>
           </center>
-          <div class="pull-left">
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ic-get-from="{% url 'admin-interests-create' %}?format=html&" ic-target="#create-form" ic-indicator="indicator_form">Добавить Интерес</button>
+          {% if request.user.role != roles.moderator %}
+            <div class="pull-left">
+              <button type="button" class="btn btn-success" data-toggle="modal" data-target=".bs-example-modal-lg" ic-get-from="{% url 'admin-interests-create' %}?format=html&" ic-target="#create-form" ic-indicator="indicator_form">Добавить Интерес</button>
 
-            <div id="create-form" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content">
+              <div id="create-form" class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
 
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
-                    </button>
-                    <h4 class="modal-title" id="myModalLabel">Добавить новый Интерес</h4>
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span>
+                      </button>
+                      <h4 class="modal-title" id="myModalLabel">Добавить новый Интерес</h4>
+                    </div>
+                    <div class="modal-body">
+
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+
                   </div>
-                  <div class="modal-body">
-
-                  </div>
-                  <div class="modal-footer">
-                  </div>
-
                 </div>
               </div>
             </div>
-          </div>
+          {% endif %}
         </div>
       </div>
     </div>

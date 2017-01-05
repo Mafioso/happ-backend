@@ -2,8 +2,10 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from django.conf import settings
 from django.views.generic import TemplateView
+from django.contrib.auth.mixins import UserPassesTestMixin
 
 from ..models import User, Event, Interest, City, Currency
+from ..permissions import IsAdministrator, IsRoot
 from .mixins import JWTAuthRequiredMixin, RoleMixin
 
 
@@ -175,9 +177,16 @@ class FeedbackView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/feedback_list.html'
 
 
-class ModeratorsListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+class ModeratorsListView(JWTAuthRequiredMixin, RoleMixin, UserPassesTestMixin, TemplateView):
     template_name = 'admin/moderators_list.html'
 
+    def test_func(self):
+        return IsRoot().has_permission('', self.request, self) or \
+               IsAdministrator().has_permission('', self.request, self)
 
-class AdministratorsListView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+
+class AdministratorsListView(JWTAuthRequiredMixin, RoleMixin, UserPassesTestMixin, TemplateView):
     template_name = 'admin/administrators_list.html'
+
+    def test_func(self):
+        return IsRoot().has_permission('', self.request, self)

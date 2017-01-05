@@ -4,7 +4,7 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from happ.models import Interest
+from happ.models import Interest, User
 from happ.policies import StaffPolicy, RootAdministratorPolicy
 from happ.decorators import patch_permission_classes, patch_serializer_class, patch_queryset
 from happ.serializers import InterestSerializer, InterestParentSerializer, InterestChildSerializer
@@ -30,6 +30,7 @@ class InterestViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).list(request, *args, **kwargs)
+        response.data['roles'] = User.get_roles_dict()
         response.template_name = 'admin/interest/list.html'
 
         return response
@@ -41,6 +42,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         self.pagination_class = SolidPagination
         response = super(InterestViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
+        response.data['roles'] = User.get_roles_dict()
         response.template_name = 'admin/categories/list.html'
         if request.GET.get('select'):
             response.template_name = 'admin/categories/select_category.html'
@@ -52,6 +54,7 @@ class InterestViewSet(viewsets.ModelViewSet):
     def children(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
+        response.data['roles'] = User.get_roles_dict()
         response.template_name = 'admin/interest/list.html'
         return response
 

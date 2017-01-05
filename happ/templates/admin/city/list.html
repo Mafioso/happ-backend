@@ -6,7 +6,7 @@
       <th>Название города</th>
       <th>Страна</th>
       <th>Статус</th>
-      <th style="width: 30%">Действия</th>
+      {% if request.user.role == roles.root %}<th style="width: 30%">Действия</th>{% endif %}
     </tr>
   </thead>
   <tbody id="city-table-body">
@@ -26,10 +26,12 @@
       </td>
       <td>{{item.country_name}}</td>
       <td>{% if item.is_active %}Активен{% else %}Не активен{% endif %}</td>
-      <td>
-        {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
-        <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-cities-detail' id=item.id %}?format=html" ic-target="#create-form"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
-      </td>
+      {% if request.user.role == roles.root %}
+        <td>
+          {% if item.is_active %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-deactivate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Деактивировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% else %}<a href="#" class="btn btn-warning btn-xs" ic-post-to="{% url 'admin-cities-activate' id=item.id %}" ic-indicator="indicator-update"><i class="fa fa-power-off"></i> Активировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>{% endif %}
+          <a href="#" class="btn btn-info btn-xs" ic-on-beforeSend="$('#create-form').modal('show');" ic-get-from="{% url 'admin-cities-detail' id=item.id %}?format=html" ic-target="#create-form"><i class="fa fa-pencil"></i> Редактировать <i id="indicator-update" class="ic-indicator fa fa-spinner fa-spin" style="display: none;"></i></a>
+        </td>
+      {% endif %}
     </tr>
   {% endfor %}
     <tr ></tr>

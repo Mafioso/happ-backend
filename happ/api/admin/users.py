@@ -66,6 +66,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
+        response.data['roles'] = User.get_roles_dict()
         response.template_name = 'admin/users/list.html'
         return response
 
@@ -79,6 +80,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def organizers(self, request, *args, **kwargs):
         response = super(UserViewSet, self).list(request, *args, **kwargs)
         response.data['page'] = int(request.GET.get('page', 1))
+        response.data['roles'] = User.get_roles_dict()
         response.template_name = 'admin/users/organizers.html'
         return response
 
