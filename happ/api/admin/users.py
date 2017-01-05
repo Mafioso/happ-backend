@@ -108,6 +108,14 @@ class UserViewSet(viewsets.ModelViewSet):
         response.template_name = 'admin/users/administrators.html'
         return response
 
+    @list_route(methods=['get'], url_path='administrators/create_form')
+    @patch_permission_classes(( RootPolicy, ))
+    def administrators_create_form(self, request, *args, **kwargs):
+        response = super(UserViewSet, self).list(request, *args, **kwargs)
+        response.data['role'] = User.ADMINISTRATOR
+        response.template_name = 'admin/users/create_form.html'
+        return response
+
     @detail_route(methods=['post'], url_path='activate')
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
