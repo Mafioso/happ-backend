@@ -59,6 +59,13 @@ class City(HappBaseDocument):
     def events_count(self):
         return Event.objects.filter(city=self).count()
 
+    @classmethod
+    def get_nearest(cls, geopoint):
+        return City.objects.filter(
+            is_active=True,
+            geopoint__near=geopoint,
+        )[0]
+
     def activate(self):
         self.is_active = True
         self.save()
