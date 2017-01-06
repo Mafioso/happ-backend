@@ -225,60 +225,6 @@ class GeoDistanceFilter(GeoFilter):
     field_class = fields.FloatField
     lookup_type = 'max_distance'
 
-
-class OtherEntityFilter(Filter):
-    field_class = fields.CharField
-    def __init__(self, entity, entity_field, reference_field, lookup=None, name=None, **kwargs):
-        self.entity = entity
-        self.entity_field = entity_field
-        self.reference_field = reference_field
-        super(OtherEntityFilter, self).__init__(lookup=lookup, name=name, **kwargs)
-
-    def filter_params(self, value):
-        """ return filtering params """
-        if value is None:
-            return {}
-
-        q_param = self.entity_field
-        if self.lookup_type is not None:
-            q_param += '__' + self.lookup_type
-
-        ids = [x.id for x in self.entity.objects.filter(**{q_param: value}).distinct(field=self.reference_field)]
-        return { "id__in": ids }
-
-
-class OtherFieldFilter(Filter):
-    def __init__(self, other_field, other_value, base_filter, base_field=None, lookup=None, name=None, **kwargs):
-        self.base_filter = base_filter
-        self.VALID_LOOKUPS = base_filter.VALID_LOOKUPS
-        self.field_class = base_filter.field_class
-        self.other_field = other_field
-        self.other_value = other_value
-        self.base_field = base_field
-        super(OtherFieldFilter, self).__init__(lookup=lookup, name=name, **kwargs)
-
-    def make_field(self, **kwargs):
-        f = self.base_filter(lookup=self.lookup_type, name=self.name, **kwargs)
-        return f.make_field(**kwargs)
-
-    def filter_params(self, value):
-        """ return filtering params """
-        if value is None:
-            return {}
-        if self.base_field:
-            value = self.prepare_value(value)
-
-        key = self.target
-        if self.lookup_type is not None:
-            key += '__' + self.lookup_type
-        return { self.other_field: self.other_value, key: value }
-
-    def prepare_value(self, value):
-        if isinstance(value, list):
-            return [self.base_field().to_internal_value(v) for v in value]
-        return self.base_field().to_internal_value(value)
-
-
 class ListItemFilter(Filter):
     field_class = fields.CharField
 
@@ -300,22 +246,3 @@ class ListItemFilter(Filter):
         if self.lookup_type is not None:
             self.list_field += '__' + self.lookup_type
         return { self.list_field: value }
-
-
-class MethodFilter(Filter):
-    def __init__(self, fn, base_filter=Filter, field_class=fields.CharField, lookup=None, name=None, **kwargs):
-        self.fn = fn
-        self.base_filter = base_filter
-        self.field_class = field_class
-        super(MethodFilter, self).__init__(lookup=lookup, name=name, **kwargs)
-
-    def make_field(self, **kwargs):
-        f = self.base_filter(lookup=self.lookup_type, name=self.name, **kwargs)
-        return f.make_field(**kwargs)
-
-    def filter_params(self, value):
-        """ return filtering params """
-        if value is None:
-            return {}
-
-        return self.fn(value)

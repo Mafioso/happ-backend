@@ -191,28 +191,3 @@ class ModelFilterset(Filterset):
             })
 
         return flt_cls(**args)
-
-
-class LogicalModelFilterset(ModelFilterset):
-    def get_params(self, name, filt):
-        val = self.values.get(name, None)
-        return filt.filter_params(val)
-
-    def filter_queryset(self, queryset):
-        """
-        convert values to filtering params and apply to queryset
-        """
-        logic = self.prepare_logic()
-        if 'or' in logic:
-            q = reduce(lambda x, y: x | Q(**self.get_params(y, self.filters[y])), logic['or'], Q())
-            queryset = queryset.filter(q)
-        if 'and' in logic:
-            for n in logic['and']:
-                params = self.get_params(n, self.filters[n])
-                if not params:
-                    continue
-                if isinstance(params, dict):
-                    queryset = queryset.filter(**params)
-                if isinstance(params, QNode):
-                    queryset = queryset.filter(params)
-        return queryset

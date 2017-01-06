@@ -1402,6 +1402,24 @@ class Tests(APISimpleTestCase):
 
         u2 = UserFactory()
 
+        for i in range(6):
+            EventFactory(
+                author=u1,
+                status=Event.APPROVED,
+                is_active=True,
+                datetimes=[
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-2)).date(),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
+                    ),
+                    EventTimeFactory(
+                        date=(datetime.now()+timedelta(days=i-1)).date(),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
+                    ),
+                ]
+            )
         for i in range(5):
             EventFactory(
                 author=u1,
@@ -1410,14 +1428,9 @@ class Tests(APISimpleTestCase):
                 datetimes=[
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-2)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
-                    ),
-                    EventTimeFactory(
-                        date=(datetime.now()+timedelta(days=i-1)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
-                    ),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
+                    )
                 ]
             )
         for i in range(4):
@@ -1428,13 +1441,13 @@ class Tests(APISimpleTestCase):
                 datetimes=[
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-2)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
                     ),
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-1)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
                     ),
                 ]
             )
@@ -1445,13 +1458,13 @@ class Tests(APISimpleTestCase):
                 datetimes=[
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-2)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
                     ),
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-1)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
                     ),
                 ]
             )
@@ -1462,13 +1475,13 @@ class Tests(APISimpleTestCase):
                 datetimes=[
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-2)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
                     ),
                     EventTimeFactory(
                         date=(datetime.now()+timedelta(days=i-1)).date(),
-                        start_time='0{}3000'.format(i),
-                        end_time='0{}3000'.format(i+1),
+                        start_time=datetime.now().time(),
+                        end_time=(datetime.now()+timedelta(hours=i+1)).time(),
                     ),
                 ]
             )
@@ -1488,57 +1501,92 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 14)
+        self.assertEqual(response.data['count'], 20)
 
-        url = prepare_url('events-organizer', query={'status': [0, 2]})
+        url = prepare_url('events-organizer', query={'rejected': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['count'], 18)
 
-        url = prepare_url('events-organizer', query={'is_active': True})
+        url = prepare_url('events-organizer', query={'moderation': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['count'], 17)
 
-        url = prepare_url('events-organizer', query={'is_active': False})
+        url = prepare_url('events-organizer', query={'not_active': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(response.data['count'], 16)
 
-        url = prepare_url('events-organizer', query={'is_active': [True, False]})
+        url = prepare_url('events-organizer', query={'active': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 9)
 
-        url = prepare_url('events-organizer', query={'is_active': [True, False], 'status': 2})
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 11)
-
-        url = prepare_url('events-organizer', query={'is_active': [True, False], 'status': [0, 2]})
+        url = prepare_url('events-organizer', query={'not_active': False, 'rejected': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 14)
 
-        url = prepare_url('events-organizer', query={'is_active': True, 'status': [0, 2]})
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 10)
-
-        url = prepare_url('events-organizer', query={'is_active': False, 'status': 0})
+        url = prepare_url('events-organizer', query={'active': False, 'rejected': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 7)
 
-        url = prepare_url('events-organizer', query={'is_active': False, 'status': 0, 'finished': True})
+        url = prepare_url('events-organizer', query={'not_active': False, 'moderation': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(response.data['count'], 13)
 
-        url = prepare_url('events-organizer', query={'is_active': [True, False], 'finished': True})
+        url = prepare_url('events-organizer', query={'active': False, 'moderation': False})
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(response.data['count'], 6)
+
+        url = prepare_url('events-organizer', query={'not_active': False, 'moderation': False, 'rejected': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 11)
+
+        url = prepare_url('events-organizer', query={'active': False, 'moderation': False, 'rejected': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 4)
+
+        url = prepare_url('events-organizer', query={'active': False, 'not_active': False, 'rejected': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+
+        url = prepare_url('events-organizer', query={'active': False, 'not_active': False, 'moderation': False,})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 2)
+
+        url = prepare_url('events-organizer', query={'finished': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 14)
+
+        url = prepare_url('events-organizer', query={'active': False, 'finished': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 6)
+
+        url = prepare_url('events-organizer', query={'not_active': False, 'finished': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 11)
+
+        url = prepare_url('events-organizer', query={'moderation': False, 'finished': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 12)
+
+        url = prepare_url('events-organizer', query={'rejected': False, 'finished': False})
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 13)
 
     def test_get_events_explore(self):
         """

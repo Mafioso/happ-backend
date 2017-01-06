@@ -8,14 +8,42 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
+from mongoengine.queryset.visitor import Q
 
 from mongoextensions import filters
-from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string
+from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string, time_to_string
 from happ.models import Event, Complaint, User
-from happ.filters import EventFilter, EventOrganizerFilter
+from happ.filters import EventFilter
 from happ.pagination import SolidPagination
-from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class
+from happ.decorators import patch_queryset, patch_order, patch_pagination_class
 from happ.serializers import EventSerializer
+
+
+def filter_organizer_feed(self, queryset):
+        FALSE = (False, 'False', 'false', '0')
+        request = self.request
+        queryset = request.user.get_organizer_feed()
+
+        active = request.query_params.get('active', True)
+        not_active = request.query_params.get('not_active', True)
+        moderation = request.query_params.get('moderation', True)
+        rejected = request.query_params.get('rejected', True)
+        finished = request.query_params.get('finished', True)
+
+        if active in FALSE:
+            queryset = queryset.filter(Q(status__in=[Event.MODERATION, Event.REJECTED]) | Q(status=Event.APPROVED, is_active__ne=True))
+        if not_active in FALSE:
+            queryset = queryset.filter(Q(status__in=[Event.MODERATION, Event.REJECTED]) | Q(status=Event.APPROVED, is_active__ne=False))
+        if moderation in FALSE:
+            queryset = queryset.filter(status__ne=Event.MODERATION)
+        if rejected in FALSE:
+            queryset = queryset.filter(status__ne=Event.REJECTED)
+        if finished in FALSE:
+            queryset = queryset.filter(
+                Q(datetimes__date__gt=date_to_string(datetime.datetime.now().date(), settings.DATE_STRING_FIELD_FORMAT) ) |
+                Q(datetimes__date    =date_to_string(datetime.datetime.now().date(), settings.DATE_STRING_FIELD_FORMAT), datetimes__end_time__gte=time_to_string(datetime.datetime.now().time(), settings.TIME_STRING_FIELD_FORMAT) )
+            )
+        return queryset
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -292,9 +320,8 @@ class EventViewSet(viewsets.ModelViewSet):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 
     @list_route(methods=['get'], url_path='organizer')
-    @patch_queryset(lambda self, x: self.request.user.get_organizer_feed())
+    @patch_queryset(filter_organizer_feed)
     @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time', ), 'popular': ('datetimes__0__date', '-votes_num')})
-    @patch_filter_class(EventOrganizerFilter)
     def organizer(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 
