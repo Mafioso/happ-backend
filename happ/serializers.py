@@ -350,7 +350,7 @@ class EventSerializer(LocalizedSerializer):
     city = CitySerializer(read_only=True)
     currency = CurrencySerializer(read_only=True)
     author = AuthorSerializer(read_only=True)
-    rejection_reasons = RejectionReasonSerializer(many=True, read_only=True)
+    rejection_reason = drf_serializers.SerializerMethodField()
     is_upvoted = drf_serializers.SerializerMethodField()
     is_in_favourites = drf_serializers.SerializerMethodField()
     images = drf_serializers.SerializerMethodField()
@@ -455,8 +455,10 @@ class EventSerializer(LocalizedSerializer):
     def get_images(self, obj):
         return FileObjectSerializer(obj.images, many=True).data
 
-    def get_datetimes(self, obj):
-        return self.get_datetimes
+    def get_rejection_reason(self, obj):
+        if obj.rejection_reasons.count() == 0:
+            return None
+        return RejectionReasonSerializer(obj.rejection_reasons[0])
 
 
 class EventAdminSerializer(LocalizedSerializer):

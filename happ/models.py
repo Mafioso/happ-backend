@@ -252,7 +252,6 @@ class Upvote(EmbeddedDocument):
 
 
 class RejectionReason(HappBaseDocument):
-
     event = ReferenceField('Event')
     author = ReferenceField('User')
     text = StringField()
@@ -319,7 +318,7 @@ class Event(HappBaseDocument):
 
     @property
     def rejection_reasons(self):
-        return RejectionReason.objects.filter(event=self)
+        return RejectionReason.objects.filter(event=self).order_by('-date_created')
 
     def localized(self, language=django_settings.HAPP_LANGUAGES[0]):
         try:

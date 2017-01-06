@@ -227,7 +227,7 @@ class EventViewSet(viewsets.ModelViewSet):
             )
         new_instance = instance.copy()
         serializer = self.get_serializer(new_instance)
-        new_instance.translate()
+        # new_instance.translate()
         return Response(serializer.data)
 
     @detail_route(methods=['post'], url_path='upvote')
