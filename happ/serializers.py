@@ -458,7 +458,7 @@ class EventSerializer(LocalizedSerializer):
     def get_rejection_reason(self, obj):
         if obj.rejection_reasons.count() == 0:
             return None
-        return RejectionReasonSerializer(obj.rejection_reasons[0])
+        return RejectionReasonSerializer(obj.rejection_reasons[0]).data
 
 
 class EventAdminSerializer(LocalizedSerializer):
