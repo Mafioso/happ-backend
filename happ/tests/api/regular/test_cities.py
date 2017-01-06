@@ -128,3 +128,42 @@ class Tests(APISimpleTestCase):
 
         u = User.objects.get(id=u.id)
         self.assertEqual(u.settings.city, city)
+
+    def test_get_nearest_city(self):
+        """
+        We can retrieve nearest city by geopoint
+        """
+        u = UserFactory()
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.assertEqual(u.settings.city, None)
+
+        center = [random.uniform(-180, 180), random.uniform(-90, 90)]
+        radius = 50000
+        c = CityFactory(geopoint=center)
+
+        for i in range(5):
+            CityFactory(
+                geopoint=generate_geopoint(center, radius),
+            )
+
+        data = {
+            'center': center
+        }
+
+        url = prepare_url('cities-nearest')
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+        response = self.client.post(url, format='json') # no data
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.post(url, data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['id'], str(c.id))

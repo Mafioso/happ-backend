@@ -61,10 +61,13 @@ class City(HappBaseDocument):
 
     @classmethod
     def get_nearest(cls, geopoint):
-        return City.objects.filter(
+        result = City.objects.filter(
             is_active=True,
             geopoint__near=geopoint,
-        )[0]
+        )
+        if result.count() == 0:
+            return None
+        return result[0]
 
     def activate(self):
         self.is_active = True

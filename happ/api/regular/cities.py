@@ -2,7 +2,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import status, mixins
 from rest_framework.response import Response
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
@@ -29,3 +29,14 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Retriev
         user.settings.city = city
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @list_route(methods=['post'], url_path='nearest')
+    def nearest(self, request, *args, **kwargs):
+        if 'center' not in request.data:
+            return Response(
+                {'error_message': _('Center was not provided.')},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        city = City.get_nearest(request.data['center'])
+        serializer = self.get_serializer(city)
+        return Response(serializer.data)
