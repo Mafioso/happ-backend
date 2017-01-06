@@ -138,7 +138,7 @@ class Tests(APISimpleTestCase):
                 )]
             )
 
-        u = UserFactory(role=User.MODERATOR)
+        u = UserFactory(role=User.ADMINISTRATOR)
         u.set_password('123')
         u.save()
 
@@ -292,6 +292,43 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['results'][7]['title'], 't14')
         self.assertEqual(response.data['results'][8]['title'], 't13')
         self.assertEqual(response.data['results'][9]['title'], 't12')
+
+    def test_get_events_for_assigned_city(self):
+        """
+        moderator gets events only for assigned city
+        """
+        c1 = CityFactory()
+        c2 = CityFactory()
+
+        for i in range(5):
+            e = EventFactory(
+                title='t1{}'.format(i),
+                city=c1,
+            )
+
+        for i in range(4):
+            e = EventFactory(
+                title='t2{}'.format(i),
+                city=c2,
+            )
+
+        u = UserFactory(role=User.MODERATOR, assigned_city=c1)
+        u.set_password('123')
+        u.save()
+
+        auth_url = prepare_url('login')
+        data = {
+            'username': u.username,
+            'password': '123'
+        }
+        response = self.client.post(auth_url, data=data, format='json')
+        token = response.data['token']
+        self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
+
+        url = prepare_url('admin-events-list')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
 
     def test_approve(self):
         """
