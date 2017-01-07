@@ -4,9 +4,9 @@ from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from happ.models import Interest, User
+from happ.models import Interest, User, LogEntry
 from happ.policies import StaffPolicy, RootAdministratorPolicy
-from happ.decorators import patch_permission_classes, patch_serializer_class, patch_queryset
+from happ.decorators import patch_permission_classes, patch_serializer_class, patch_queryset, log_entry
 from happ.serializers import InterestSerializer, InterestParentSerializer, InterestChildSerializer
 from happ.pagination import SolidPagination
 
@@ -18,8 +18,17 @@ class InterestViewSet(viewsets.ModelViewSet):
     search_fields = ('title', )
 
     @patch_permission_classes(( RootAdministratorPolicy, ))
+    @log_entry(LogEntry.ADDITION, Interest)
     def create(self, request, *args, **kwargs):
         return super(InterestViewSet, self).create(request, *args, **kwargs)
+
+    @log_entry(LogEntry.CHANGE, Interest)
+    def update(self, request, *args, **kwargs):
+        return super(InterestViewSet, self).update(request, *args, **kwargs)
+
+    @log_entry(LogEntry.DELETION, Interest)
+    def destroy(self, request, *args, **kwargs):
+        return super(InterestViewSet, self).destroy(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         response = super(InterestViewSet, self).retrieve(request, *args, **kwargs)
@@ -71,6 +80,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         return response
 
     @detail_route(methods=['post'], url_path='activate')
+    @log_entry(LogEntry.ACTIVATION, Interest)
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.activate()
@@ -78,6 +88,7 @@ class InterestViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['post'], url_path='deactivate')
+    @log_entry(LogEntry.DEACTIVATION, Interest)
     def deactivate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.deactivate()

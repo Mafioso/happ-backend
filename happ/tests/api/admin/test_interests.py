@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
-from happ.models import User, Interest
+from happ.models import User, Interest, LogEntry
 from happ.factories import (
     UserFactory,
     InterestFactory,
@@ -101,6 +101,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         url = prepare_url('admin-interests-list')
 
@@ -134,6 +135,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Interest.objects.count(), n+1)
         self.assertEqual(response.data['title'], 'NewInterest name')
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
         # ok for root
         u.role = User.ROOT
@@ -145,6 +147,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Interest.objects.count(), n+2)
         self.assertEqual(response.data['title'], 'NewInterest name')
+        self.assertEqual(LogEntry.objects.count(), log_n+2)
 
     def test_update_interest(self):
         """
@@ -155,6 +158,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -178,6 +182,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Interest.objects.count(), n)
         self.assertEqual(response.data['title'], 'NewInterest name')
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_delete_interest(self):
         """
@@ -186,6 +191,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         i = InterestFactory()
         i.save()
@@ -205,6 +211,7 @@ class Tests(APISimpleTestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Interest.objects.count(), n-1)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_get_categories(self):
         """
@@ -275,6 +282,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -292,6 +300,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         i = Interest.objects.get(id=i.id)
         self.assertTrue(i.is_active)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_deactivate(self):
         """
@@ -300,6 +309,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -317,3 +327,4 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         i = Interest.objects.get(id=i.id)
         self.assertFalse(i.is_active)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
