@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
-from happ.models import User, Complaint
+from happ.models import User, Complaint, LogEntry
 from happ.factories import (
     UserFactory,
     ComplaintFactory,
@@ -66,6 +66,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         c = ComplaintFactory()
 
@@ -85,3 +86,4 @@ class Tests(APISimpleTestCase):
         url = prepare_url('admin-complaints-reply', kwargs={'id': str(c.id)})
         response = self.client.post(url, data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)

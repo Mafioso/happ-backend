@@ -3,9 +3,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
 
-from happ.models import Complaint
+from happ.models import Complaint, LogEntry
 from happ.policies import StaffPolicy
-from happ.decorators import patch_queryset
+from happ.decorators import patch_queryset, log_entry
 from happ.serializers import ComplaintSerializer
 
 
@@ -40,6 +40,7 @@ class ComplaintViewSet(viewsets.ReadOnlyModelViewSet):
         return response
 
     @detail_route(methods=['post'], url_path='reply')
+    @log_entry(LogEntry.REPLY, Complaint)
     def reply(self, request, *args, **kwargs):
         instance = self.get_object()
         answer = request.data.get('answer', '')
