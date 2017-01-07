@@ -10,8 +10,8 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from rest_framework.renderers import StaticHTMLRenderer
 
-from happ.models import FileObject, Currency, StaticText
-from happ.decorators import patch_permission_classes
+from happ.models import FileObject, Currency, StaticText, LogEntry
+from happ.decorators import patch_permission_classes, log_entry
 from happ.integrations import google, yahoo
 from happ.serializers import FileObjectSerializer
 
@@ -53,12 +53,13 @@ class EditableHTMLView(APIView):
         return Response(st.text or '', status=status.HTTP_200_OK)
 
     @patch_permission_classes(api_settings.DEFAULT_PERMISSION_CLASSES)
+    @log_entry(LogEntry.CHANGE, StaticText)
     def post(self, request):
         text = request.data['text']
         st = self.get_static_text(request)
         st.text = text.encode('utf-8')
         st.save()
-        return Response(status=status.HTTP_200_OK)
+        return Response({'id': st.id}, status=status.HTTP_200_OK)
 
 
 class TermsOfServiceView(EditableHTMLView):
