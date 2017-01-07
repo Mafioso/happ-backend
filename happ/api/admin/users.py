@@ -6,9 +6,9 @@ from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
-from happ.models import User, City
+from happ.models import User, City, LogEntry
 from happ.policies import StaffPolicy, RootAdministratorPolicy, RootPolicy
-from happ.decorators import patch_permission_classes, patch_queryset
+from happ.decorators import patch_permission_classes, patch_queryset, log_entry
 from happ.serializers import UserAdminSerializer
 
 
@@ -17,6 +17,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserAdminSerializer
     queryset = User.objects.all()
 
+    @log_entry(LogEntry.ADDITION, User)
     def create(self, request, *args, **kwargs):
         if 'role' in request.data:
             if request.data['role'] >= User.MODERATOR and request.user.role <= User.MODERATOR:
@@ -34,6 +35,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return super(UserViewSet, self).create(request, *args, **kwargs)
 
     @patch_permission_classes(( RootAdministratorPolicy, ))
+    @log_entry(LogEntry.CHANGE, User)
     def update(self, request, *args, **kwargs):
         if 'role' in request.data:
             if request.data['role'] >= User.ADMINISTRATOR and request.user.role <= User.ADMINISTRATOR:
@@ -46,6 +48,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 )
         return super(UserViewSet, self).update(request, *args, **kwargs)
 
+    @log_entry(LogEntry.DELETION, User)
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.role >= User.MODERATOR and request.user.role <= User.MODERATOR:
@@ -119,12 +122,14 @@ class UserViewSet(viewsets.ModelViewSet):
         return response
 
     @detail_route(methods=['post'], url_path='activate')
+    @log_entry(LogEntry.ACTIVATION, User)
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.activate()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['post'], url_path='deactivate')
+    @log_entry(LogEntry.DEACTIVATION, User)
     def deactivate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.deactivate()
