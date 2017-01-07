@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
-from happ.models import User, City
+from happ.models import User, City, LogEntry
 from happ.factories import (
     UserFactory,
     CountryFactory,
@@ -98,6 +98,7 @@ class Tests(APISimpleTestCase):
         we can create city
         """
         n = City.objects.count()
+        log_n = LogEntry.objects.count()
         country = CountryFactory()
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
@@ -122,6 +123,8 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=city_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(City.objects.count(), n)
+        self.assertEqual(LogEntry.objects.count(), log_n)
 
         # restricted for administrator
         u.role = User.ADMINISTRATOR
@@ -131,6 +134,8 @@ class Tests(APISimpleTestCase):
         self.client.credentials(HTTP_AUTHORIZATION='{} {}'.format(api_settings.JWT_AUTH_HEADER_PREFIX, token))
         response = self.client.post(url, data=city_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(City.objects.count(), n)
+        self.assertEqual(LogEntry.objects.count(), log_n)
 
         # ok for root
         u.role = User.ROOT
@@ -142,6 +147,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(City.objects.count(), n+1)
         self.assertEqual(response.data['country_name'], country.name)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_update_city(self):
         """
@@ -152,6 +158,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -176,6 +183,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.data['name'], 'NewCity name')
         self.assertEqual(response.data['is_active'], False)
         self.assertEqual(response.data['country_name'], country.name)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_delete_city(self):
         """
@@ -184,6 +192,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         c = CityFactory()
         c.save()
@@ -203,6 +212,7 @@ class Tests(APISimpleTestCase):
         response = self.client.delete(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(City.objects.count(), n-1)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_activate(self):
         """
@@ -211,6 +221,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -228,6 +239,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         c = City.objects.get(id=c.id)
         self.assertTrue(c.is_active)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_deactivate(self):
         """
@@ -236,6 +248,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -253,3 +266,4 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         c = City.objects.get(id=c.id)
         self.assertFalse(c.is_active)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)

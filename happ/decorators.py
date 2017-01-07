@@ -1,3 +1,8 @@
+from rest_framework import status
+
+from .models import LogEntry
+
+
 def patch_serializer_class(serializer_class):
 
     def decorator(fn):
@@ -71,5 +76,34 @@ def patch_filter_class(filter_class):
             rv = fn(self, request, *a, **kw)
             self.filter_class = prev_filter_class
             return rv
+        return wrapper
+    return decorator
+
+def log_entry(flag, cls):
+
+    def decorator(fn):
+        def wrapper(self, request, *a, **kw):
+            if flag in (
+                LogEntry.ADDITION,
+                LogEntry.CHANGE,
+            ):
+                rv = fn(self, request, *a, **kw)
+                if status.is_success(rv.status_code):
+                    entity = cls.objects.get(id=rv.data['id'])
+                    LogEntry.objects.create(entity=entity, flag=flag, author=request.user, data={attr: getattr(entity, attr) for attr in cls.log_attrs})
+                return rv
+            if flag in (
+                LogEntry.DELETION,
+                LogEntry.APPROVAL,
+                LogEntry.REJECTION,
+                LogEntry.ACTIVATION,
+                LogEntry.DEACTIVATION,
+                LogEntry.REPLY,
+            ):
+                entity = self.get_object()
+                rv = fn(self, request, *a, **kw)
+                if status.is_success(rv.status_code):
+                    LogEntry.objects.create(entity=entity, flag=flag, author=request.user, data={attr: getattr(entity, attr) for attr in cls.log_attrs})
+                return rv
         return wrapper
     return decorator

@@ -49,6 +49,8 @@ class City(HappBaseDocument):
     country = ReferenceField(Country, reverse_delete_rule=CASCADE)
     geopoint = PointField()
 
+    log_attrs = ('name', )
+
     @property
     def country_name(self):
         if self.country:
@@ -114,6 +116,8 @@ class User(AbstractUser, HappBaseDocument):
     confirmation_key_expires = DateTimeField(blank=True, null=True)
     facebook_id = StringField()
     assigned_city = ReferenceField(City, reverse_delete_rule=CASCADE, required=False, null=True)
+
+    log_attrs = ('username', )
 
     @property
     def fn(self):
@@ -223,6 +227,8 @@ class Interest(HappBaseDocument):
     parent = ReferenceField('self')
     is_active = BooleanField(default=True)
 
+    log_attrs = ('title', )
+
     @property
     def children(self):
         return Interest.objects.filter(parent=self)
@@ -300,6 +306,8 @@ class Event(HappBaseDocument):
     tickets_link = StringField()
     min_age = IntField(default=0)
     max_age = IntField(default=200)
+
+    log_attrs = ('title', )
 
     ## TEMP
     _random = IntField()
@@ -464,6 +472,8 @@ class Complaint(HappBaseDocument):
     executor = ReferenceField(User, reverse_delete_rule=CASCADE)
     event = ReferenceField(Event, reverse_delete_rule=CASCADE)
 
+    log_attrs = ('text', )
+
     def reply(self, answer, executor):
         self.answer = answer
         self.executor = executor
@@ -483,6 +493,31 @@ class StaticText(HappBaseDocument):
 
     text = StringField()
     type = IntField(choices=TYPES, default=TERMS_OF_SERVICE)
+
+    log_attrs = ('type', )
+
+
+class LogEntry(HappBaseDocument):
+    """
+        city:
+            - name
+        interest
+            - title
+        user
+            - username
+        event
+            - title
+        complaint
+            - text
+        static_text
+            - type
+    """
+    FLAGS = ADDITION, CHANGE, DELETION, APPROVAL, REJECTION, ACTIVATION, DEACTIVATION, REPLY = range(8)
+
+    entity = GenericReferenceField()
+    data = DictField()
+    flag = IntField(choices=FLAGS, default=ADDITION)
+    author = ReferenceField(User, reverse_delete_rule=CASCADE)
 
 
 # Notification
