@@ -6,7 +6,7 @@ from rest_framework.test import APISimpleTestCase
 from rest_framework_jwt.settings import api_settings
 
 from happ.utils import date_to_string
-from happ.models import User, City, Currency, Event
+from happ.models import User, City, Currency, Event, LogEntry
 from happ.factories import (
     UserFactory,
     CityFactory,
@@ -337,6 +337,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -354,6 +355,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.status, Event.APPROVED)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_reject(self):
         """
@@ -362,6 +364,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -385,6 +388,7 @@ class Tests(APISimpleTestCase):
         e = Event.objects.get(id=e.id)
         self.assertEqual(e.status, Event.REJECTED)
         self.assertEqual(len(e.rejection_reasons), count+1)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_activate(self):
         """
@@ -393,6 +397,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -410,6 +415,7 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         i = Event.objects.get(id=i.id)
         self.assertTrue(i.is_active)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)
 
     def test_deactivate(self):
         """
@@ -418,6 +424,7 @@ class Tests(APISimpleTestCase):
         u = UserFactory(role=User.MODERATOR)
         u.set_password('123')
         u.save()
+        log_n = LogEntry.objects.count()
 
         auth_url = prepare_url('login')
         data = {
@@ -435,3 +442,4 @@ class Tests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         i = Event.objects.get(id=i.id)
         self.assertFalse(i.is_active)
+        self.assertEqual(LogEntry.objects.count(), log_n+1)

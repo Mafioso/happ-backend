@@ -11,10 +11,10 @@ from rest_framework_mongoengine import viewsets
 
 from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string
-from happ.models import Event, User
+from happ.models import Event, User, LogEntry
 from happ.filters import EventFilter
 from happ.policies import StaffPolicy
-from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class
+from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_filter_class, log_entry
 from happ.serializers import EventAdminSerializer
 
 
@@ -47,6 +47,7 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    @log_entry(LogEntry.ADDITION, Event)
     def create(self, request, *args, **kwargs):
         """
         Creates event
@@ -134,6 +135,7 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+    @log_entry(LogEntry.CHANGE, Event)
     def update(self, request, *args, **kwargs):
         """
         Updates event
@@ -221,6 +223,10 @@ class EventViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+    @log_entry(LogEntry.DELETION, Event)
+    def destroy(self, request, *args, **kwargs):
+        return super(EventViewSet, self).destroy(request, *args, **kwargs)
+
     @list_route(methods=['get'], url_path='moderation')
     @patch_queryset(lambda self, x: x.filter(status=Event.MODERATION))
     def moderation(self, request, *args, **kwargs):
@@ -232,6 +238,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return response
 
     @detail_route(methods=['post'], url_path='approve')
+    @log_entry(LogEntry.APPROVAL, Event)
     def approve(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.approve()
@@ -239,6 +246,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['post'], url_path='reject')
+    @log_entry(LogEntry.REJECTION, Event)
     def reject(self, request, *args, **kwargs):
         text = request.data.get('text', '')
         instance = self.get_object()
@@ -253,6 +261,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return response
 
     @detail_route(methods=['post'], url_path='activate')
+    @log_entry(LogEntry.ACTIVATION, Event)
     def activate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.activate()
@@ -260,6 +269,7 @@ class EventViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @detail_route(methods=['post'], url_path='deactivate')
+    @log_entry(LogEntry.DEACTIVATION, Event)
     def deactivate(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.deactivate()
