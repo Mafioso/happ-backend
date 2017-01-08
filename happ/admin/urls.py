@@ -28,4 +28,5 @@ urlpatterns = [
     url(r'^feedback/$', views.FeedbackView.as_view(), name="feedback"),
     url(r'^moderators/$', views.ModeratorsListView.as_view(), name="moderators_list"),
     url(r'^administrators/$', views.AdministratorsListView.as_view(), name="administrators_list"),
+    url(r'^log/$', views.ActionLogView.as_view(), name="action_log_list"),
 ]

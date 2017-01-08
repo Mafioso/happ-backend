@@ -116,6 +116,7 @@
                       {% if request.user.role == roles.root %}
                         <li><a href="{% url 'administrators_list' %}">Администраторы</a></li>
                       {% endif %}
+                      <li><a href="{% url 'action_log_list' %}">Журнал действий</a></li>
                       <!-- <li><a href="#">Рассылки</a></li> -->
                     </ul>
                   </li>

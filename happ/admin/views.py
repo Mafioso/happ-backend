@@ -207,3 +207,7 @@ class AdministratorsListView(JWTAuthRequiredMixin, RoleMixin, UserPassesTestMixi
 
     def test_func(self):
         return IsRoot().has_permission('', self.request, self)
+
+
+class ActionLogView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
+    template_name = 'admin/action_log_list.html'

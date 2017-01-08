@@ -22,6 +22,7 @@ from .models import (
     RejectionReason,
     FeedbackMessage,
     EventTime,
+    LogEntry,
 )
 
 
@@ -599,3 +600,10 @@ class FeedbackMessageSerializer(serializers.DocumentSerializer):
         fm.author = author
         fm.save()
         return fm
+
+
+class LogEntrySerializer(serializers.DocumentSerializer):
+    author = AuthorSerializer()
+
+    class Meta:
+        model = LogEntry
