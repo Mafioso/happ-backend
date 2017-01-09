@@ -158,7 +158,7 @@
                         </div>
                       </div>
                       <div class="form-group">
-                        <label for="registration_link" class="control-label col-md-3 col-sm-3 col-xs-12">Ссылка на регистрацию</label>
+                        <label for="registration_link" class="control-label col-md-3 col-sm-3 col-xs-12">Ссылка на регистрацию или покупка билетов</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <input id="registration_link" class="form-control col-md-7 col-xs-12" type="text" name="registration_link">
                         </div>
@@ -282,7 +282,7 @@
             showDropdowns: true,
             timePicker: true,
             timePicker24Hour: 1,
-            timePickerIncrement: 10,
+            timePickerIncrement: 1,
         }, function(start, end, label) {
           console.log(start, end, start.format('YYYYMMDD')==end.format('YYYYMMDD'))
 
