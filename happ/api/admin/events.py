@@ -206,7 +206,9 @@ class EventViewSet(viewsets.ModelViewSet):
                         {'error_message': _('Wrong datetimes format provided.')},
                         status=status.HTTP_400_BAD_REQUEST
                     )
-        if request.data['close_on_start'] == 'on':
+
+        #print request.data.get('close_on_start')
+        if request.data.get('close_on_start') and (request.data.get('close_on_start') == 'on' or request.data.get('close_on_start')==1):
             request.data['close_on_start'] = True
         else:
             request.data['close_on_start'] = False
