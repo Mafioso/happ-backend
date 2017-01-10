@@ -37,11 +37,18 @@ services:
     extends:
       file: docker-compose.base.yml
       service: rabbitmq
+    ports:
+      - "15672"
+      - "5672"
+    environment:
+      - RABBITMQ_USER_PASSWD=user:f1b0nacc1
 
   mongo:
     extends:
       file: docker-compose.base.yml
       service: mongo
+    ports:
+      - "27017"
 
   app:
     extends:
@@ -51,6 +58,7 @@ services:
     command: bash -c "python manage.py collectstatic --no-input && uwsgi --ini uwsgi.ini"
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.prod
+      - RABBITMQ_ENV_RABBITMQ_USER_PASSWD=user:f1b0nacc1
     links:
       - mongo
       - rabbitmq
@@ -67,8 +75,10 @@ services:
       file: docker-compose.base.yml
       service: celery
     image: askhatomarov/happ:latest
+    command: bash -c "DJANGO_SETTINGS_MODULE=happ.settings.prod celery -A happ worker -l debug --concurrency=2"
     environment:
       - DJANGO_SETTINGS_MODULE=happ.settings.prod
+      - RABBITMQ_ENV_RABBITMQ_USER_PASSWD=user:f1b0nacc1
     links:
       - mongo
       - rabbitmq

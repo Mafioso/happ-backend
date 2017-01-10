@@ -233,7 +233,7 @@ TIME_STRING_FIELD_FORMAT = "%H%M%S"
 
 GOOGLE_BROWSER_KEY = 'AIzaSyCGkwazxd0oxX1fxOb49PBJeV2sKZZj29U'
 GOOGLE_API_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
-GOOGLE_TRANSLATE_LINK = 'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
+GOOGLE_TRANSLATE_LINK = u'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
 GOOGLE_URL_SHORTENER_LINK = 'https://www.googleapis.com/urlshortener/v1/url?key={}'
 GOOGLE_PLACES_LINK = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key={}'
 GOOGLE_PHOTOS_LINK = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth={}&photoreference={}&key={}'
@@ -243,7 +243,7 @@ YAHOO_EXCHANGE_API = 'https://query.yahooapis.com/v1/public/yql?q=select * from 
 BROKER_USER_PASSWORD = os.getenv('RABBITMQ_ENV_RABBITMQ_USER_PASSWD', 'guest:guest')
 # BROKER_VHOST = os.getenv('RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST', '/')
 
-BROKER_URL = 'amqp://{user_passwd}@{host}/{vhost}'.format(**{
+BROKER_URL = 'amqp://{user_passwd}@{host}:{port}/{vhost}'.format(**{
     'user_passwd': BROKER_USER_PASSWORD,
     'host': os.getenv('RABBITMQ_PORT_5672_TCP_ADDR', '127.0.0.1'),
     'port': os.getenv('RABBITMQ_PORT_5672_TCP_PORT', 5672),

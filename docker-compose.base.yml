@@ -13,9 +13,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.5.4-management
-    ports:
-      - "15672:15672"
-      - "5672:5672"
     environment:
       - RABBITMQ_DEFAULT_VHOST=/
       - RABBITMQ_USER_PASSWD=guest:guest
@@ -24,8 +21,6 @@ services:
     image: mongo:3.2
     command: mongod --dbpath=/data/db --bind_ip=0.0.0.0
     restart: always
-    ports:
-      - "27017:27017"
     volumes:
       - ./mongodb/db:/data/db
       - ./mongodb/dumps:/data/dumps
@@ -37,6 +32,7 @@ services:
       - MONGODB_PORT=27017
       - MONGO_PORT_27017_TCP_ADDR=mongo
       - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
+      - RABBITMQ_ENV_RABBITMQ_USER_PASSWD=guest:guest
 
   celery:
     image: askhatomarov/happ:latest
@@ -48,3 +44,4 @@ services:
       - RABBITMQ_PORT_5672_TCP_ADDR=rabbitmq
       - RABBITMQ_PORT_5672_TCP_PORT=5672
       - RABBITMQ_ENV_RABBITMQ_DEFAULT_VHOST=/
+      - RABBITMQ_ENV_RABBITMQ_USER_PASSWD=guest:guest

@@ -22,11 +22,16 @@ services:
     extends:
       file: docker-compose.base.yml
       service: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
 
   mongo:
     extends:
       file: docker-compose.base.yml
       service: mongo
+    ports:
+      - "27017:27017"
 
   app:
     extends:
