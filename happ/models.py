@@ -151,7 +151,7 @@ class User(AbstractUser, HappBaseDocument):
         }
 
     def get_favourites(self):
-        return Event.objects(in_favourites=self)
+        return Event.objects(in_favourites=self, datetimes__0__date__gte=datetime.datetime.now().date())
 
     def get_feed(self):
         return Event.objects(
@@ -184,7 +184,8 @@ class User(AbstractUser, HappBaseDocument):
         # make it flatten
         interests = [item for sublist in family_interests for item in sublist]
 
-        all_events = Event.objects(interests__in=interests,
+        all_events = Event.objects(city=self.settings.city,
+                                   interests__in=interests,
                                    type__in=[Event.NORMAL, Event.ADS],
                                    status=Event.APPROVED,
                                    datetimes__0__date__gte=datetime.datetime.now().date(),

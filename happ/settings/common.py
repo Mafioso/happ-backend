@@ -235,7 +235,7 @@ GOOGLE_BROWSER_KEY = 'AIzaSyCGkwazxd0oxX1fxOb49PBJeV2sKZZj29U'
 GOOGLE_API_KEY = 'AIzaSyBXnpQ8pPpfLsud5qqE6-YYhVW_DsR8Ce4'
 GOOGLE_TRANSLATE_LINK = u'https://www.googleapis.com/language/translate/v2?key={}&q={}&target={}'
 GOOGLE_URL_SHORTENER_LINK = 'https://www.googleapis.com/urlshortener/v1/url?key={}'
-GOOGLE_PLACES_LINK = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key={}'
+GOOGLE_PLACES_LINK = 'https://maps.googleapis.com/maps/api/place/textsearch/json?query={}&key={}&language=ru&region=KZ'
 GOOGLE_PHOTOS_LINK = 'https://maps.googleapis.com/maps/api/place/photo?maxwidth={}&photoreference={}&key={}'
 
 YAHOO_EXCHANGE_API = 'https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair = \"{}{}\"&format=json&env=store://datatables.org/alltableswithkeys'

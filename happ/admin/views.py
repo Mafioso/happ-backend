@@ -104,6 +104,7 @@ class EventCreateView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
         context['cities'] = City.objects.filter(is_active=True)
         context['currencies'] = Currency.objects.all()
         context['interests'] = Interest.objects.filter(is_active=True, parent=None).order_by('title')
+        context['api_key'] = settings.GOOGLE_BROWSER_KEY
         return context
 
 
@@ -116,6 +117,7 @@ class EventEditView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
         context['cities'] = City.objects.filter(is_active=True)
         context['currencies'] = Currency.objects.all()
         context['interests'] = Interest.objects.filter(is_active=True, parent=None)
+        context['api_key'] = settings.GOOGLE_BROWSER_KEY
         return context
 
 

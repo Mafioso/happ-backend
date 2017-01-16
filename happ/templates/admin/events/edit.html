@@ -33,14 +33,16 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="event-type" class="form-control col-md-7 col-xs-12">
                             <option></option>
-                            <option>Мастер-класс</option>
-                            <option>Лекция</option>
-                            <option>Семинар</option>
-                            <option>Выставка</option>
-                            <option>Опера</option>
                             <option>Балет</option>
+                            <option>Вечеринка</option>
+                            <option>Выставка</option>
+                            <option>Концерт</option>
+                            <option>Лекция</option>
+                            <option>Мастер-класс</option>
+                            <option>Опера</option>
+                            <option>Показ фильма</option>
+                            <option>Спектакль</option>
                             <option>Тренинг</option>
-                            <option>Кинопоказ</option>
                           </select>
                         </div>
                       </div>
@@ -58,9 +60,9 @@
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="city_id">Город проведения <span class="required">*</span>
                         </label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="city_id" class="form-control col-md-7 col-xs-12 selectpicker" name="city_id" data-live-search="true">
+                          <select id="city_id" class="form-control col-md-7 col-xs-12 selectpicker" name="city_id" data-live-search="true" >
                             {% for item in cities %}
-                              <option value="{{item.id}}" data-subtext="{{item.country_name}}" {% if object.city.id == item.id %}selected="selected"{% endif %}>{{item.name}}</option>
+                              <option value="{{item.id}}" lng="{{item.geopoint.coordinates.0}}" lat="{{item.geopoint.coordinates.1}}" data-subtext="{{item.country_name}}" {% if object.city.id == item.id %}selected="selected"{% endif %}>{{item.name}}</option>
                             {% endfor%}
                           </select>
                         </div>
@@ -125,12 +127,24 @@
                       <div class="form-group">
                         <label for="place_name" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="place_name" class="form-control col-md-7 col-xs-12 place_name selectized" name="place_name">
+                          <select id="place_name" class="form-control col-md-7 col-xs-12 place_name selectized">
                             <option>{{ object.place_name }}</option>
                           </select>
+                          <div id="map"></div>
                           <input type="hidden" name="geopoint_lng" id="geopoint_lng" value="{{ object.geopoint.0 }}" />
                           <input type="hidden" name="geopoint_lat" id="geopoint_lat" value="{{ object.geopoint.1 }}" />
-                          <input type="hidden" name="address" id="address" value="{{ object.address }}" />
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Названия места проведения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="place_name" id="place_name_txt" class="form-control col-md-7 col-xs-12" value="{{ object.place_name }}" />
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Адрес</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="address" id="address" class="form-control col-md-7 col-xs-12" value="{{ object.address }}" />
                         </div>
                       </div>
                       <div class="form-group">
@@ -276,6 +290,8 @@
     <script src="{% get_static_prefix %}js/moment/moment.min.js"></script>
     <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
     <script src="{% get_static_prefix %}js/selectize.min.js"></script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
 
     <script>
       datetimes = [
@@ -427,10 +443,30 @@
               $('#geopoint_lng').val(item.geometry.location.lng);
               $('#geopoint_lat').val(item.geometry.location.lat);
               $('#address').val(item.formatted_address);
+              $('#place_name_txt').val(item.name);
+              map = new google.maps.Map(document.getElementById('map'), {
+                center: {lng: item.geometry.location.lng, lat: item.geometry.location.lat},
+                zoom: 15
+              });
+              marker = new google.maps.Marker({
+                position: {lng: item.geometry.location.lng, lat: item.geometry.location.lat},
+                label: item.formatted_address,
+                title: item.name,
+                map: map,
+                draggable:true
+              });
+              marker.addListener('dragend', function() {
+                var position = marker.getPosition();
+                $('#geopoint_lng').val(position.lng());
+                $('#geopoint_lat').val(position.lat());
+                // console.log(marker.getPosition().lat());
+              });
             } else {
               $('#geopoint_lng').val('');
               $('#geopoint_lat').val('');
               $('#address').val('');
+              $('#place_name_txt').val('');
+              marker.setMap(null);
             }
           },
         });
@@ -471,6 +507,47 @@
 
             reader.readAsDataURL(input.get(0).files[0]);
           }
+      });
+      var map;
+      var marker;
+
+      function initMap() {
+        {% if object.geopoint %}
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lng: {{object.geopoint.coordinates.0}}, lat: {{object.geopoint.coordinates.1}}},
+          zoom: 15
+        });
+
+        marker = new google.maps.Marker({
+          position: {lng: {{object.geopoint.coordinates.0}}, lat: {{object.geopoint.coordinates.1}}},
+          label: "{{object.address}}",
+          title: "{{object.place_name}}",
+          map: map,
+          draggable:true
+        });
+        marker.addListener('dragend', function() {
+          var position = marker.getPosition();
+          $('#geopoint_lng').val(position.lng());
+          $('#geopoint_lat').val(position.lat());
+          // console.log(marker.getPosition().lat());
+        });
+        {% else %}
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: {lng: {{cities.0.geopoint.coordinates.0}}, lat: {{cities.0.geopoint.coordinates.1}}},
+            zoom: 11
+          });
+        {% endif %}
+      };
+      $("#city_id").change(function () {
+        $( "#city_id option:selected" ).each(function() {
+          var lng = parseFloat($(this).attr('lng'));
+          var lat = parseFloat($(this).attr('lat'));
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: {lng: lng, lat: lat},
+            zoom: 11
+          });
+          //console.log($( this ).attr('lat'), $( this ).attr('lng'))
+        });
       });
     </script>
 {% endblock %}

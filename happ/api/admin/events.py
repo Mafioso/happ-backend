@@ -77,6 +77,12 @@ class EventViewSet(viewsets.ModelViewSet):
                 {'error_message': _('Min_price or max_price should be provided.')},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        if 'web_site' in request.data and request.data['web_site'] != '':
+            web_site = request.data['web_site']
+            if not web_site.startswith('http://'):
+                if not web_site.startswith('https://'):
+                    request.data['web_site'] = 'http://' + web_site
+
         if 'raw_datetimes' not in request.data:
             if 'start_datetime' not in request.data:
                 return Response(

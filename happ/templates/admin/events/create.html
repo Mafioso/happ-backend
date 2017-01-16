@@ -18,7 +18,7 @@
                 <div class="x_panel">
                   <div class="x_content">
                     <br />
-                    <form id="event-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-events-list' %}" ic-on-success="window.location.replace('{% url 'event_list' %}');" ic-indicator="#indicator3">
+                    <form id="event-form" data-parsley-validate class="form-horizontal form-label-left" ic-post-to="{% url 'admin-events-list' %}" ic-on-success="window.location.replace('{% url 'event_list' %}');"  ic-indicator="#indicator3">
 
                       <div class="form-group">
                         <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">Название события <span class="required">*</span>
@@ -32,14 +32,16 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="event-type" class="form-control col-md-7 col-xs-12">
                             <option></option>
-                            <option>Мастер-класс</option>
-                            <option>Лекция</option>
-                            <option>Семинар</option>
-                            <option>Выставка</option>
-                            <option>Опера</option>
                             <option>Балет</option>
+                            <option>Вечеринка</option>
+                            <option>Выставка</option>
+                            <option>Концерт</option>
+                            <option>Лекция</option>
+                            <option>Мастер-класс</option>
+                            <option>Опера</option>
+                            <option>Показ фильма</option>
+                            <option>Спектакль</option>
                             <option>Тренинг</option>
-                            <option>Кинопоказ</option>
                           </select>
                         </div>
                       </div>
@@ -59,7 +61,7 @@
                         <div class="col-md-6 col-sm-6 col-xs-12">
                           <select id="city_id" class="form-control col-md-7 col-xs-12 selectpicker" name="city_id" data-live-search="true">
                             {% for item in cities %}
-                              <option value="{{item.id}}" data-subtext="{{item.country_name}}">{{item.name}}</option>
+                              <option value="{{item.id}}" data-subtext="{{item.country_name}}" lng="{{item.geopoint.coordinates.0}}" lat="{{item.geopoint.coordinates.1}}">{{item.name}}</option>
                             {% endfor%}
                           </select>
                         </div>
@@ -122,11 +124,24 @@
                       <div class="form-group">
                         <label for="place_name" class="control-label col-md-3 col-sm-3 col-xs-12">Место проведения</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <select id="place_name" class="form-control col-md-7 col-xs-12 place_name selectized" name="place_name">
+                          <select id="place_name" class="form-control col-md-7 col-xs-12 place_name selectized">
                           </select>
+                          <div id="map"></div>
                           <input type="hidden" name="geopoint_lng" id="geopoint_lng" />
                           <input type="hidden" name="geopoint_lat" id="geopoint_lat" />
-                          <input type="hidden" name="address" id="address" />
+
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Названия места проведения</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="place_name" id="place_name_txt" class="form-control col-md-7 col-xs-12" />
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="description" class="control-label col-md-3 col-sm-3 col-xs-12">Адрес</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                          <input type="text" name="address" id="address" class="form-control col-md-7 col-xs-12" />
                         </div>
                       </div>
                       <div class="form-group">
@@ -154,7 +169,7 @@
                       <div class="form-group">
                         <label for="web_site" class="control-label col-md-3 col-sm-3 col-xs-12">Веб сайт мероприятия или организатора</label>
                         <div class="col-md-6 col-sm-6 col-xs-12">
-                          <input id="web_site" class="form-control col-md-7 col-xs-12" type="text" name="web_site">
+                          <input id="web_site" class="form-control col-md-7 col-xs-12" type="text" name="web_site" >
                         </div>
                       </div>
                       <div class="form-group">
@@ -262,7 +277,11 @@
     <script src="{% get_static_prefix %}js/datepicker/daterangepicker.js"></script>
     <script src="{% get_static_prefix %}js/selectize.min.js"></script>
 
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
+
     <script>
+
+
       datetimes = []
       function delete_datetime(index){
         datetimes.splice(index, 1);
@@ -405,7 +424,7 @@
               });
           },
           onLoad: function(data){
-            console.log(data);
+            // console.log(data);
             $(this)[0].open();
           },
           onChange: function(value) {
@@ -415,10 +434,30 @@
               $('#geopoint_lng').val(item.geometry.location.lng);
               $('#geopoint_lat').val(item.geometry.location.lat);
               $('#address').val(item.formatted_address);
+              $('#place_name_txt').val(item.name);
+              map = new google.maps.Map(document.getElementById('map'), {
+                center: {lng: item.geometry.location.lng, lat: item.geometry.location.lat},
+                zoom: 15
+              });
+              marker = new google.maps.Marker({
+                position: {lng: item.geometry.location.lng, lat: item.geometry.location.lat},
+                label: item.formatted_address,
+                title: item.name,
+                map: map,
+                draggable:true
+              });
+              marker.addListener('dragend', function() {
+                var position = marker.getPosition();
+                $('#geopoint_lng').val(position.lng());
+                $('#geopoint_lat').val(position.lat());
+                // console.log(marker.getPosition().lat());
+              });
             } else {
               $('#geopoint_lng').val('');
               $('#geopoint_lat').val('');
               $('#address').val('');
+              $('#place_name_txt').val('')
+              marker.setMap(null);
             }
           },
         });
@@ -461,6 +500,26 @@
 
             reader.readAsDataURL(input.get(0).files[0]);
           }
+      });
+      var map;
+      var marker;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lng: {{cities.0.geopoint.coordinates.0}}, lat: {{cities.0.geopoint.coordinates.1}}},
+          zoom: 11
+        });
+      };
+      $("#city_id").change(function () {
+        $( "#city_id option:selected" ).each(function() {
+          var lng = parseFloat($(this).attr('lng'));
+          var lat = parseFloat($(this).attr('lat'));
+          map = new google.maps.Map(document.getElementById('map'), {
+            center: {lng: lng, lat: lat},
+            zoom: 11
+          });
+          //console.log($( this ).attr('lat'), $( this ).attr('lng'))
+        });
       });
     </script>
 {% endblock %}
