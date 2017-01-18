@@ -604,6 +604,7 @@ class FeedbackMessageSerializer(serializers.DocumentSerializer):
 
 class LogEntrySerializer(serializers.DocumentSerializer):
     author = AuthorSerializer()
+    text = drf_serializers.CharField(read_only=True)
 
     class Meta:
         model = LogEntry

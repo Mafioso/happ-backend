@@ -2,7 +2,9 @@ from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework_mongoengine import viewsets
 
+from mongoextensions import filters
 from happ.models import LogEntry, User
+from happ.filters import LogEntryFilter
 from happ.policies import StaffPolicy
 from happ.serializers import LogEntrySerializer
 
@@ -11,6 +13,8 @@ class LogEntryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (StaffPolicy, )
     serializer_class = LogEntrySerializer
     queryset = LogEntry.objects.all().order_by('-date_created')
+    filter_backends = (filters.MongoFilterBackend,)
+    filter_class = LogEntryFilter
 
     def list(self, request, *args, **kwargs):
         response = super(LogEntryViewSet, self).list(request, *args, **kwargs)

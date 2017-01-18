@@ -1,7 +1,7 @@
 from rest_framework import fields
 
 from mongoextensions.filters import filtersets, filters
-from .models import Event, EventTime
+from .models import Event, LogEntry
 
 
 class EventFilter(filtersets.ModelFilterset):
@@ -27,4 +27,16 @@ class EventFilter(filtersets.ModelFilterset):
             'max_price',
             'status',
             'type',
+        ]
+
+
+class LogEntryFilter(filtersets.ModelFilterset):
+    start_date = filters.DateTimeFilter(name='date_created', lookup='gte')
+    end_date = filters.DateTimeFilter(name='date_created', lookup='lte')
+
+    class Meta:
+        model = LogEntry
+        fields = [
+            'start_date',
+            'end_date',
         ]

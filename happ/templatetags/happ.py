@@ -106,17 +106,3 @@ def div(a, b):
 @register.filter(name='mult')
 def mult(a, b):
     return a * b
-
-@register.filter(name='action_text')
-def page_count(log_entry):
-    flag_texts = {
-        LogEntry.ADDITION: u'Создание',
-        LogEntry.CHANGE: u'Изменение',
-        LogEntry.DELETION: u'Удаление',
-        LogEntry.APPROVAL: u'Утверждение',
-        LogEntry.REJECTION: u'Отклонение',
-        LogEntry.ACTIVATION: u'Активация',
-        LogEntry.DEACTIVATION: u'Деактивация',
-        LogEntry.REPLY: u'Ответ',
-    }
-    return flag_texts[log_entry['flag']]

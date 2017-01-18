@@ -497,6 +497,17 @@ class StaticText(HappBaseDocument):
 
     log_attrs = ('type', )
 
+    @classmethod
+    def title(cls, type):
+        titles = {
+            StaticText.TERMS_OF_SERVICE: u'Правила пользования',
+            StaticText.PRIVACY_POLICY: u'Политика конфиденциальности',
+            StaticText.ORGANIZER_RULES: u'Правила организатора события',
+            StaticText.FAQ: u'Вопросы-ответы',
+        }
+        return titles[type]
+
+
 
 class LogEntry(HappBaseDocument):
     """
@@ -519,6 +530,32 @@ class LogEntry(HappBaseDocument):
     data = DictField()
     flag = IntField(choices=FLAGS, default=ADDITION)
     author = ReferenceField(User, reverse_delete_rule=CASCADE)
+
+    @property
+    def text(self):
+        flag_texts = {
+            LogEntry.ADDITION: u'Создание',
+            LogEntry.CHANGE: u'Изменение',
+            LogEntry.DELETION: u'Удаление',
+            LogEntry.APPROVAL: u'Утверждение',
+            LogEntry.REJECTION: u'Отклонение',
+            LogEntry.ACTIVATION: u'Активация',
+            LogEntry.DEACTIVATION: u'Деактивация',
+            LogEntry.REPLY: u'Ответ',
+        }
+        if self.entity.__class__ == City:
+            return u'{flag} города {name}'.format(flag=flag_texts[self.flag], name=self.data['name'])
+        if self.entity.__class__ == User:
+            return u'{flag} пользователя {username}'.format(flag=flag_texts[self.flag], username=self.data['username'])
+        if self.entity.__class__ == Interest:
+            return u'{flag} интереса {title}'.format(flag=flag_texts[self.flag], title=self.data['title'])
+        if self.entity.__class__ == Event:
+            return u'{flag} события {title}'.format(flag=flag_texts[self.flag], title=self.data['title'])
+        if self.entity.__class__ == Complaint:
+            return u'{flag} на жалобу {text}'.format(flag=flag_texts[self.flag], text=self.data['text'])
+        if self.entity.__class__ == StaticText:
+            return u'{flag} статичной страницы {type}'.format(flag=flag_texts[self.flag], type=StaticText.titles(self.data['type']))
+        return ''
 
 
 # Notification
