@@ -36,7 +36,7 @@
                 <span class="fa fa-search"></span> Фильтр
             </button>
           </div>
-          <div id="log-table" ic-src="{% url 'admin-log-list' %}?format=html" ic-trigger-on="load" ic-target="#log-table" ic-indicator="#indicator" ic-deps="*">
+          <div id="log-table" ic-src="{% url 'admin-log-list' %}?format=html&page={{page|default:1}}&{{ request.GET.urlencode }}" ic-trigger-on="load" ic-target="#log-table" ic-indicator="#indicator" ic-deps="*">
 
           </div>
           <center> <!-- lol -->
@@ -68,12 +68,12 @@
 
 <script>
   $(document).ready(function() {
-    // if($('#start_date').val()) {
-    //     $('#start_date').val(moment($('#start_date').val(), 'YYYYMMDD').format('DD/MM/YYYY'));
-    // }
-    // if($('#end_date').val()) {
-    //     $('#end_date').val(moment($('#end_date').val(), 'YYYYMMDD').format('DD/MM/YYYY'));
-    // }
+    if($('#start_date').val()) {
+        $('#start_date').val(moment($('#start_date').val()).format('DD/MM/YYYY'));
+    }
+    if($('#end_date').val()) {
+        $('#end_date').val(moment($('#end_date').val()).format('DD/MM/YYYY'));
+    }
     $('.date-picker').daterangepicker({
       singleDatePicker: true,
       calender_style: "picker_4"
@@ -83,9 +83,9 @@
 
     $('#filter_form').submit(function() {
       if($('#start_date').val())
-        $('#start_date').val(moment($('#start_date').val()).toISOString());
+        $('#start_date').val(moment($('#start_date').val()).format());
       if($('#end_date').val())
-        $('#end_date').val(moment($('#end_date').val()).toISOString());
+        $('#end_date').val(moment($('#end_date').val()).format());
     });
 
     // $('#city').selectize();

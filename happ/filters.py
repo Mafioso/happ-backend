@@ -31,8 +31,8 @@ class EventFilter(filtersets.ModelFilterset):
 
 
 class LogEntryFilter(filtersets.ModelFilterset):
-    start_date = filters.DateTimeFilter(name='date_created', lookup='gte')
-    end_date = filters.DateTimeFilter(name='date_created', lookup='lte')
+    start_date = filters.DateTimeFilter(source='date_created', lookup='gte')
+    end_date = filters.DateTimeFilter(source='date_created', lookup='lte')
 
     class Meta:
         model = LogEntry
