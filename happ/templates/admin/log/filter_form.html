@@ -3,10 +3,10 @@
 <form class="form" role="form" method="get" action="" id="filter_form">
   <div class="col-md-6">
     <div class="form-group" style="margin-right:10px;">
-        <label class="control-label" for="city">Пользователь</label>
-        <select id="city" class="form-control selectize" name="city" multiple="multiple">
-          {% for item in cities %}
-            <option value="{{item.id}}" data-subtext="{{item.country_name}}" {% if item.id|stringformat:'s' in request.GET|getlist:'city' %}selected="selected"{% endif %}>{{item.name}}</option>
+        <label class="control-label" for="author">Пользователь</label>
+        <select id="author" class="form-control selectize" name="author" multiple="multiple">
+          {% for item in users %}
+            <option value="{{item.id}}" data-subtext="{{item.role|role}}" {% if item.id|stringformat:'s' in request.GET|getlist:'author' %}selected="selected"{% endif %}>{{item.fn}}</option>
           {% endfor%}
         </select>
     </div>

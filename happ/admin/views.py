@@ -213,3 +213,8 @@ class AdministratorsListView(JWTAuthRequiredMixin, RoleMixin, UserPassesTestMixi
 
 class ActionLogView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     template_name = 'admin/action_log_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ActionLogView, self).get_context_data(**kwargs)
+        context['users'] = User.objects.filter(role__gte=User.MODERATOR)
+        return context
