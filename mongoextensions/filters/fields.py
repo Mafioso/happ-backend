@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 class DateTime000Field(fields.DateTimeField):
     """ discards microseconds """
     def to_internal_value(self, value):
-        value = super().to_internal_value(value)
+        value = super(DateTime000Field, self).to_internal_value(value)
         return value.replace(microsecond=value.microsecond//1000*1000)
 
 
