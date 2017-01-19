@@ -101,7 +101,13 @@ class EventCreateView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(EventCreateView, self).get_context_data(**kwargs)
-        context['cities'] = City.objects.filter(is_active=True)
+        # print self.request.user.role
+        # print User.MODERATOR
+        if self.request.user.role == User.MODERATOR:
+            context['cities'] = [self.request.user.assigned_city]
+        else:
+            context['cities'] = City.objects.filter(is_active=True)
+        #context['cities'] = City.objects.filter(is_active=True)
         context['currencies'] = Currency.objects.all()
         context['interests'] = Interest.objects.filter(is_active=True, parent=None).order_by('title')
         context['api_key'] = settings.GOOGLE_BROWSER_KEY
@@ -114,7 +120,11 @@ class EventEditView(JWTAuthRequiredMixin, RoleMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(EventEditView, self).get_context_data(**kwargs)
         context['object'] = Event.objects.get(id=kwargs['id'])
-        context['cities'] = City.objects.filter(is_active=True)
+        if self.request.user.role == User.MODERATOR:
+            context['cities'] = [self.request.user.assigned_city]
+        else:
+            context['cities'] = City.objects.filter(is_active=True)
+        #context['cities'] = City.objects.filter(is_active=True)
         context['currencies'] = Currency.objects.all()
         context['interests'] = Interest.objects.filter(is_active=True, parent=None)
         context['api_key'] = settings.GOOGLE_BROWSER_KEY
