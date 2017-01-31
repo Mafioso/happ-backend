@@ -252,3 +252,10 @@ BROKER_URL = 'amqp://{user_passwd}@{host}:{port}/{vhost}'.format(**{
 
 EARTH_RADIUS = 6378100.0 # Earth radius in meters
 MAP_VIEW_DEFAULT_DISTANCE = 10000 # default radius in meters
+
+QUICKBLOX_API_ENDPOINT = 'https://api.quickblox.com/'
+QUICKBLOX_ACCOUNT_KEY = 'pyJjVCDgfxsPmWPBayxd'
+QUICKBLOX_ACCOUNT_ID = 65815
+QUICKBLOX_APP_ID = 53118
+QUICKBLOX_AUTH_KEY = 'h4CGXJSZaU4HaGY'
+QUICKBLOX_AUTH_SECRET = 'M6RSmnnMJq796Jc'
