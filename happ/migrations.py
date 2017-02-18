@@ -214,3 +214,12 @@ def migration__event_geopoint__0022():
                 {'_id': event['_id']},
                 {'$set': {'geopoint': { "type" : "Point", "coordinates" : event['geopoint'] }}},
             )
+
+def migration__event_to_feed__0023():
+    coll = get_db()['event']
+    feed = get_db()['feed']
+    for event in coll.find({}):
+        if 'datetimes' in event and isinstance(event['datetimes'], list):
+            for date in event['datetimes']:
+                feed.insert({'event': event['_id'], 'datetimes': [date]})
+

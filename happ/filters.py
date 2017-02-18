@@ -1,7 +1,7 @@
 from rest_framework import fields
 
 from mongoextensions.filters import filtersets, filters
-from .models import Event, LogEntry
+from .models import Event, LogEntry, Feed
 
 
 class EventFilter(filtersets.ModelFilterset):
@@ -40,4 +40,20 @@ class LogEntryFilter(filtersets.ModelFilterset):
         fields = [
             'start_date',
             'end_date',
+        ]
+
+class FeedFilter(filtersets.ModelFilterset):
+    start_date = filters.ListItemFilter(list_field='datetimes', at2='date', lookup='gte')
+    start_time = filters.ListItemFilter(list_field='datetimes', at2='start_time', lookup='gte')
+    end_date = filters.ListItemFilter(list_field='datetimes', at2='date', lookup='lte')
+    end_time = filters.ListItemFilter(list_field='datetimes', at2='end_time', lookup='lte')
+
+
+    class Meta:
+        model = Feed
+        fields = [
+            'start_date',
+            'start_time',
+            'end_date',
+            'end_time',
         ]

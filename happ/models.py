@@ -154,14 +154,23 @@ class User(AbstractUser, HappBaseDocument):
         return Event.objects(in_favourites=self, datetimes__0__date__gte=datetime.datetime.now().date())
 
     def get_feed(self):
-        return Event.objects(
+        events = Event.objects(
             city=self.settings.city,
             interests__in=self.current_interests,
             type__in=[Event.NORMAL, Event.ADS],
             status=Event.APPROVED,
-            datetimes__0__date__gte=datetime.datetime.now().date(),
+            datetimes__date__gte=datetime.datetime.now().date(),
             is_active=True
         )
+        feed = Feed.objects(
+            event__in=list(events),
+            datetimes__date__gte=datetime.datetime.now().date()
+            )
+        #events = events.aggregate({ '$unwind' : "$datetimes" }, {'$sort': {'datetimes.date':1, 'datetimes.start_time':1}})
+        #print(list(events))
+        # import pdb;pdb.set_trace()
+
+        return feed
 
     def get_featured(self):
         return Event.objects(
@@ -417,6 +426,9 @@ class Event(HappBaseDocument):
         self.is_active = False
         self.save()
 
+class Feed(HappBaseDocument):
+    event = ReferenceField(Event, reverse_delete_rule=CASCADE)
+    datetimes = EmbeddedDocumentListField('EventTime')
 
 class EventTime(EmbeddedDocument):
     date = DateStringField()

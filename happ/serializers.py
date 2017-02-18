@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers as drf_serializers
@@ -8,6 +9,8 @@ from rest_framework.exceptions import ValidationError
 from rest_framework_mongoengine import serializers
 
 from mongoextensions.filters.fields import GeoPointField
+
+from happ.utils import string_to_date
 
 from .models import (
     Country,
@@ -23,6 +26,7 @@ from .models import (
     FeedbackMessage,
     EventTime,
     LogEntry,
+    Feed,
 )
 
 
@@ -344,7 +348,9 @@ class EventTimeSerializer(serializers.EmbeddedDocumentSerializer):
 
 class EventSerializer(LocalizedSerializer):
     geopoint = GeoPointField()
-    datetimes = EventTimeSerializer(many=True, required=False)
+    #datetimes = EventTimeSerializer(many=True, required=False)
+    datetimes = drf_serializers.SerializerMethodField()
+    #datetime = drf_serializers.SerializerMethodField()
 
     # read only fields
     interests = InterestChildSerializer(many=True, read_only=True)
@@ -456,10 +462,195 @@ class EventSerializer(LocalizedSerializer):
     def get_images(self, obj):
         return FileObjectSerializer(obj.images, many=True).data
 
+    def get_datetimes(self, obj):
+        #import pdb;pdb.set_trace()
+        datetimes = []
+        for item in obj['datetimes']:
+            if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
+                datetimes.append(item)
+        return EventTimeSerializer(datetimes, many=True, required=False).data
+
+    def get_datetime(self, obj):
+        datetimes = []
+        for item in obj['datetimes']:
+            if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
+                datetimes.append(item)
+                break
+        return EventTimeSerializer(datetimes, many=True, required=False).data
+
     def get_rejection_reason(self, obj):
         if obj.rejection_reasons.count() == 0:
             return None
         return RejectionReasonSerializer(obj.rejection_reasons[0]).data
+
+class FeedSerializer(serializers.DocumentSerializer):
+    #event = EventSerializer(read_only=True)
+    id = drf_serializers.SerializerMethodField()
+    geopoint = drf_serializers.SerializerMethodField()#GeoPointField()
+    event_datetimes = drf_serializers.SerializerMethodField()
+
+    # read only fields
+    interests = drf_serializers.SerializerMethodField()# InterestChildSerializer(many=True, read_only=True)
+    city = drf_serializers.SerializerMethodField() #CitySerializer(read_only=True)
+    currency = drf_serializers.SerializerMethodField() #CurrencySerializer(read_only=True)
+    author = drf_serializers.SerializerMethodField() #AuthorSerializer(read_only=True)
+
+    rejection_reason = drf_serializers.SerializerMethodField()
+    is_upvoted = drf_serializers.SerializerMethodField()
+    is_in_favourites = drf_serializers.SerializerMethodField()
+    images = drf_serializers.SerializerMethodField()
+    #is_active = drf_serializers.BooleanField(read_only=True)
+
+    title = drf_serializers.SerializerMethodField()
+    description = drf_serializers.SerializerMethodField()
+    language = drf_serializers.SerializerMethodField() # en ru fr it es de
+    type = drf_serializers.SerializerMethodField()
+    status = drf_serializers.SerializerMethodField()
+    is_active = drf_serializers.SerializerMethodField()
+    min_price = drf_serializers.SerializerMethodField()
+    max_price = drf_serializers.SerializerMethodField()
+    address = drf_serializers.SerializerMethodField()
+    place_name = drf_serializers.SerializerMethodField()
+    phones = drf_serializers.SerializerMethodField()#(drf_serializers.SerializerMethodField())
+    email = drf_serializers.SerializerMethodField()
+    web_site = drf_serializers.SerializerMethodField()
+    votes_num = drf_serializers.SerializerMethodField()
+    close_on_start = drf_serializers.SerializerMethodField()
+    registration_link = drf_serializers.SerializerMethodField()
+    tickets_link = drf_serializers.SerializerMethodField()
+    min_age = drf_serializers.SerializerMethodField()
+    max_age = drf_serializers.SerializerMethodField()
+
+    # write only fields
+    # interest_ids = drf_serializers.ListField(write_only=True, required=False)
+    # currency_id = drf_serializers.SerializerMethodField() #serializers.ObjectIdField(write_only=True, required=False)
+    # city_id = drf_serializers.SerializerMethodField() #serializers.ObjectIdField(write_only=True, required=False)
+    # image_ids = drf_serializers.SerializerMethodField() #drf_serializers.ListField(write_only=True, required=False)
+    datetimes = EventTimeSerializer(many=True, required=False)
+
+    class Meta:
+        model = Feed
+
+    def get_id(self, obj):
+        return str(obj['event']['id'])
+
+    def get_title(self, obj):
+        return obj['event']['title']
+
+    def get_description(self, obj):
+        return obj['event']['description']
+
+    def get_language(self, obj):
+        return obj['event']['language']
+
+    def get_type(self, obj):
+        return obj['event']['type']
+
+    def get_status(self, obj):
+        return obj['event']['status']
+
+    def get_is_active(self, obj):
+        return obj['event']['is_active']
+
+    def get_min_price(self, obj):
+        return obj['event']['min_price']
+
+    def get_max_price(self, obj):
+        return obj['event']['max_price']
+
+    def get_address(self, obj):
+        return obj['event']['address']
+
+    def get_place_name(self, obj):
+        return obj['event']['place_name']
+
+    def get_phones(self, obj):
+        return obj['event']['phones']
+
+    def get_email(self, obj):
+        return obj['event']['email']
+
+    def get_votes(self, obj):
+        return obj['event']['votes']
+
+    def get_web_site(self, obj):
+        return obj['event']['web_site']
+
+    def get_votes_num(self, obj):
+        return obj['event']['votes_num']
+
+    def get_close_on_start(self, obj):
+        return obj['event']['close_on_start']
+
+    def get_registration_link(self, obj):
+        return obj['event']['registration_link']
+
+    def get_tickets_link(self, obj):
+        return obj['event']['tickets_link']
+
+    def get_min_age(self, obj):
+        return obj['event']['min_age']
+
+    def get_max_age(self, obj):
+        return obj['event']['max_age']
+
+    def get_geopoint(self, obj):
+        return obj['event']['geopoint']
+
+    def get_interests(self, obj):
+        return InterestChildSerializer(obj['event']['interests'], many=True, read_only=True).data
+
+    def get_city(self, obj):
+        return CitySerializer(obj['event']['city'], read_only=True).data
+
+    def get_currency(self, obj):
+        return CurrencySerializer(obj['event']['currency'], read_only=True).data
+
+    def get_author(self, obj):
+        return AuthorSerializer(obj['event']['author'], read_only=True).data
+
+    def get_currency_id(self, obj):
+        return serializers.ObjectIdField(obj['event']['currency'], required=False)
+
+    def get_city_id(self, obj):
+        return serializers.ObjectIdField(obj['event']['city'], required=False)
+
+    def get_image_ids(self, obj):
+        return drf_serializers.ListField(obj['event'].images, required=False)
+
+
+    def get_is_upvoted(self, obj):
+        if 'request' not in self.context:
+            return False
+        return bool(obj['event'].is_upvoted(self.context['request'].user))
+
+    def get_is_in_favourites(self, obj):
+        if 'request' not in self.context:
+            return False
+        return obj['event'].is_in_favourites(self.context['request'].user)
+
+    def get_images(self, obj):
+        return FileObjectSerializer(obj['event'].images, many=True).data
+
+    # def get_datetimes(self, obj):
+    #     #import pdb;pdb.set_trace()
+    #     datetimes = []
+    #     for item in obj['datetimes']:
+    #         if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
+    #             datetimes.append(item)
+    #     return EventTimeSerializer(datetimes, many=True, required=False).data
+
+    def get_event_datetimes(self, obj):
+        datetimes = []
+        for item in obj['event']['datetimes']:
+            if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
+                datetimes.append(item)
+        return EventTimeSerializer(datetimes, many=True, required=False).data
+
+    def get_rejection_reason(self, obj):
+        if obj['event'].rejection_reasons.count() == 0:
+            return None
+        return RejectionReasonSerializer(obj['event'].rejection_reasons[0]).data
 
 
 class EventAdminSerializer(LocalizedSerializer):

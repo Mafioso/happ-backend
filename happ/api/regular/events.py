@@ -8,15 +8,16 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route, list_route
 from rest_framework_mongoengine import viewsets
+from rest_framework.pagination import CursorPagination
 from mongoengine.queryset.visitor import Q
 
 from mongoextensions import filters
 from happ.utils import store_file, string_to_date, string_to_time, daterange, date_to_string, time_to_string
 from happ.models import Event, Complaint, User
-from happ.filters import EventFilter
+from happ.filters import EventFilter, FeedFilter
 from happ.pagination import SolidPagination
-from happ.decorators import patch_queryset, patch_order, patch_pagination_class
-from happ.serializers import EventSerializer
+from happ.decorators import patch_queryset, patch_order, patch_pagination_class, patch_serializer_class, patch_filter_class
+from happ.serializers import EventSerializer, FeedSerializer
 
 
 def filter_organizer_feed(self, queryset):
@@ -308,8 +309,10 @@ class EventViewSet(viewsets.ModelViewSet):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 
     @list_route(methods=['get'], url_path='feed')
+    @patch_serializer_class(FeedSerializer)
     @patch_queryset(lambda self, x: self.request.user.get_feed())
-    @patch_order({'default': ('datetimes__0__date', 'datetimes__0__start_time', ), 'popular': ('datetimes__0__date', '-votes_num')})
+    @patch_order({'default': ('datetimes__date', 'datetimes__start_time', )})
+    @patch_filter_class(FeedFilter)
     def feed(self, request, *args, **kwargs):
         return super(EventViewSet, self).list(request, *args, **kwargs)
 

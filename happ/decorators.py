@@ -35,7 +35,7 @@ def patch_order(sort_dict):
             order = request.GET.get('order')
             if order not in sort_dict:
                 order = 'default'
-            # self.queryset = prev_queryset.order_by(*sort_dict[order])
+            self.queryset = prev_queryset.order_by(*sort_dict[order])
             rv = fn(self, request, *a, **kw)
             self.queryset = prev_queryset
             return rv
