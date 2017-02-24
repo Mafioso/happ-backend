@@ -48,7 +48,7 @@ def signup(login, password, facebook_id='', email='', full_name='', session_id=N
     if session_id is None:
         session_id = get_session()['session']['token']
     url = '{host}{path}'.format(host=djsettings.QUICKBLOX_API_ENDPOINT, path=ENDPOINTS['signup'])
-    login = '{}-{}'.format(login, password)
+    login = '{}-{}'.format(login, password).replace(' ', '')
     data = {
         'user': {
             'login': login,
