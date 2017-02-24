@@ -237,8 +237,8 @@ def migration__user_to_quickblox__0024():
 def migration__user_to_quickblox_empty__0025():
     users = get_db()['user']
     for user in users.find({}):
-        #if 'quickblox_id' not in user:
-        users.update(
+        if 'quickblox_id' not in user and user.get('quickblox_id'):
+            users.update(
                 {'_id': user.get('_id')},
-                {'$unset': {'quickblox_id': "", 'quickblox_password': ""}}
+                {'$set': {'quickblox_id': int(user.get('quickblox_id',''))}}
                     )

@@ -117,7 +117,7 @@ class User(AbstractUser, HappBaseDocument):
     facebook_id = StringField()
     assigned_city = ReferenceField(City, reverse_delete_rule=CASCADE, required=False, null=True)
 
-    quickblox_id = StringField()
+    quickblox_id = IntField()
     quickblox_password = StringField()
     quickblox_login = StringField()
 
