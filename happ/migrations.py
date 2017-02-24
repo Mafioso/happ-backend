@@ -231,7 +231,7 @@ def migration__user_to_quickblox__0024():
         if 'errors' not in quickblox_user:
             users.update(
                     {'_id': user.get('_id')},
-                    {'$set': {'quickblox_id': str(quickblox_user['user']['id']), 'quickblox_password': quickblox_password}}
+                    {'$set': {'quickblox_id': str(quickblox_user['user']['id']), 'quickblox_password': quickblox_password, 'quickblox_login': str(quickblox_user['user']['login'])}}
                     )
 
 def migration__user_to_quickblox_empty__0025():
