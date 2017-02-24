@@ -10,7 +10,8 @@ from rest_framework_mongoengine import serializers
 
 from mongoextensions.filters.fields import GeoPointField
 
-from happ.utils import string_to_date
+from happ.utils import string_to_date, make_random_password
+from happ.integrations.quickblox import signup as quickblox_signup
 
 from .models import (
     Country,
@@ -249,6 +250,14 @@ class UserSerializer(serializers.DocumentSerializer):
             user.set_password(validated_data['password'])
         user.settings = UserSettings()
         user.save()
+        quickblox_password = make_random_password()
+        quickblox_user = quickblox_signup(user.username, quickblox_password, facebook_id=user.facebook_id, email=user.email)
+        # import pdb;pdb.set_trace()
+        if 'errors' not in quickblox_user:
+            user.quickblox_id = str(quickblox_user['user']['id'])
+            user.quickblox_login = str(quickblox_user['user']['login'])
+            user.quickblox_password = quickblox_password
+            user.save()
         return user
 
     def update(self, instance, validated_data):
@@ -330,6 +339,7 @@ class AuthorSerializer(serializers.DocumentSerializer):
         fields = (
             'id',
             'fn',
+            'quickblox_id'
         )
 
 

@@ -14,6 +14,7 @@ ENDPOINTS = {
     'settings': 'account_settings.json',
     'session': 'session.json',
     'signup': 'users.json',
+    'subscription': 'subscriptions.json'
 }
 
 def make_signature(string):
@@ -36,6 +37,7 @@ def get_session():
         'auth_key': djsettings.QUICKBLOX_AUTH_KEY,
         'nonce': random.randint(0, 100000),
         'timestamp': datetime.now().strftime('%s'),
+        # 'user': {"login": "admin", "password": "f23gy5EtFC"}
     })
     string = urllib.urlencode(sorted(data.items(), key=lambda t: t[0]))
     data['signature'] = make_signature(string)
@@ -46,6 +48,7 @@ def signup(login, password, facebook_id='', email='', full_name='', session_id=N
     if session_id is None:
         session_id = get_session()['session']['token']
     url = '{host}{path}'.format(host=djsettings.QUICKBLOX_API_ENDPOINT, path=ENDPOINTS['signup'])
+    login = '{}-{}'.format(login, password)
     data = {
         'user': {
             'login': login,
@@ -59,4 +62,16 @@ def signup(login, password, facebook_id='', email='', full_name='', session_id=N
         'QB-Token': session_id,
     }
     response = requests.post(url, json=data, headers=headers)
+    print response.content
+    return json.loads(response.content)
+
+def get_subscription(session_id=None):
+    if session_id is None:
+        print get_session()
+        session_id = get_session()['session']['token']
+    url = '{host}{path}'.format(host=djsettings.QUICKBLOX_API_ENDPOINT, path=ENDPOINTS['subscription'])
+    headers = {
+        'QB-Token': session_id,
+    }
+    response = requests.post(url, headers=headers)
     return json.loads(response.content)

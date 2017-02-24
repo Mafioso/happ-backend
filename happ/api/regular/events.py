@@ -310,7 +310,7 @@ class EventViewSet(viewsets.ModelViewSet):
 
     @list_route(methods=['get'], url_path='feed')
     @patch_serializer_class(FeedSerializer)
-    @patch_queryset(lambda self, x: self.request.user.get_feed())
+    @patch_queryset(lambda self, x: self.request.user.get_feed(self.request))
     @patch_order({'default': ('datetimes__date', 'datetimes__start_time', )})
     @patch_filter_class(FeedFilter)
     def feed(self, request, *args, **kwargs):

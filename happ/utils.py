@@ -12,6 +12,7 @@ from PIL import Image
 from django.conf import settings
 from django.template import loader
 from django.core.mail import EmailMultiAlternatives
+from django.utils.crypto import get_random_string
 
 from rest_framework_jwt.settings import api_settings
 
@@ -180,3 +181,14 @@ def daterange(start, end, delta=timedelta(days=1)):
     while curr <= end:
         yield curr
         curr += delta
+
+def make_random_password(length=10,
+                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
+                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
+                                           '23456789'):
+    """
+    Generate a random password with the given length and given
+    allowed_chars. The default value of allowed_chars does not have "I" or
+    "O" or letters and digits that look similar -- just to avoid confusion.
+    """
+    return get_random_string(length, allowed_chars)

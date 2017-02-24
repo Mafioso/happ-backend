@@ -47,8 +47,8 @@ class FeedFilter(filtersets.ModelFilterset):
     start_time = filters.ListItemFilter(list_field='datetimes', at2='start_time', lookup='gte')
     end_date = filters.ListItemFilter(list_field='datetimes', at2='date', lookup='lte')
     end_time = filters.ListItemFilter(list_field='datetimes', at2='end_time', lookup='lte')
-    min_price = filters.IntegerFilter('gte')
-    max_price = filters.IntegerFilter('lte')
+    # min_price = filters.IntegerFilter('gte')
+    # max_price = filters.IntegerFilter('lte')
 
     class Meta:
         model = Feed
@@ -57,6 +57,6 @@ class FeedFilter(filtersets.ModelFilterset):
             'start_time',
             'end_date',
             'end_time',
-            'min_price',
-            'max_price'
+            # 'min_price',
+            # 'max_price'
         ]

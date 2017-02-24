@@ -7,8 +7,8 @@ import pymongo
 from django.conf import settings
 
 from .models import get_db
-from .utils import average_color, daterange, string_to_date, date_to_string
-
+from .utils import average_color, daterange, string_to_date, date_to_string, make_random_password
+from .integrations.quickblox import signup as quickblox_signup
 
 def migration__user__change_interests_schema__0001():
     user_coll = get_db()['user']
@@ -223,3 +223,22 @@ def migration__event_to_feed__0023():
             for date in event['datetimes']:
                 feed.insert({'event': event['_id'], 'datetimes': [date]})
 
+def migration__user_to_quickblox__0024():
+    users = get_db()['user']
+    for user in users.find({}):
+        quickblox_password = make_random_password()
+        quickblox_user = quickblox_signup(user.get('username'), quickblox_password)
+        if 'errors' not in quickblox_user:
+            users.update(
+                    {'_id': user.get('_id')},
+                    {'$set': {'quickblox_id': str(quickblox_user['user']['id']), 'quickblox_password': quickblox_password}}
+                    )
+
+def migration__user_to_quickblox_empty__0025():
+    users = get_db()['user']
+    for user in users.find({}):
+        #if 'quickblox_id' not in user:
+        users.update(
+                {'_id': user.get('_id')},
+                {'$unset': {'quickblox_id': "", 'quickblox_password': ""}}
+                    )

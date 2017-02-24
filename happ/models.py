@@ -117,6 +117,10 @@ class User(AbstractUser, HappBaseDocument):
     facebook_id = StringField()
     assigned_city = ReferenceField(City, reverse_delete_rule=CASCADE, required=False, null=True)
 
+    quickblox_id = StringField()
+    quickblox_password = StringField()
+    quickblox_login = StringField()
+
     log_attrs = ('username', )
 
     @property
@@ -153,18 +157,24 @@ class User(AbstractUser, HappBaseDocument):
     def get_favourites(self):
         return Event.objects(in_favourites=self, datetimes__0__date__gte=datetime.datetime.now().date())
 
-    def get_feed(self):
+    def get_feed(self, request):
+        #import pdb;pdb.set_trace()
+        max_price = 0
+        if request.query_params.get('max_price') and int(request.query_params.get('max_price')) == 0:
+            max_price = None
         events = Event.objects(
             city=self.settings.city,
             interests__in=self.current_interests,
             type__in=[Event.NORMAL, Event.ADS],
             status=Event.APPROVED,
             datetimes__date__gte=datetime.datetime.now().date(),
-            is_active=True
+            is_active=True,
+            max_price__gte=max_price
         )
         feed = Feed.objects(
             event__in=list(events),
-            datetimes__date__gte=datetime.datetime.now().date()
+            datetimes__date__gte=datetime.datetime.now().date(),
+            # datetimes__0__start_time__lte=datetime.datetime.now().strftime('%H%M%S')
             )
         #events = events.aggregate({ '$unwind' : "$datetimes" }, {'$sort': {'datetimes.date':1, 'datetimes.start_time':1}})
         #print(list(events))
