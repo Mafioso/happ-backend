@@ -9,6 +9,6 @@ def exchange(source, target, amount):
     data = requests.get(url).json()
     try:
         rate = float(data['query']['results']['rate']['Rate'])
-        return rate * amount
+        return round(rate * amount, 2)
     except:
         return False

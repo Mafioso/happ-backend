@@ -12,6 +12,7 @@ from mongoextensions.filters.fields import GeoPointField
 
 from happ.utils import string_to_date, make_random_password
 from happ.integrations.quickblox import signup as quickblox_signup
+from happ.integrations import yahoo
 
 from .models import (
     Country,
@@ -359,7 +360,7 @@ class EventTimeSerializer(serializers.EmbeddedDocumentSerializer):
 class EventSerializer(LocalizedSerializer):
     geopoint = GeoPointField()
     #datetimes = EventTimeSerializer(many=True, required=False)
-    datetimes = drf_serializers.SerializerMethodField()
+    #datetimes = drf_serializers.SerializerMethodField()
     #datetime = drf_serializers.SerializerMethodField()
 
     # read only fields
@@ -378,7 +379,7 @@ class EventSerializer(LocalizedSerializer):
     currency_id = serializers.ObjectIdField(write_only=True, required=False)
     city_id = serializers.ObjectIdField(write_only=True, required=False)
     image_ids = drf_serializers.ListField(write_only=True, required=False)
-    datetimes = EventTimeSerializer(write_only=True, many=True, required=False)
+    datetimes = EventTimeSerializer( many=True, required=False)
 
     class Meta:
         model = Event
@@ -432,6 +433,7 @@ class EventSerializer(LocalizedSerializer):
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
         #event.translate()
+        event.create_feed()
         return event
 
     def update(self, instance, validated_data):
@@ -459,6 +461,7 @@ class EventSerializer(LocalizedSerializer):
         event.status = Event.MODERATION
         event.save()
         #event.translate()
+        event.create_feed()
         return event
 
     def get_is_upvoted(self, obj):
@@ -564,10 +567,33 @@ class FeedSerializer(serializers.DocumentSerializer):
         return obj['event']['is_active']
 
     def get_min_price(self, obj):
-        return obj['event']['min_price']
+        result = 0
+        request = self.context.get("request")
+        user_currency = request.user.settings.currency.code
+        event_currency = obj['event']['currency'].code
+        if user_currency == event_currency:
+            return obj['event']['min_price']
+        else:
+            if obj['event']['min_price']:
+                result = yahoo.exchange(source=event_currency,
+                                target=user_currency,
+                                amount=int(obj['event']['min_price']))
+        return result
 
     def get_max_price(self, obj):
-        return obj['event']['max_price']
+        result = 0
+        request = self.context.get("request")
+        user_currency = request.user.settings.currency.code
+        event_currency = obj['event']['currency'].code
+        if user_currency == event_currency:
+            return obj['event']['max_price']
+        else:
+            if obj['event']['max_price']:
+                result = yahoo.exchange(source=event_currency,
+                                target=user_currency,
+                                amount=int(obj['event']['max_price']))
+        return result
+        #return obj['event']['max_price']
 
     def get_address(self, obj):
         return obj['event']['address']
@@ -615,7 +641,9 @@ class FeedSerializer(serializers.DocumentSerializer):
         return CitySerializer(obj['event']['city'], read_only=True).data
 
     def get_currency(self, obj):
-        return CurrencySerializer(obj['event']['currency'], read_only=True).data
+        request = self.context.get("request")
+        user_currency = request.user.settings.currency
+        return CurrencySerializer(user_currency, read_only=True).data
 
     def get_author(self, obj):
         return AuthorSerializer(obj['event']['author'], read_only=True).data
@@ -739,6 +767,7 @@ class EventAdminSerializer(LocalizedSerializer):
 
         map(lambda x: x.move_to_media(entity=event), FileObject.objects.filter(id__in=image_ids))
         #event.translate()
+        event.create_feed()
         return event
 
     def update(self, instance, validated_data):
@@ -769,6 +798,7 @@ class EventAdminSerializer(LocalizedSerializer):
 
         event.save()
         #event.translate()
+        event.create_feed()
         return event
 
     def get_images(self, obj):

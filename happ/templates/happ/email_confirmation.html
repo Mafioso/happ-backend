@@ -1,13 +1,14 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans %}You're receiving this email because you requested an email confirmation for HAPP app.{% endblocktrans %}<br />
+{% blocktrans %}Вы получили данное письмо потому что запросили подтверждение email в режиме организатора в приложение  HAPP.{% endblocktrans %}<br />
 
-{% trans "Please go to the following page to confirm email:" %}<br />
+{% trans "Пожалуйста пройдите по ссылке ниже чтобы закончить подтверждение:" %}<br />
+
 {% block reset_link %}
-<a href="http://{{ domain }}{% url 'redirect' %}?url={{ url|urlencode }}" target="_blank">Confirm email</a><br />
+<b><a href="http://{{ url }}" target="_blank">Подтвердить</a></b><br />
 {% endblock %}
 
-{% trans "Thanks for using our site!" %}<br /><br />
+{% trans "Спасибо большое за использование нашего приложения!" %}<br /><br />
 
-{% blocktrans %}The HAPP team{% endblocktrans %}<br />
+{% blocktrans %}С Уважением, команда HAPP!{% endblocktrans %}<br />
 
 {% endautoescape %}

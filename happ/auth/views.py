@@ -264,11 +264,12 @@ class EmailConfirmationRequest(APIView):
 
 class EmailConfirmation(APIView):
 
-    def post(self, request, format=None):
+    def get(self, request, format=None):
         """
         Confirms email and assigns Organizer role to user
         """
-        key = request.data.pop('key', None)
+        key = request.query_params.get('key', None)
+        #import pdb;pdb.set_trace()
         if not key:
             return Response(
                 {'error_message': _('Confirmation key is not provided.')},
@@ -292,7 +293,7 @@ class EmailConfirmation(APIView):
         user.role = User.ORGANIZER
         user.save()
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_200_OK, template_name='happ/organizer.html')
 
 
 class AdminLogin(ObtainJSONWebToken):

@@ -155,22 +155,45 @@ class User(AbstractUser, HappBaseDocument):
         }
 
     def get_favourites(self):
-        return Event.objects(in_favourites=self, datetimes__0__date__gte=datetime.datetime.now().date())
+        return Event.objects(in_favourites=self, datetimes__date__gte=datetime.datetime.now().date())
 
     def get_feed(self, request):
         #import pdb;pdb.set_trace()
         max_price = 0
-        if request.query_params.get('max_price') and int(request.query_params.get('max_price')) == 0:
-            max_price = None
+
         events = Event.objects(
             city=self.settings.city,
             interests__in=self.current_interests,
             type__in=[Event.NORMAL, Event.ADS],
             status=Event.APPROVED,
             datetimes__date__gte=datetime.datetime.now().date(),
-            is_active=True,
-            max_price__gte=max_price
+            is_active=True
         )
+
+        if request.query_params.get('max_price') and int(request.query_params.get('max_price')) == 0:
+            max_price = None
+            events = Event.objects(
+                city=self.settings.city,
+                interests__in=self.current_interests,
+                type__in=[Event.NORMAL, Event.ADS],
+                status=Event.APPROVED,
+                datetimes__date__gte=datetime.datetime.now().date(),
+                is_active=True,
+                max_price__in=[max_price, 0],
+                min_price__lte=0
+            )
+
+        # import pdb;pdb.set_trace()
+        # events = Event.objects(
+        #     city=self.settings.city,
+        #     interests__in=self.current_interests,
+        #     type__in=[Event.NORMAL, Event.ADS],
+        #     status=Event.APPROVED,
+        #     datetimes__date__gte=datetime.datetime.now().date(),
+        #     is_active=True,
+        #     max_price=max_price,
+        #     min_price__gte=None
+        # )
         feed = Feed.objects(
             event__in=list(events),
             datetimes__date__gte=datetime.datetime.now().date(),
@@ -381,6 +404,13 @@ class Event(HappBaseDocument):
         else:
             for language in django_settings.HAPP_LANGUAGES:
                 translate_entity.delay(cls=self.__class__, id=self.id, target=language)
+
+    def create_feed(self):
+        feed = Feed.objects.filter(event=self.id)
+        feed.delete()
+        for item in self.datetimes:
+            feed_item = Feed(event=self.id, datetimes=[item])
+            feed_item.save()
 
     def is_upvoted(self, user):
         try:
