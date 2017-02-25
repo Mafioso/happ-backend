@@ -378,6 +378,7 @@ class EventSerializer(LocalizedSerializer):
     currency_id = serializers.ObjectIdField(write_only=True, required=False)
     city_id = serializers.ObjectIdField(write_only=True, required=False)
     image_ids = drf_serializers.ListField(write_only=True, required=False)
+    datetimes = EventTimeSerializer(write_only=True, many=True, required=False)
 
     class Meta:
         model = Event
@@ -403,6 +404,7 @@ class EventSerializer(LocalizedSerializer):
         except Currency.MultipleObjectsReturned:
             raise ValidationError(_('Too many currencies with this currency_id'))
         return currency
+
 
     def validate(self, data):
         """
@@ -473,20 +475,19 @@ class EventSerializer(LocalizedSerializer):
         return FileObjectSerializer(obj.images, many=True).data
 
     def get_datetimes(self, obj):
-        #import pdb;pdb.set_trace()
         datetimes = []
         for item in obj['datetimes']:
             if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
                 datetimes.append(item)
         return EventTimeSerializer(datetimes, many=True, required=False).data
 
-    def get_datetime(self, obj):
-        datetimes = []
-        for item in obj['datetimes']:
-            if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
-                datetimes.append(item)
-                break
-        return EventTimeSerializer(datetimes, many=True, required=False).data
+    # def get_datetime(self, obj):
+    #     datetimes = []
+    #     for item in obj['datetimes']:
+    #         if string_to_date(str(item['date']), settings.DATE_STRING_FIELD_FORMAT) >= datetime.now().date():
+    #             datetimes.append(item)
+    #             break
+    #     return EventTimeSerializer(datetimes, many=True, required=False).data
 
     def get_rejection_reason(self, obj):
         if obj.rejection_reasons.count() == 0:

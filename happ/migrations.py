@@ -225,7 +225,7 @@ def migration__event_to_feed__0023():
 
 def migration__user_to_quickblox__0024():
     users = get_db()['user']
-    for user in users.find({ "quickblox_login": { '$not': { '$exists': true } } }):
+    for user in users.find({ "quickblox_login": { '$not': { '$exists': True } } }):
         quickblox_password = make_random_password()
         quickblox_user = quickblox_signup(user.get('username'), quickblox_password)
         if 'errors' not in quickblox_user:
