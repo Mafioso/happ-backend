@@ -569,29 +569,35 @@ class FeedSerializer(serializers.DocumentSerializer):
     def get_min_price(self, obj):
         result = 0
         request = self.context.get("request")
-        user_currency = request.user.settings.currency.code
-        event_currency = obj['event']['currency'].code
-        if user_currency == event_currency:
+        if not request.user.settings.currency:
             return obj['event']['min_price']
         else:
-            if obj['event']['min_price']:
-                result = yahoo.exchange(source=event_currency,
-                                target=user_currency,
-                                amount=int(obj['event']['min_price']))
+            user_currency = request.user.settings.currency.code
+            event_currency = obj['event']['currency'].code
+            if user_currency == event_currency:
+                return obj['event']['min_price']
+            else:
+                if obj['event']['min_price']:
+                    result = yahoo.exchange(source=event_currency,
+                                    target=user_currency,
+                                    amount=int(obj['event']['min_price']))
         return result
 
     def get_max_price(self, obj):
         result = 0
         request = self.context.get("request")
-        user_currency = request.user.settings.currency.code
-        event_currency = obj['event']['currency'].code
-        if user_currency == event_currency:
+        if not request.user.settings.currency:
             return obj['event']['max_price']
         else:
-            if obj['event']['max_price']:
-                result = yahoo.exchange(source=event_currency,
-                                target=user_currency,
-                                amount=int(obj['event']['max_price']))
+            user_currency = request.user.settings.currency.code
+            event_currency = obj['event']['currency'].code
+            if user_currency == event_currency:
+                return obj['event']['max_price']
+            else:
+                if obj['event']['max_price']:
+                    result = yahoo.exchange(source=event_currency,
+                                    target=user_currency,
+                                    amount=int(obj['event']['max_price']))
         return result
         #return obj['event']['max_price']
 
@@ -642,8 +648,11 @@ class FeedSerializer(serializers.DocumentSerializer):
 
     def get_currency(self, obj):
         request = self.context.get("request")
-        user_currency = request.user.settings.currency
-        return CurrencySerializer(user_currency, read_only=True).data
+        if not request.user.settings.currency:
+            return CurrencySerializer(obj['event']['currency'], read_only=True).data
+        else:
+            user_currency = request.user.settings.currency
+            return CurrencySerializer(user_currency, read_only=True).data
 
     def get_author(self, obj):
         return AuthorSerializer(obj['event']['author'], read_only=True).data

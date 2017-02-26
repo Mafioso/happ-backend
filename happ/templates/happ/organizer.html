@@ -22,15 +22,20 @@
         <div class="animate form login_form">
           <section class="login_content">
             <form id="auth" action="{% url 'admin-login-api' %}" method="POST">
-              <h1>Теперь вы можете использовать режим организатора</h1>
-
+              <h3>HAPP</h3>
+              {% if error_message %}
+                <p>{{error_message}}</p>
+              {% else %}
+              <p>Вы подтвердили ваш email - {{email}}</p>
+              <p>Теперь вы можете использовать режим организатора</p>
+              {% endif %}
               <div class="clearfix"></div>
 
               <div class="separator">
 
                 <div>
                   <h1><i class="fa fa-feed"></i> HAPP</h1>
-                  <p>©2016 Все права защищены. Happ app! Developed by JarviSystem</p>
+                  <p>©2016 Все права защищены. Happ app!</p>
                 </div>
               </div>
             </form>

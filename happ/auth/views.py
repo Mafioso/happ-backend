@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 from django.conf import settings
@@ -8,6 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
+from django.views.generic import TemplateView
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
@@ -262,38 +265,51 @@ class EmailConfirmationRequest(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class EmailConfirmation(APIView):
+class EmailConfirmation(TemplateView):
+    template_name='happ/organizer.html'
 
-    def get(self, request, format=None):
+    def get_context_data(self, **kwargs):
+
+    #def get(self, request, format=None):
         """
         Confirms email and assigns Organizer role to user
         """
-        key = request.query_params.get('key', None)
+        context = super(EmailConfirmation, self).get_context_data(**kwargs)
         #import pdb;pdb.set_trace()
+        key = self.request.GET.get('key', None)
+        #
         if not key:
-            return Response(
-                {'error_message': _('Confirmation key is not provided.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            context['error_message'] = u"Не предоставлен ключ активации"
+            return context
+            # return context Response(
+            #     {'error_message': _('Confirmation key is not provided.')},
+            #     status=status.HTTP_400_BAD_REQUEST
+            # )
         try:
             user = User.objects.get(confirmation_key=key)
         except User.DoesNotExist:
-            return Response(
-                {'error_message': _('Wrong confirmation key.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            context['error_message'] = u"Неправильный ключ активации"
+            return context
+            # return Response(
+            #     {'error_message': _('Wrong confirmation key.')},
+            #     status=status.HTTP_400_BAD_REQUEST
+            # )
         if datetime.datetime.now() > user.confirmation_key_expires:
-            return Response(
-                {'error_message': _('Confirmation key expired.')},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            context['error_message'] = u"Истек срок действия ключа активации"
+            return context
+            # return Response(
+            #     {'error_message': _('Confirmation key expired.')},
+            #     status=status.HTTP_400_BAD_REQUEST
+            # )
 
         user.confirmation_key = None
         user.confirmation_key_expires = None
         user.role = User.ORGANIZER
         user.save()
 
-        return Response(status=status.HTTP_200_OK, template_name='happ/organizer.html')
+        context['email'] = user.email
+
+        return context
 
 
 class AdminLogin(ObtainJSONWebToken):
